@@ -1,0 +1,199 @@
+[
+    {
+        "id": 1,
+        "name": "Table de massage",
+        "slug": "table-de-massage",
+        "category": "sante",
+        "categoryLabel": "Santé / Bien-être",
+        "price": 90,
+        "badge": "Populaire",
+        "photos": 7,
+        "description_courte": "Table de massage pliable à 3 zones - Hauteur réglable - Portable et légère",
+        "description_complete": "Table de massage pliable à 3 zones - Table de massage mobile - Lit pliable portable.\n\nTaille: 182 x 60 x 61cm\nPoids: 18,05 Kilogrammes\nStyle: Contemporain\nAssemblage requis: Non\n\nConfort ultime : vous méritez une pure détente ! Notre table de massage offre une expérience de couchage incomparable grâce à son rembourrage extra épais en mousse à cellules fines.\n\nQue ce soit comme chaise de maquillage, pour le tatouage, pour les soins du corps ou comme table de thérapie, notre table pliante vous permet de vous sentir comme sur un nuage.\n\nMobilité et stabilité : en déplacement et pourtant parfaitement équipé ? Notre table de massage pliable, équipée d'un cadre en aluminium léger, est idéale pour les salons de beauté mobiles.",
+        "caracteristiques": [
+            "Dimensions: 182 x 60 x 61cm",
+            "Poids: 18kg",
+            "3 zones pliables",
+            "Appui-tête réglable",
+            "Rembourrage mousse cellulaire",
+            "Résistant à l'huile et l'eau"
+        ],
+        "thumbnail": "images/products/table-massage-1.jpg",
+        "images": [
+            "images/products/table-massage-1.jpg",
+            "images/products/table-massage-2.jpg",
+            "images/products/table-massage-3.jpg"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Vélo d'appartement",
+        "slug": "velo-appartement",
+        "category": "sport",
+        "categoryLabel": "Sport / Fitness",
+        "price": 150,
+        "badge": "Nouveau",
+        "photos": 5,
+        "description_courte": "Vélo d'appartement avec écran LCD - Résistance magnétique réglable - Silencieux",
+        "description_complete": "Vélo d'appartement professionnel pour entraînement à domicile.\n\nCaractéristiques principales:\n- Écran LCD multifonction (temps, distance, calories, vitesse)\n- Résistance magnétique à 8 niveaux\n- Selle réglable en hauteur et profondeur\n- Pédales antidérapantes avec sangles\n- Roulettes de transport intégrées\n- Capteurs de fréquence cardiaque sur le guidon\n\nIdéal pour un entraînement cardio efficace à domicile.",
+        "caracteristiques": [
+            "Écran LCD multifonction",
+            "8 niveaux de résistance",
+            "Selle ajustable",
+            "Poids max utilisateur: 120kg",
+            "Dimensions: 85 x 45 x 115cm",
+            "Silencieux"
+        ],
+        "thumbnail": "images/products/velo-1.jpg",
+        "images": [
+            "images/products/velo-1.jpg",
+            "images/products/velo-2.jpg"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Canapé convertible",
+        "slug": "canape-convertible",
+        "category": "mobilier",
+        "categoryLabel": "Mobilier",
+        "price": 350,
+        "badge": null,
+        "photos": 6,
+        "description_courte": "Canapé-lit 3 places en tissu - Mécanisme clic-clac - Rangement intégré",
+        "description_complete": "Canapé convertible élégant et pratique pour votre salon.\n\nCaractéristiques:\n- 3 places confortables\n- Mécanisme clic-clac facile à utiliser\n- Coffre de rangement sous le siège\n- Tissu doux et résistant\n- Structure en bois massif\n- Pieds en métal chromé\n\nParfait pour accueillir des invités ou optimiser l'espace de votre appartement.",
+        "caracteristiques": [
+            "Dimensions canapé: 200 x 90 x 85cm",
+            "Dimensions lit: 200 x 120cm",
+            "Tissu polyester haute résistance",
+            "Coffre de rangement",
+            "Mécanisme clic-clac",
+            "Coloris: Gris anthracite"
+        ],
+        "thumbnail": "images/products/canape-1.jpg",
+        "images": [
+            "images/products/canape-1.jpg",
+            "images/products/canape-2.jpg"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Machine à café expresso",
+        "slug": "machine-cafe-expresso",
+        "category": "electromenager",
+        "categoryLabel": "Électroménager",
+        "price": 120,
+        "badge": "Promo",
+        "photos": 4,
+        "description_courte": "Machine à café automatique - Pression 15 bars - Mousseur à lait intégré",
+        "description_complete": "Machine à café expresso professionnelle pour un café de qualité barista à la maison.\n\nFonctionnalités:\n- Pression 15 bars pour un expresso parfait\n- Mousseur à lait vapeur\n- Réservoir d'eau 1.5L amovible\n- Plateau chauffe-tasses\n- Compatible café moulu et dosettes\n- Arrêt automatique\n\nPréparez espresso, cappuccino, latte et bien plus encore.",
+        "caracteristiques": [
+            "Pression: 15 bars",
+            "Réservoir: 1.5L",
+            "Mousseur à lait vapeur",
+            "Chauffe-tasses",
+            "Puissance: 1450W",
+            "Coloris: Noir/Inox"
+        ],
+        "thumbnail": "images/products/cafe-1.jpg",
+        "images": [
+            "images/products/cafe-1.jpg",
+            "images/products/cafe-2.jpg"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Lampadaire LED",
+        "slug": "lampadaire-led",
+        "category": "decoration",
+        "categoryLabel": "Décoration",
+        "price": 75,
+        "badge": null,
+        "photos": 3,
+        "description_courte": "Lampadaire sur pied LED - Intensité réglable - Design moderne minimaliste",
+        "description_complete": "Lampadaire LED moderne pour illuminer votre intérieur avec style.\n\nCaractéristiques:\n- Éclairage LED économique\n- Intensité lumineuse réglable (variateur)\n- 3 températures de couleur (chaud, neutre, froid)\n- Hauteur ajustable\n- Base stable\n- Design épuré et contemporain\n\nParfait pour salon, chambre ou bureau.",
+        "caracteristiques": [
+            "Hauteur: 150-180cm ajustable",
+            "LED 20W (équivalent 100W)",
+            "3 modes de couleur",
+            "Variateur intégré",
+            "Base en marbre",
+            "Coloris: Or/Blanc"
+        ],
+        "thumbnail": "images/products/lampe-1.jpg",
+        "images": [
+            "images/products/lampe-1.jpg"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Tapis de yoga premium",
+        "slug": "tapis-yoga-premium",
+        "category": "sport",
+        "categoryLabel": "Sport / Fitness",
+        "price": 45,
+        "badge": null,
+        "photos": 4,
+        "description_courte": "Tapis de yoga antidérapant - Épaisseur 6mm - Matériaux écologiques",
+        "description_complete": "Tapis de yoga professionnel pour une pratique confortable et stable.\n\nCaractéristiques:\n- Surface antidérapante double face\n- Épaisseur 6mm pour protéger les articulations\n- Matériaux TPE écologiques et non toxiques\n- Léger et facile à transporter\n- Sangle de transport incluse\n- Entretien facile\n\nIdéal pour yoga, pilates, stretching et méditation.",
+        "caracteristiques": [
+            "Dimensions: 183 x 61cm",
+            "Épaisseur: 6mm",
+            "Matériau: TPE écologique",
+            "Antidérapant double face",
+            "Poids: 900g",
+            "Sangle incluse"
+        ],
+        "thumbnail": "images/products/yoga-1.jpg",
+        "images": [
+            "images/products/yoga-1.jpg"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Étagère murale",
+        "slug": "etagere-murale",
+        "category": "decoration",
+        "categoryLabel": "Décoration",
+        "price": 55,
+        "badge": null,
+        "photos": 5,
+        "description_courte": "Set de 3 étagères murales flottantes - Bois et métal - Style industriel",
+        "description_complete": "Ensemble de 3 étagères murales au design industriel élégant.\n\nCaractéristiques:\n- 3 tailles différentes (grande, moyenne, petite)\n- Plateaux en bois de pin massif\n- Supports en métal noir mat\n- Fixation murale invisible\n- Style industriel/loft\n- Montage facile (visserie incluse)\n\nParfait pour exposer livres, plantes, photos et objets décoratifs.",
+        "caracteristiques": [
+            "Grande: 60 x 20 x 15cm",
+            "Moyenne: 45 x 17 x 15cm",
+            "Petite: 30 x 14 x 15cm",
+            "Bois de pin massif",
+            "Supports métal noir",
+            "Charge max: 10kg chacune"
+        ],
+        "thumbnail": "images/products/etagere-1.jpg",
+        "images": [
+            "images/products/etagere-1.jpg"
+        ]
+    },
+    {
+        "id": 8,
+        "name": "Robot aspirateur",
+        "slug": "robot-aspirateur",
+        "category": "electromenager",
+        "categoryLabel": "Électroménager",
+        "price": 180,
+        "badge": "Best-seller",
+        "photos": 4,
+        "description_courte": "Robot aspirateur intelligent - Navigation laser - Application mobile",
+        "description_complete": "Robot aspirateur dernière génération pour un nettoyage automatique et efficace.\n\nFonctionnalités avancées:\n- Navigation laser LiDAR précise\n- Cartographie automatique de votre maison\n- Contrôle via application mobile\n- Compatible Alexa et Google Home\n- Aspiration puissante 2500Pa\n- Autonomie 120 minutes\n- Retour automatique à la base de charge\n\nParfait pour les sols durs et les tapis.",
+        "caracteristiques": [
+            "Navigation: LiDAR",
+            "Puissance: 2500Pa",
+            "Autonomie: 120 min",
+            "Niveau sonore: 55dB",
+            "Contrôle: App + Voix",
+            "Bac à poussière: 600ml"
+        ],
+        "thumbnail": "images/products/robot-1.jpg",
+        "images": [
+            "images/products/robot-1.jpg"
+        ]
+    }
+]
