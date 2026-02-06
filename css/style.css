@@ -11,9 +11,9 @@
     --text: #333;
     --text-light: #666;
     --white: #fff;
-    --shadow-sm: 0 2px 20px rgba(0,0,0,.08);
-    --shadow-md: 0 4px 30px rgba(0,0,0,.08);
-    --shadow-lg: 0 12px 40px rgba(0,0,0,.15);
+    --shadow-sm: 0 2px 20px rgba(0, 0, 0, .08);
+    --shadow-md: 0 4px 30px rgba(0, 0, 0, .08);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, .15);
     --transition: all .3s ease;
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -28,6 +28,15 @@
     --text: #e0e0e0;
     --text-light: #999;
     --white: #2a2a2a;
+    --input-bg: #333;
+    --input-border: #444;
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea {
+    background-color: var(--input-bg);
+    color: var(--text);
+    border-color: var(--input-border);
 }
 
 /* Reset & Base */
@@ -47,7 +56,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Cormorant Garamond', serif;
 }
 
@@ -1176,6 +1190,7 @@ footer {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1183,19 +1198,32 @@ footer {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 4px 20px rgba(37, 211, 102, .4);
     }
+
     50% {
         box-shadow: 0 4px 30px rgba(37, 211, 102, .7);
     }
@@ -1206,6 +1234,7 @@ footer {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1243,7 +1272,7 @@ footer {
         grid-template-columns: 1fr;
         gap: 40px;
     }
-    
+
     .product-gallery {
         position: relative;
         top: 0;
@@ -1256,54 +1285,54 @@ footer {
         gap: 20px;
         padding: 15px 20px;
     }
-    
+
     .nav-links {
         gap: 20px;
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .search-input {
         width: 200px;
     }
-    
+
     .container {
         padding: 40px 20px;
     }
-    
+
     .products-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .hero {
         padding: 80px 20px 60px;
     }
-    
+
     .hero-stats {
         gap: 30px;
     }
-    
+
     .whatsapp-float {
         bottom: 20px;
         right: 20px;
         width: 55px;
         height: 55px;
     }
-    
+
     .whatsapp-menu {
         bottom: 85px;
         right: 20px;
     }
-    
+
     .cart-sidebar {
         width: 100%;
         right: -100%;
     }
-    
+
     .product-contact-buttons {
         flex-direction: column;
     }
-    
+
     .btn-primary,
     .btn-whatsapp,
     .btn-cart,
@@ -1316,19 +1345,19 @@ footer {
     .hero h1 {
         font-size: 2rem;
     }
-    
+
     .section-title {
         font-size: 1.8rem;
     }
-    
+
     .product-detail-title {
         font-size: 2rem;
     }
-    
+
     .categories-filter {
         gap: 10px;
     }
-    
+
     .category-btn {
         padding: 10px 20px;
         font-size: 0.8rem;
