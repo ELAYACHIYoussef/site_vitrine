@@ -36,15 +36,247 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Chargement des Produits
 // ========================================
 async function loadProducts() {
-    try {
-        const response = await fetch('data/products.json');
-        App.products = await response.json();
-        renderProducts(App.products);
-        updateStats();
-    } catch (error) {
-        console.error('Erreur chargement produits:', error);
-        showToast('Erreur de chargement des produits', 'error');
+    // Données intégrées pour éviter les problèmes CORS en local
+    App.products = [
+    {
+        "id":  1,
+        "name":  "Table de massage",
+        "slug":  "table-de-massage",
+        "category":  "sante",
+        "categoryLabel":  "Santé / Bien-être",
+        "price":  90,
+        "badge":  "Populaire",
+        "photos":  7,
+        "description_courte":  "Table de massage pliable à 3 zones - Lit portable - Hauteur réglable - Idéale pour massage, maquillage, tatouage - Taille 182x60x61cm - Poids 18kg - Rembourrage mousse cellulaire - Appui-tête réglable",
+        "description_complete":  "Table de massage pliable à 3 zones - Lit portable - Hauteur réglable - Idéale pour massage, maquillage, tatouage - Taille 182x60x61cm - Poids 18kg - Rembourrage mousse cellulaire - Appui-tête réglable",
+        "caracteristiques":  [
+                                 "Dimensions: 182 x 60 x 61cm",
+                                 "Poids: 18kg",
+                                 "3 zones pliables",
+                                 "Appui-tête réglable",
+                                 "Rembourrage mousse cellulaire",
+                                 "Résistant à l'huile et l'eau"
+                             ],
+        "thumbnail":  "images/products/product_1.jpg",
+        "images":  [
+                       "images/products/product_1.jpg",
+                       "images/products/product_2.jpg",
+                       "images/products/product_3.jpg",
+                       "images/products/product_4.jpg",
+                       "images/products/product_5.jpg",
+                       "images/products/product_6.jpg",
+                       "images/products/product_7.jpg"
+                   ]
+    },
+    {
+        "id":  2,
+        "name":  "LEADZM Fauteuil Relax avec Fonction électrique Massage",
+        "slug":  "leadzm-fauteuil-relax-avec-fonction-lectrique-massage",
+        "category":  "mobilier",
+        "categoryLabel":  "Maison / Confort",
+        "price":  280,
+        "badge":  "Nouveau",
+        "photos":  10,
+        "description_courte":  "Fauteuil relax massage électrique - Rotation 360° - Massage 2 points + chauffage - Inclinaison jusqu'à 160° - 2 porte-gobelets - Poches de rangement - Dimensions: 63.5x90x102cm - Poids 26kg",
+        "description_complete":  "Fauteuil relax massage électrique - Rotation 360° - Massage 2 points + chauffage - Inclinaison jusqu'à 160° - 2 porte-gobelets - Poches de rangement - Dimensions: 63.5x90x102cm - Poids 26kg",
+        "caracteristiques":  [
+                                 "Écran LCD multifonction",
+                                 "8 niveaux de résistance",
+                                 "Selle ajustable",
+                                 "Poids max utilisateur: 120kg",
+                                 "Dimensions: 85 x 45 x 115cm",
+                                 "Silencieux"
+                             ],
+        "thumbnail":  "images/products/product_8.jpg",
+        "images":  [
+                       "images/products/product_8.jpg",
+                       "images/products/product_9.jpg",
+                       "images/products/product_10.jpg",
+                       "images/products/product_11.jpg",
+                       "images/products/product_12.jpg",
+                       "images/products/product_13.jpg",
+                       "images/products/product_14.jpg",
+                       "images/products/product_15.jpg",
+                       "images/products/product_16.jpg",
+                       "images/products/product_17.jpg"
+                   ]
+    },
+    {
+        "id":  3,
+        "name":  "Fauteuil Inclinable",
+        "slug":  "fauteuil-inclinable",
+        "category":  "mobilier",
+        "categoryLabel":  "Maison / Confort",
+        "price":  250,
+        "badge":  null,
+        "photos":  5,
+        "description_courte":  "Fauteuil inclinable massage électrique - 4 points massage dossier + 2 vibrations siège - Chauffage - Inclinaison 135° - Matériau PU - Poche de rangement - Dimensions: 90x63.5x102cm - Poids 26kg",
+        "description_complete":  "Fauteuil inclinable massage électrique - 4 points massage dossier + 2 vibrations siège - Chauffage - Inclinaison 135° - Matériau PU - Poche de rangement - Dimensions: 90x63.5x102cm - Poids 26kg",
+        "caracteristiques":  [
+                                 "Dimensions canapé: 200 x 90 x 85cm",
+                                 "Dimensions lit: 200 x 120cm",
+                                 "Tissu polyester haute résistance",
+                                 "Coffre de rangement",
+                                 "Mécanisme clic-clac",
+                                 "Coloris: Gris anthracite"
+                             ],
+        "thumbnail":  "images/products/product_18.jpg",
+        "images":  [
+                       "images/products/product_18.jpg",
+                       "images/products/product_19.jpg",
+                       "images/products/product_20.jpg",
+                       "images/products/product_21.jpg",
+                       "images/products/product_22.jpg"
+                   ]
+    },
+    {
+        "id":  4,
+        "name":  "Cuisinière à gaz à 5 flammes",
+        "slug":  "cuisini-re-gaz-5-flammes",
+        "category":  "electromenager",
+        "categoryLabel":  "Électroménager",
+        "price":  350,
+        "badge":  "Promo",
+        "photos":  5,
+        "description_courte":  "Cuisinière gaz 5 brûleurs - Acier inoxydable - Feu puissant - Allumage pulsé - Protection extinction flamme - Dimensions: 49x49x79cm - Facile à nettoyer - Usage domestique et commercial",
+        "description_complete":  "Cuisinière gaz 5 brûleurs - Acier inoxydable - Feu puissant - Allumage pulsé - Protection extinction flamme - Dimensions: 49x49x79cm - Facile à nettoyer - Usage domestique et commercial",
+        "caracteristiques":  [
+                                 "Pression: 15 bars",
+                                 "Réservoir: 1.5L",
+                                 "Mousseur à lait vapeur",
+                                 "Chauffe-tasses",
+                                 "Puissance: 1450W",
+                                 "Coloris: Noir/Inox"
+                             ],
+        "thumbnail":  "images/products/product_23.jpg",
+        "images":  [
+                       "images/products/product_23.jpg",
+                       "images/products/product_24.jpg",
+                       "images/products/product_25.jpg",
+                       "images/products/product_26.jpg",
+                       "images/products/product_27.jpg"
+                   ]
+    },
+    {
+        "id":  5,
+        "name":  "Réchaud à gaz à 4 brûleurs",
+        "slug":  "r-chaud-gaz-4-br-leurs",
+        "category":  "electromenager",
+        "categoryLabel":  "Électroménager",
+        "price":  180,
+        "badge":  null,
+        "photos":  9,
+        "description_courte":  "Réchaud gaz 4 brûleurs sur pied - 50cm - Double étagère + couvercle - Fer haute qualité - Contrôle indépendant - Pare-brise - Dimensions: 49x49x79cm - Poids 9kg - Idéal extérieur",
+        "description_complete":  "Réchaud gaz 4 brûleurs sur pied - 50cm - Double étagère + couvercle - Fer haute qualité - Contrôle indépendant - Pare-brise - Dimensions: 49x49x79cm - Poids 9kg - Idéal extérieur",
+        "caracteristiques":  [
+                                 "Hauteur: 150-180cm ajustable",
+                                 "LED 20W (équivalent 100W)",
+                                 "3 modes de couleur",
+                                 "Variateur intégré",
+                                 "Base en marbre",
+                                 "Coloris: Or/Blanc"
+                             ],
+        "thumbnail":  "images/products/product_28.jpg",
+        "images":  [
+                       "images/products/product_28.jpg",
+                       "images/products/product_29.jpg",
+                       "images/products/product_30.jpg",
+                       "images/products/product_31.jpg",
+                       "images/products/product_32.jpg",
+                       "images/products/product_33.jpg",
+                       "images/products/product_34.jpg",
+                       "images/products/product_35.jpg",
+                       "images/products/product_36.jpg"
+                   ]
+    },
+    {
+        "id":  6,
+        "name":  "Évier",
+        "slug":  "-vier",
+        "category":  "electromenager",
+        "categoryLabel":  "Électroménager",
+        "price":  420,
+        "badge":  null,
+        "photos":  6,
+        "description_courte":  "Évier cuisine intelligent 80cm - Acier inox - Robinet cascade affichage numérique - Contrôle température LED - Profondeur 21cm - Revêtement nano - Planche à découper + panier égouttoir inclus",
+        "description_complete":  "Évier cuisine intelligent 80cm - Acier inox - Robinet cascade affichage numérique - Contrôle température LED - Profondeur 21cm - Revêtement nano - Planche à découper + panier égouttoir inclus",
+        "caracteristiques":  [
+                                 "Dimensions: 183 x 61cm",
+                                 "Épaisseur: 6mm",
+                                 "Matériau: TPE écologique",
+                                 "Antidérapant double face",
+                                 "Poids: 900g",
+                                 "Sangle incluse"
+                             ],
+        "thumbnail":  "images/products/product_37.jpg",
+        "images":  [
+                       "images/products/product_37.jpg",
+                       "images/products/product_38.jpg",
+                       "images/products/product_39.jpg",
+                       "images/products/product_40.jpg",
+                       "images/products/product_41.jpg",
+                       "images/products/product_42.jpg"
+                   ]
+    },
+    {
+        "id":  7,
+        "name":  "Vélo pour garçon",
+        "slug":  "v-lo-pour-gar-on",
+        "category":  "sport",
+        "categoryLabel":  "Sport / Fitness",
+        "price":  150,
+        "badge":  null,
+        "photos":  5,
+        "description_courte":  "VTT 20 pouces 6 vitesses - Double frein disque - Cadre acier carbone - Selle confortable cuir+éponge - Garde-boue - Porte-gobelet - Cloche boussole - Charge max 85kg - Couleur rouge",
+        "description_complete":  "VTT 20 pouces 6 vitesses - Double frein disque - Cadre acier carbone - Selle confortable cuir+éponge - Garde-boue - Porte-gobelet - Cloche boussole - Charge max 85kg - Couleur rouge",
+        "caracteristiques":  [
+                                 "Grande: 60 x 20 x 15cm",
+                                 "Moyenne: 45 x 17 x 15cm",
+                                 "Petite: 30 x 14 x 15cm",
+                                 "Bois de pin massif",
+                                 "Supports métal noir",
+                                 "Charge max: 10kg chacune"
+                             ],
+        "thumbnail":  "images/products/product_43.jpg",
+        "images":  [
+                       "images/products/product_43.jpg",
+                       "images/products/product_44.jpg",
+                       "images/products/product_45.jpg",
+                       "images/products/product_46.jpg",
+                       "images/products/product_47.jpg"
+                   ]
+    },
+    {
+        "id":  8,
+        "name":  "Vases de mariage",
+        "slug":  "vases-de-mariage",
+        "category":  "decoration",
+        "categoryLabel":  "Divers",
+        "price":  80,
+        "badge":  "Best-seller",
+        "photos":  5,
+        "description_courte":  "Set 3 vases carton mariage - Hauteurs 40+60+80cm - Présentoir fleurs pliable - Blanc laiteux - Diamètre 30cm - Charge max 50kg/pièce - Idéal centre de table mariage/fête",
+        "description_complete":  "Set 3 vases carton mariage - Hauteurs 40+60+80cm - Présentoir fleurs pliable - Blanc laiteux - Diamètre 30cm - Charge max 50kg/pièce - Idéal centre de table mariage/fête",
+        "caracteristiques":  [
+                                 "Navigation: LiDAR",
+                                 "Puissance: 2500Pa",
+                                 "Autonomie: 120 min",
+                                 "Niveau sonore: 55dB",
+                                 "Contrôle: App + Voix",
+                                 "Bac à poussière: 600ml"
+                             ],
+        "thumbnail":  "images/products/product_48.jpg",
+        "images":  [
+                       "images/products/product_48.jpg",
+                       "images/products/product_49.jpg",
+                       "images/products/product_50.jpg",
+                       "images/products/product_51.jpg",
+                       "images/products/product_52.jpg"
+                   ]
     }
+];
+    renderProducts(App.products);
+    updateStats();
 }
 
 function renderProducts(products) {

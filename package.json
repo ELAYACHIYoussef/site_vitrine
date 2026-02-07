@@ -1,0 +1,21 @@
+{
+  "name": "site_vitrine",
+  "version": "1.0.0",
+  "description": "Wwch youssef \r 7atha hna\r http://localhost:8000 hahiya a zbi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "google-auth-library": "^10.5.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "sqlite3": "^5.1.7"
+  }
+}

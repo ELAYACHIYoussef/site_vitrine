@@ -48,10 +48,8 @@
         <div class="nav-content">
             <a href="#" onclick="showHome(); return false;" class="logo">Collection</a>
 
-            <ul class="nav-links">
-                <li><a href="#" onclick="showHome(); return false;">Accueil</a></li>
-                <li><a href="#produits">Produits</a></li>
-                <li><a href="#contact">Contact</a></li>
+            <ul class="nav-links" id="navLinks">
+                <!-- Dynamic links injected by auth.js -->
             </ul>
 
             <div class="nav-icons">
@@ -262,6 +260,10 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JavaScript -->
+    <!-- Auth Module -->
+    <script src="js/auth.js"></script>
+
+    <!-- Main Application Script -->
     <script src="js/app.js"></script>
 </body>
 
