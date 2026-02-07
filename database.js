@@ -83,6 +83,20 @@ const initDb = () => {
                     else console.log('Favorites table ready.');
                 });
 
+                // Create Password Reset Tokens Table
+                db.run(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    token TEXT NOT NULL UNIQUE,
+                    expires_at DATETIME NOT NULL,
+                    used BOOLEAN DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )`, (err) => {
+                    if (err) console.error('Error creating password_reset_tokens table:', err);
+                    else console.log('Password reset tokens table ready.');
+                });
+
                 // Create Cart Table
                 db.run(`CREATE TABLE IF NOT EXISTS cart (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,10 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const { db, initDb } = require('./database');
 
@@ -27,8 +31,63 @@ const ADMIN_EMAILS = process.env.ADMIN_EMAILS
     ? process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase())
     : [];
 
-// Middleware
-app.use(cors());
+// Email Configuration (Nodemailer)
+const emailTransporter = process.env.EMAIL_HOST ? nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: process.env.EMAIL_SECURE === 'true',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+}) : null;
+
+// Security Middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'", "https://accounts.google.com"]
+        }
+    }
+}));
+
+// CORS Configuration
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production' 
+        ? process.env.ALLOWED_ORIGINS?.split(',') || 'https://yourdomain.com'
+        : '*',
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// Rate Limiting
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 tentatives max
+    message: { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requêtes max
+    message: { error: 'Trop de requêtes. Réessayez plus tard.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Apply rate limiting
+app.use('/api/auth', authLimiter);
+app.use('/api', apiLimiter);
+
+// Body Parser
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
@@ -150,8 +209,130 @@ app.post('/api/auth/google', async (req, res) => {
     }
 });
 
+// ========== PASSWORD RESET ROUTES ==========
+
+// Request password reset
+app.post('/api/auth/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    
+    if (!email) {
+        return res.status(400).json({ error: 'Email requis' });
+    }
+
+    try {
+        // Check if user exists
+        db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
+            if (err) return res.status(500).json({ error: err.message });
+            
+            // Always return success message (security best practice)
+            // Don't reveal if email exists or not
+            if (!user) {
+                return res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
+            }
+
+            // Generate reset token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+            // Save token to database
+            db.run(
+                `INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)`,
+                [user.id, resetToken, expiresAt.toISOString()],
+                async (err) => {
+                    if (err) {
+                        console.error('Error saving reset token:', err);
+                        return res.status(500).json({ error: 'Erreur serveur' });
+                    }
+
+                    // Send email if configured
+                    if (emailTransporter) {
+                        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password.html?token=${resetToken}`;
+                        
+                        try {
+                            await emailTransporter.sendMail({
+                                from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                                to: email,
+                                subject: 'Réinitialisation de votre mot de passe',
+                                html: `
+                                    <h2>Réinitialisation de mot de passe</h2>
+                                    <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
+                                    <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+                                    <a href="${resetUrl}" style="padding: 10px 20px; background: #0066cc; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">Réinitialiser mon mot de passe</a>
+                                    <p>Ce lien expire dans 1 heure.</p>
+                                    <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
+                                `
+                            });
+                            console.log(`Password reset email sent to ${email}`);
+                        } catch (emailErr) {
+                            console.error('Error sending email:', emailErr);
+                        }
+                    } else {
+                        console.log(`Reset token for ${email}: ${resetToken}`);
+                        console.log('Email not configured. Token logged to console.');
+                    }
+
+                    res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
+                }
+            );
+        });
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+// Reset password with token
+app.post('/api/auth/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+        return res.status(400).json({ error: 'Token et nouveau mot de passe requis' });
+    }
+
+    if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 6 caractères' });
+    }
+
+    try {
+        // Find valid token
+        db.get(
+            `SELECT * FROM password_reset_tokens 
+             WHERE token = ? AND used = 0 AND datetime(expires_at) > datetime('now')`,
+            [token],
+            async (err, resetToken) => {
+                if (err) return res.status(500).json({ error: err.message });
+                
+                if (!resetToken) {
+                    return res.status(400).json({ error: 'Token invalide ou expiré' });
+                }
+
+                // Hash new password
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+                // Update password
+                db.run(
+                    `UPDATE users SET password = ? WHERE id = ?`,
+                    [hashedPassword, resetToken.user_id],
+                    (err) => {
+                        if (err) return res.status(500).json({ error: err.message });
+
+                        // Mark token as used
+                        db.run(`UPDATE password_reset_tokens SET used = 1 WHERE id = ?`, [resetToken.id]);
+
+                        res.json({ message: 'Mot de passe réinitialisé avec succès' });
+                    }
+                );
+            }
+        );
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
 // ========== PRODUCTS ROUTES ==========
 
+// Get all products
 app.get('/api/products', (req, res) => {
     db.all("SELECT * FROM products", [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -161,6 +342,66 @@ app.get('/api/products', (req, res) => {
             images: JSON.parse(p.images || '[]')
         }));
         res.json(products);
+    });
+});
+
+// Search products with filters
+app.get('/api/products/search', (req, res) => {
+    const { q, category, minPrice, maxPrice, sortBy } = req.query;
+    
+    let sql = "SELECT * FROM products WHERE 1=1";
+    let params = [];
+    
+    // Search query
+    if (q) {
+        sql += " AND (name LIKE ? OR description_courte LIKE ? OR categoryLabel LIKE ?)";
+        const searchTerm = `%${q}%`;
+        params.push(searchTerm, searchTerm, searchTerm);
+    }
+    
+    // Category filter
+    if (category) {
+        sql += " AND category = ?";
+        params.push(category);
+    }
+    
+    // Price range
+    if (minPrice) {
+        sql += " AND price >= ?";
+        params.push(parseFloat(minPrice));
+    }
+    if (maxPrice) {
+        sql += " AND price <= ?";
+        params.push(parseFloat(maxPrice));
+    }
+    
+    // Sorting
+    if (sortBy === 'price_asc') {
+        sql += " ORDER BY price ASC";
+    } else if (sortBy === 'price_desc') {
+        sql += " ORDER BY price DESC";
+    } else if (sortBy === 'name') {
+        sql += " ORDER BY name ASC";
+    } else {
+        sql += " ORDER BY id DESC"; // Default: newest first
+    }
+    
+    db.all(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const products = rows.map(p => ({
+            ...p,
+            caracteristiques: JSON.parse(p.caracteristiques || '[]'),
+            images: JSON.parse(p.images || '[]')
+        }));
+        res.json(products);
+    });
+});
+
+// Get product categories (distinct)
+app.get('/api/products/categories', (req, res) => {
+    db.all("SELECT DISTINCT category, categoryLabel FROM products ORDER BY categoryLabel", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
     });
 });
 
