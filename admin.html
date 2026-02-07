@@ -117,6 +117,22 @@
             </div>
         </div>
 
+        <!-- Admin Management Section -->
+        <div class="form-card">
+            <h2>⚙️ Gestion des Administrateurs</h2>
+            <div class="form-group">
+                <label>Ajouter un administrateur par email</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="email" id="newAdminEmail" placeholder="email@example.com" style="flex: 1;">
+                    <button onclick="addAdmin()" class="product-cta">Ajouter Admin</button>
+                </div>
+                <small style="color: #666; margin-top: 5px; display: block;">
+                    L'utilisateur doit avoir un compte existant pour être promu administrateur.
+                </small>
+            </div>
+            <div id="adminsList" style="margin-top: 20px;"></div>
+        </div>
+
         <!-- Add Product Form -->
         <div class="form-card">
             <h2>Ajouter un Produit</h2>
@@ -175,6 +191,123 @@
 
     <script src="js/auth.js"></script>
     <script src="js/admin.js"></script>
+    <script>
+        // Admin Management Functions
+        async function loadAdmins() {
+            try {
+                const response = await fetch('/api/admin/admins', {
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+                if (!response.ok) throw new Error('Failed to load admins');
+                
+                const data = await response.json();
+                const adminsList = document.getElementById('adminsList');
+                
+                if (data.admins.length === 0) {
+                    adminsList.innerHTML = '<p style="color: #666;">Aucun administrateur pour le moment.</p>';
+                    return;
+                }
+                
+                let html = '<table class="products-table"><thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Actions</th></tr></thead><tbody>';
+                
+                data.admins.forEach(admin => {
+                    const currentUser = Auth.getUser();
+                    const isSelf = currentUser && currentUser.id === admin.id;
+                    
+                    html += `<tr>
+                        <td>${admin.id}</td>
+                        <td>${admin.username}</td>
+                        <td>${admin.email}</td>
+                        <td>
+                            ${isSelf ? 
+                                '<span style="color: #666; font-style: italic;">Vous</span>' : 
+                                `<button onclick="removeAdmin(${admin.id}, '${admin.email}')" class="delete-btn">Retirer</button>`
+                            }
+                        </td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                
+                if (data.configuredEmails.length > 0) {
+                    html += `<div style="margin-top: 15px; padding: 15px; background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 4px;">
+                        <strong>📋 Emails admin configurés (fichier .env):</strong><br>
+                        <small style="color: #666;">${data.configuredEmails.join(', ')}</small><br>
+                        <small style="color: #888; font-style: italic;">Ces utilisateurs recevront automatiquement le rôle admin lors de l'inscription.</small>
+                    </div>`;
+                }
+                
+                adminsList.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading admins:', error);
+                document.getElementById('adminsList').innerHTML = '<p style="color: #ff4444;">Erreur de chargement</p>';
+            }
+        }
+
+        async function addAdmin() {
+            const emailInput = document.getElementById('newAdminEmail');
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                alert('Veuillez entrer un email');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/admins', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${Auth.getToken()}`
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(result.message);
+                    emailInput.value = '';
+                    loadAdmins();
+                } else {
+                    alert(`Erreur: ${result.error}\n${result.info || ''}`);
+                }
+            } catch (error) {
+                console.error('Error adding admin:', error);
+                alert('Erreur lors de l\'ajout de l\'administrateur');
+            }
+        }
+
+        async function removeAdmin(userId, email) {
+            if (!confirm(`Êtes-vous sûr de vouloir retirer les droits admin à ${email} ?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/admin/admins/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(result.message);
+                    loadAdmins();
+                } else {
+                    alert(`Erreur: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error removing admin:', error);
+                alert('Erreur lors de la suppression');
+            }
+        }
+
+        // Load admins on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAdmins();
+        });
+    </script>
 </body>
 
 </html>

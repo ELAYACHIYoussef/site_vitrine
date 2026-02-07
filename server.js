@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -8,18 +9,23 @@ const { OAuth2Client } = require('google-auth-library');
 const { db, initDb } = require('./database');
 
 const app = express();
-const PORT = 3000;
-const JWT_SECRET = 'votre_super_secret_jwt_key_changez_la_en_prod';
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Google OAuth Client ID - REPLACE WITH YOUR OWN
-const GOOGLE_CLIENT_ID = 'VOTRE_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+// Validate required environment variables
+if (!JWT_SECRET) {
+    console.error('ERREUR: JWT_SECRET n\'est pas défini dans le fichier .env');
+    process.exit(1);
+}
 
-// Admin emails list
-const ADMIN_EMAILS = [
-    'ysf.elayachi@gmail.com',
-    'selmanim113@gmail.com'
-];
+// Google OAuth Client ID
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
+
+// Admin emails list from environment
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS 
+    ? process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase())
+    : [];
 
 // Middleware
 app.use(cors());
@@ -101,6 +107,13 @@ app.post('/api/auth/login', (req, res) => {
 
 // Google OAuth Login
 app.post('/api/auth/google', async (req, res) => {
+    // Check if Google OAuth is configured
+    if (!googleClient || !GOOGLE_CLIENT_ID) {
+        return res.status(503).json({ 
+            error: 'Authentification Google non configurée. Veuillez contacter l\'administrateur.' 
+        });
+    }
+
     const { credential } = req.body;
     try {
         const ticket = await googleClient.verifyIdToken({
@@ -358,7 +371,73 @@ app.post('/api/checkout', authenticateToken, (req, res) => {
     });
 });
 
+// ========== CONFIG ROUTES ==========
+
+// Get public configuration (pour le frontend)
+app.get('/api/config', (req, res) => {
+    res.json({
+        googleClientId: GOOGLE_CLIENT_ID || null,
+        googleAuthEnabled: !!GOOGLE_CLIENT_ID
+    });
+});
+
+// ========== ADMIN MANAGEMENT ROUTES ==========
+
+// Get all admin emails (admin only)
+app.get('/api/admin/admins', authenticateToken, authorizeAdmin, (req, res) => {
+    db.all(`SELECT id, username, email, role FROM users WHERE role = 'admin'`, [], (err, admins) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ 
+            admins,
+            configuredEmails: ADMIN_EMAILS 
+        });
+    });
+});
+
+// Add admin by email (admin only)
+app.post('/api/admin/admins', authenticateToken, authorizeAdmin, (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email requis' });
+
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Update user role to admin if exists
+    db.run(`UPDATE users SET role = 'admin' WHERE LOWER(email) = ?`, [normalizedEmail], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        if (this.changes > 0) {
+            res.json({ message: `Utilisateur ${email} promu administrateur`, changes: this.changes });
+        } else {
+            res.status(404).json({ 
+                error: 'Utilisateur non trouvé',
+                info: 'L\'utilisateur doit d\'abord créer un compte'
+            });
+        }
+    });
+});
+
+// Remove admin role (admin only)
+app.delete('/api/admin/admins/:userId', authenticateToken, authorizeAdmin, (req, res) => {
+    const userId = parseInt(req.params.userId);
+    
+    // Prevent removing own admin role
+    if (userId === req.user.id) {
+        return res.status(400).json({ error: 'Vous ne pouvez pas retirer vos propres droits d\'administrateur' });
+    }
+
+    db.run(`UPDATE users SET role = 'client' WHERE id = ?`, [userId], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Droits administrateur retirés', changes: this.changes });
+    });
+});
+
 // Start Server
 initDb().then(() => {
-    app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+    app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`JWT Secret configured: ${!!JWT_SECRET}`);
+        console.log(`Google OAuth enabled: ${!!GOOGLE_CLIENT_ID}`);
+        console.log(`Admin emails configured: ${ADMIN_EMAILS.length}`);
+    });
 }).catch(err => console.error('DB init failed:', err));

@@ -133,16 +133,38 @@
     <script src="js/auth.js"></script>
     <script>
         // Google Sign-In initialization
-        window.onload = function () {
-            google.accounts.id.initialize({
-                client_id: 'VOTRE_GOOGLE_CLIENT_ID.apps.googleusercontent.com', // REPLACE THIS
-                callback: handleGoogleSignIn
-            });
-            google.accounts.id.renderButton(
-                document.getElementById('googleBtn'),
-                { theme: 'outline', size: 'large', text: 'signin_with', width: '320' }
-            );
-        };
+        let googleConfig = null;
+
+        // Fetch configuration from server
+        async function loadGoogleConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                googleConfig = config;
+                
+                if (config.googleAuthEnabled && config.googleClientId) {
+                    // Initialize Google Sign-In
+                    google.accounts.id.initialize({
+                        client_id: config.googleClientId,
+                        callback: handleGoogleSignIn
+                    });
+                    google.accounts.id.renderButton(
+                        document.getElementById('googleBtn'),
+                        { theme: 'outline', size: 'large', text: 'signin_with', width: '320' }
+                    );
+                } else {
+                    // Hide Google button if not configured
+                    document.getElementById('googleBtn').style.display = 'none';
+                    const divider = document.querySelector('.divider');
+                    if (divider) divider.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+                document.getElementById('googleBtn').style.display = 'none';
+            }
+        }
+
+        window.onload = loadGoogleConfig;
 
         async function handleGoogleSignIn(response) {
             try {
@@ -160,6 +182,8 @@
                 }
             } catch (error) {
                 console.error('Google Sign-In error:', error);
+                document.getElementById('errorMessage').textContent = 'Erreur lors de la connexion Google';
+                document.getElementById('errorMessage').style.display = 'block';
             }
         }
 

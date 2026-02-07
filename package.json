@@ -1,17 +1,21 @@
 {
   "name": "site_vitrine",
   "version": "1.0.0",
-  "description": "Wwch youssef \r 7atha hna\r http://localhost:8000 hahiya a zbi",
-  "main": "index.js",
+  "description": "Site vitrine e-commerce avec authentification JWT et Google OAuth",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "generate-jwt": "node generate-jwt-secret.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["ecommerce", "nodejs", "express", "jwt", "oauth"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.3",
