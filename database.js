@@ -1,185 +1,169 @@
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
-const dbPath = path.resolve(__dirname, 'products.db');
-const db = new sqlite3.Database(dbPath);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-const initDb = () => {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.run(`CREATE TABLE IF NOT EXISTS products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                slug TEXT,
-                category TEXT,
-                categoryLabel TEXT,
-                price REAL,
-                badge TEXT,
-                photos INTEGER,
-                description_courte TEXT,
-                description_complete TEXT,
-                caracteristiques TEXT, -- JSON string
-                thumbnail TEXT,
-                images TEXT, -- JSON string
-                views INTEGER DEFAULT 0,
-                condition TEXT,
-                images_json TEXT
-            )`, (err) => {
-                if (err) {
-                    console.error('Error creating table:', err);
-                    reject(err);
-                    return;
+if (!supabaseUrl || !supabaseKey) {
+    console.error('[DATABASE] SUPABASE_URL or SUPABASE_KEY missing in .env');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const db = {
+    get: async (sql, params, callback) => {
+        if (typeof params === 'function') {
+            callback = params;
+            params = [];
+        }
+        try {
+            const lsql = sql.toLowerCase();
+            // User by email
+            if (lsql.includes('from users where email = ?')) {
+                const { data, error } = await supabase.from('users').select('*').eq('email', params[0]).single();
+                if (callback) callback(error, data);
+            }
+            // Password reset token
+            else if (lsql.includes('from password_reset_tokens')) {
+                const { data, error } = await supabase.from('password_reset_tokens')
+                    .select('*')
+                    .eq('token', params[0])
+                    .eq('used', false)
+                    .gt('expires_at', new Date().toISOString())
+                    .single();
+                if (callback) callback(error, data);
+            }
+            // Count users/orders
+            else if (lsql.includes('select count(*)')) {
+                const table = lsql.includes('from users') ? 'users' : (lsql.includes('from orders') ? 'orders' : 'products');
+                let query = supabase.from(table).select('*', { count: 'exact', head: true });
+                if (lsql.includes("role = 'client'")) query = query.eq('role', 'client');
+                const { count, error } = await query;
+                if (callback) callback(error, { count: count || 0 });
+            }
+            // Sum views
+            else if (lsql.includes('select sum(views)')) {
+                const { data, error } = await supabase.from('products').select('views');
+                const sum = data ? data.reduce((acc, curr) => acc + (curr.views || 0), 0) : 0;
+                if (callback) callback(error, { count: sum });
+            }
+            // Product by ID
+            else if (lsql.includes('from products where id = ?')) {
+                const { data, error } = await supabase.from('products').select('*').eq('id', params[0]).single();
+                if (callback) callback(error, data);
+            }
+            else {
+                console.warn(`[Supabase Wrapper] get: Unsupported query: ${sql}`);
+                if (callback) callback(null, null);
+            }
+        } catch (err) {
+            if (callback) callback(err);
+        }
+    },
+
+    all: async (sql, params, callback) => {
+        if (typeof params === 'function') {
+            callback = params;
+            params = [];
+        }
+        try {
+            const lsql = sql.toLowerCase();
+            if (lsql.includes('select distinct category, categorylabel from products')) {
+                const { data, error } = await supabase.from('products').select('category, categorylabel');
+                // Manually handle distinct if needed, or just let the frontend handle it
+                const unique = Array.from(new Map(data?.map(item => [item.category, item])).values());
+                if (callback) callback(error, unique || []);
+                return;
+            }
+            // Products
+            if (lsql.includes('from products')) {
+                let query = supabase.from('products').select('*');
+                if (lsql.includes('where category = ?')) query = query.eq('category', params[0]);
+                if (lsql.includes('order by views desc')) query = query.order('views', { ascending: false });
+                if (lsql.includes('limit')) {
+                    const limit = parseInt(sql.match(/limit (\d+)/i)?.[1] || '10');
+                    query = query.limit(limit);
                 }
+                const { data, error } = await query;
+                if (callback) callback(error, data || []);
+            }
+            else {
+                console.warn(`[Supabase Wrapper] all: Unsupported query: ${sql}`);
+                if (callback) callback(null, []);
+            }
+        } catch (err) {
+            if (callback) callback(err);
+        }
+    },
 
-                // Add columns to existing table if they don't exist
-                const columnsToAdd = [
-                    { name: 'views', type: 'INTEGER DEFAULT 0' },
-                    { name: 'condition', type: 'TEXT' },
-                    { name: 'images_json', type: 'TEXT' }
-                ];
+    run: async (sql, params, callback) => {
+        if (typeof params === 'function') {
+            callback = params;
+            params = [];
+        }
+        try {
+            const lsql = sql.toLowerCase();
+            let result = { changes: 1 };
 
-                columnsToAdd.forEach(col => {
-                    db.run(`ALTER TABLE products ADD COLUMN ${col.name} ${col.type}`, (err) => {
-                        if (err && !err.message.includes('duplicate column name')) {
-                            // Ignore error if column already exists
-                            console.log(`Column ${col.name} already exists or error:`, err.message);
-                        }
-                    });
+            // INSERT user
+            if (lsql.includes('insert into users')) {
+                const { data, error } = await supabase.from('users').insert({
+                    username: params[0], email: params[1], password: params[2], role: params[3]
+                }).select().single();
+                if (callback) callback.call({ lastID: data?.id }, error);
+            }
+            // INSERT reset token
+            else if (lsql.includes('insert into password_reset_tokens')) {
+                const { error } = await supabase.from('password_reset_tokens').insert({
+                    user_id: params[0], token: params[1], expires_at: params[2]
                 });
+                if (callback) callback(error);
+            }
+            // UPDATE user password
+            else if (lsql.includes('update users set password')) {
+                const { error } = await supabase.from('users').update({ password: params[0] }).eq('id', params[1]);
+                if (callback) callback(error);
+            }
+            // UPDATE reset token used
+            else if (lsql.includes('update password_reset_tokens set used = 1')) {
+                const { error } = await supabase.from('password_reset_tokens').update({ used: true }).eq('id', params[0]);
+                if (callback) callback(error);
+            }
+            // INSERT products (Leboncoin sync)
+            else if (lsql.includes('insert into products') || lsql.includes('insert or ignore into products')) {
+                const isIgnore = lsql.includes('ignore');
+                const { data, error } = await supabase.from('products').insert({
+                    name: params[0], price: params[1], category: params[2], categorylabel: params[3],
+                    description_courte: params[4], thumbnail: params[5], images: params[6]
+                }).select().single();
+                if (callback) callback.call({ lastID: data?.id, changes: (error && isIgnore) ? 0 : 1 }, error);
+            }
+            // UPDATE product views
+            else if (lsql.includes('update products set views = views + 1')) {
+                const { data: p } = await supabase.from('products').select('views').eq('id', params[0]).single();
+                const { error } = await supabase.from('products').update({ views: (p?.views || 0) + 1 }).eq('id', params[0]);
+                if (callback) callback(error);
+            }
+            else {
+                console.warn(`[Supabase Wrapper] run: Unsupported query: ${sql}`);
+                if (callback) callback(null);
+            }
+        } catch (err) {
+            if (callback) callback(err);
+        }
+    },
 
-                console.log('Product table ready.');
-
-                // Create Users Table
-                db.run(`CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE,
-                    email TEXT UNIQUE,
-                    password TEXT,
-                    role TEXT DEFAULT 'client'
-                )`, (err) => {
-                    if (err) console.error('Error creating users table:', err);
-                    else console.log('Users table ready.');
-                });
-
-                // Create Orders Table
-                db.run(`CREATE TABLE IF NOT EXISTS orders (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    total REAL NOT NULL,
-                    status TEXT DEFAULT 'pending',
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id)
-                )`, (err) => {
-                    if (err) console.error('Error creating orders table:', err);
-                    else console.log('Orders table ready.');
-                });
-
-                // Create Order Items Table
-                db.run(`CREATE TABLE IF NOT EXISTS order_items (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    order_id INTEGER NOT NULL,
-                    product_id INTEGER NOT NULL,
-                    quantity INTEGER NOT NULL,
-                    price REAL NOT NULL,
-                    FOREIGN KEY (order_id) REFERENCES orders(id),
-                    FOREIGN KEY (product_id) REFERENCES products(id)
-                )`, (err) => {
-                    if (err) console.error('Error creating order_items table:', err);
-                    else console.log('Order items table ready.');
-                });
-
-                // Create Favorites Table
-                db.run(`CREATE TABLE IF NOT EXISTS favorites (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    product_id INTEGER NOT NULL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    UNIQUE(user_id, product_id),
-                    FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (product_id) REFERENCES products(id)
-                )`, (err) => {
-                    if (err) console.error('Error creating favorites table:', err);
-                    else console.log('Favorites table ready.');
-                });
-
-                // Create Password Reset Tokens Table
-                db.run(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    token TEXT NOT NULL UNIQUE,
-                    expires_at DATETIME NOT NULL,
-                    used BOOLEAN DEFAULT 0,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id)
-                )`, (err) => {
-                    if (err) console.error('Error creating password_reset_tokens table:', err);
-                    else console.log('Password reset tokens table ready.');
-                });
-
-                // Create Cart Table
-                db.run(`CREATE TABLE IF NOT EXISTS cart (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    product_id INTEGER NOT NULL,
-                    quantity INTEGER NOT NULL DEFAULT 1,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    UNIQUE(user_id, product_id),
-                    FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (product_id) REFERENCES products(id)
-                )`, (err) => {
-                    if (err) console.error('Error creating cart table:', err);
-                    else console.log('Cart table ready.');
-                });
-
-                // Check if table is empty
-                db.get("SELECT count(*) as count FROM products", [], (err, row) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-
-                    if (row.count === 0) {
-                        console.log('Seeding initial data...');
-                        const productsDataPath = path.join(__dirname, 'data', 'products.json');
-                        if (fs.existsSync(productsDataPath)) {
-                            let fileContent = fs.readFileSync(productsDataPath, 'utf8');
-                            // Remove BOM if present
-                            if (fileContent.charCodeAt(0) === 0xFEFF) {
-                                fileContent = fileContent.slice(1);
-                            }
-                            const products = JSON.parse(fileContent);
-                            const stmt = db.prepare(`INSERT INTO products (
-                                name, slug, category, categoryLabel, price, badge, photos,
-                                description_courte, description_complete, caracteristiques,
-                                thumbnail, images
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-
-                            products.forEach(p => {
-                                stmt.run(
-                                    p.name,
-                                    p.slug || '',
-                                    p.category,
-                                    p.categoryLabel,
-                                    p.price,
-                                    p.badge,
-                                    p.photos,
-                                    p.description_courte,
-                                    p.description_complete,
-                                    JSON.stringify(p.caracteristiques),
-                                    p.thumbnail,
-                                    JSON.stringify(p.images)
-                                );
-                            });
-                            stmt.finalize();
-                            console.log('Product Data seeded successfully.');
-                        }
-                    }
-                    resolve(db);
-                });
-            });
-        });
-    });
+    serialize: (fn) => fn(),
+    prepare: (sql) => ({
+        run: (...args) => {
+            const callback = args.pop();
+            db.run(sql, args, callback);
+        },
+        finalize: () => { }
+    })
 };
 
-module.exports = { db, initDb };
+const initDb = async () => {
+    return Promise.resolve(db);
+};
+
+module.exports = { db, initDb, supabase };

@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
-const { db, initDb } = require('./database');
+const { db, supabase, initDb } = require('./database');
 const { parseLeboncoinHTML } = require('./js/leboncoin-parser');
 
 const app = express();
@@ -82,9 +82,9 @@ app.use(cors(corsOptions));
 
 // Rate Limiting
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 1000, // 15 seconds
     max: 5, // 5 tentatives max
-    message: { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+    message: { error: 'Trop de tentatives. Réessayez dans 15 secondes.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -396,7 +396,14 @@ app.post('/api/admin/leboncoin-sync', authenticateToken, authorizeAdmin, async (
         try {
             const products = parseLeboncoinHTML(html);
             if (!products || products.length === 0) {
-                return res.status(400).json({ error: 'Aucun produit trouvé dans le code source fourni.' });
+                // DEBUG: Save failed HTML to a file for inspection
+                const debugPath = path.join(__dirname, 'debug_failed_sync.html');
+                require('fs').writeFileSync(debugPath, html);
+                console.error(`[SYNC ERROR] No products found. HTML saved to ${debugPath} for inspection.`);
+                return res.status(400).json({
+                    error: 'Aucun produit trouvé dans le code source fourni.',
+                    suggestion: 'Assurez-vous de bien copier TOUT le code source (CTRL+A) après avoir fait CTRL+U.'
+                });
             }
 
             let newCount = 0;
@@ -461,8 +468,8 @@ app.get('/api/products/:id/recommendations', (req, res) => {
                 if (err) return res.status(500).json({ error: err.message });
                 const processedRecs = recommendations.map(p => ({
                     ...p,
-                    caracteristiques: JSON.parse(p.caracteristiques || '[]'),
-                    images: JSON.parse(p.images || '[]')
+                    caracteristiques: typeof p.caracteristiques === 'string' ? JSON.parse(p.caracteristiques || '[]') : (p.caracteristiques || []),
+                    images: typeof p.images === 'string' ? JSON.parse(p.images || '[]') : (p.images || [])
                 }));
                 res.json(processedRecs);
             }
@@ -478,8 +485,8 @@ app.get('/api/products', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         const products = rows.map(p => ({
             ...p,
-            caracteristiques: JSON.parse(p.caracteristiques || '[]'),
-            images: JSON.parse(p.images || '[]')
+            caracteristiques: typeof p.caracteristiques === 'string' ? JSON.parse(p.caracteristiques || '[]') : (p.caracteristiques || []),
+            images: typeof p.images === 'string' ? JSON.parse(p.images || '[]') : (p.images || [])
         }));
         res.json(products);
     });
@@ -530,8 +537,8 @@ app.get('/api/products/search', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         const products = rows.map(p => ({
             ...p,
-            caracteristiques: JSON.parse(p.caracteristiques || '[]'),
-            images: JSON.parse(p.images || '[]')
+            caracteristiques: typeof p.caracteristiques === 'string' ? JSON.parse(p.caracteristiques || '[]') : (p.caracteristiques || []),
+            images: typeof p.images === 'string' ? JSON.parse(p.images || '[]') : (p.images || [])
         }));
         res.json(products);
     });
@@ -615,8 +622,8 @@ app.get('/api/favorites', authenticateToken, (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         const products = rows.map(p => ({
             ...p,
-            caracteristiques: JSON.parse(p.caracteristiques || '[]'),
-            images: JSON.parse(p.images || '[]')
+            caracteristiques: typeof p.caracteristiques === 'string' ? JSON.parse(p.caracteristiques || '[]') : (p.caracteristiques || []),
+            images: typeof p.images === 'string' ? JSON.parse(p.images || '[]') : (p.images || [])
         }));
         res.json(products);
     });
