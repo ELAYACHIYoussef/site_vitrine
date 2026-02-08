@@ -99,11 +99,8 @@
 </head>
 
 <body>
-    <nav>
-        <div class="nav-content">
-            <a href="/" class="logo">COLLECTION</a>
-        </div>
-    </nav>
+    <!-- Navigation Centralisée -->
+    <header id="main-header"></header>
 
     <div class="auth-container">
         <div class="auth-card">
@@ -124,13 +121,19 @@
                     <label>Mot de passe</label>
                     <input type="password" name="password" required>
                 </div>
-                <a href="forgot-password.html" style="display: block; text-align: right; margin-bottom: 15px; color: var(--accent); text-decoration: none; font-size: 0.85rem;">Mot de passe oublié ?</a>
+                <a href="forgot-password.html"
+                    style="display: block; text-align: right; margin-bottom: 15px; color: var(--accent); text-decoration: none; font-size: 0.85rem;">Mot
+                    de passe oublié ?</a>
                 <button type="submit" class="product-cta" style="width: 100%">Se Connecter</button>
             </form>
             <a href="register.html" class="auth-link">Pas encore de compte ? Créer un compte</a>
         </div>
     </div>
 
+    <!-- Footer Centralisé -->
+    <footer id="main-footer"></footer>
+
+    <script src="js/components.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // Google Sign-In initialization
@@ -142,7 +145,7 @@
                 const response = await fetch('/api/config');
                 const config = await response.json();
                 googleConfig = config;
-                
+
                 if (config.googleAuthEnabled && config.googleClientId) {
                     // Initialize Google Sign-In
                     google.accounts.id.initialize({

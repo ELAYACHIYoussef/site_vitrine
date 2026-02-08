@@ -99,11 +99,8 @@
 </head>
 
 <body>
-    <nav>
-        <div class="nav-content">
-            <a href="/" class="logo">COLLECTION</a>
-        </div>
-    </nav>
+    <!-- Navigation Centralisée -->
+    <header id="main-header"></header>
 
     <div class="auth-container">
         <div class="auth-card">
@@ -134,6 +131,10 @@
         </div>
     </div>
 
+    <!-- Footer Centralisé -->
+    <footer id="main-footer"></footer>
+
+    <script src="js/components.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // Google Sign-In initialization (same as login - creates account if needed)
@@ -145,7 +146,7 @@
                 const response = await fetch('/api/config');
                 const config = await response.json();
                 googleConfig = config;
-                
+
                 if (config.googleAuthEnabled && config.googleClientId) {
                     // Initialize Google Sign-In
                     google.accounts.id.initialize({

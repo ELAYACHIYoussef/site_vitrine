@@ -11,9 +11,22 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const { db, initDb } = require('./database');
+const { parseLeboncoinHTML } = require('./js/leboncoin-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Request size logger for debugging large payloads
+app.use((req, res, next) => {
+    if (req.path === '/api/admin/leboncoin-sync') {
+        console.log(`[DEBUG] Sync request: Content-Length = ${req.headers['content-length']} bytes`);
+    }
+    next();
+});
+
+// Body Parser - Increased to 200MB for very large Leboncoin HTML source code
+app.use(express.json({ limit: '200mb' }));
+app.use(express.urlencoded({ limit: '200mb', extended: true }));
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Validate required environment variables
@@ -27,7 +40,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
 // Admin emails list from environment
-const ADMIN_EMAILS = process.env.ADMIN_EMAILS 
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS
     ? process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase())
     : [];
 
@@ -58,7 +71,7 @@ app.use(helmet({
 
 // CORS Configuration
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' 
+    origin: process.env.NODE_ENV === 'production'
         ? process.env.ALLOWED_ORIGINS?.split(',') || 'https://yourdomain.com'
         : '*',
     credentials: true,
@@ -87,9 +100,19 @@ const apiLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 app.use('/api', apiLimiter);
 
-// Body Parser
-app.use(express.json());
+// Static files
 app.use(express.static(path.join(__dirname)));
+
+// GLOBAL ERROR HANDLER - Ensures all errors return JSON instead of HTML
+app.use((err, req, res, next) => {
+    console.error('[SERVER ERROR]', err);
+    const status = err.status || err.statusCode || 500;
+    res.status(status).json({
+        error: err.message || 'Erreur interne du serveur.',
+        type: err.type,
+        status: status
+    });
+});
 
 // Authentication Middleware
 const authenticateToken = (req, res, next) => {
@@ -168,8 +191,8 @@ app.post('/api/auth/login', (req, res) => {
 app.post('/api/auth/google', async (req, res) => {
     // Check if Google OAuth is configured
     if (!googleClient || !GOOGLE_CLIENT_ID) {
-        return res.status(503).json({ 
-            error: 'Authentification Google non configurée. Veuillez contacter l\'administrateur.' 
+        return res.status(503).json({
+            error: 'Authentification Google non configurée. Veuillez contacter l\'administrateur.'
         });
     }
 
@@ -214,7 +237,7 @@ app.post('/api/auth/google', async (req, res) => {
 // Request password reset
 app.post('/api/auth/forgot-password', async (req, res) => {
     const { email } = req.body;
-    
+
     if (!email) {
         return res.status(400).json({ error: 'Email requis' });
     }
@@ -223,7 +246,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         // Check if user exists
         db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
             if (err) return res.status(500).json({ error: err.message });
-            
+
             // Always return success message (security best practice)
             // Don't reveal if email exists or not
             if (!user) {
@@ -247,7 +270,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
                     // Send email if configured
                     if (emailTransporter) {
                         const resetUrl = `${req.protocol}://${req.get('host')}/reset-password.html?token=${resetToken}`;
-                        
+
                         try {
                             await emailTransporter.sendMail({
                                 from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
@@ -301,7 +324,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
             [token],
             async (err, resetToken) => {
                 if (err) return res.status(500).json({ error: err.message });
-                
+
                 if (!resetToken) {
                     return res.status(400).json({ error: 'Token invalide ou expiré' });
                 }
@@ -330,6 +353,122 @@ app.post('/api/auth/reset-password', async (req, res) => {
     }
 });
 
+// ========== ANALYTICS & RECOMMANDATIONS ==========
+
+// ========== ADMIN ANALYTICS & SYNC ==========
+
+// Get overview stats for dashboard
+app.get('/api/admin/stats', authenticateToken, authorizeAdmin, (req, res) => {
+    const stats = {};
+
+    db.get("SELECT COUNT(*) as count FROM users WHERE role = 'client'", (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        stats.totalClients = row.count;
+
+        db.get("SELECT SUM(views) as count FROM products", (err, row) => {
+            if (err) return res.status(500).json({ error: err.message });
+            stats.totalViews = row.count || 0;
+
+            db.get("SELECT COUNT(*) as count FROM orders", (err, row) => {
+                if (err) return res.status(500).json({ error: err.message });
+                stats.totalOrders = row.count;
+
+                db.all("SELECT name, views FROM products ORDER BY views DESC LIMIT 5", (err, rows) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    stats.topProducts = rows;
+                    res.json(stats);
+                });
+            });
+        });
+    });
+});
+
+// Leboncoin Sync Endpoint (Accepts HTML or URL)
+app.post('/api/admin/leboncoin-sync', authenticateToken, authorizeAdmin, async (req, res) => {
+    const { html, url } = req.body;
+
+    if (!html && !url) {
+        return res.status(400).json({ error: 'HTML ou URL Leboncoin requis.' });
+    }
+
+    if (html) {
+        try {
+            const products = parseLeboncoinHTML(html);
+            if (!products || products.length === 0) {
+                return res.status(400).json({ error: 'Aucun produit trouvé dans le code source fourni.' });
+            }
+
+            let newCount = 0;
+            const insertPromises = products.map(p => {
+                return new Promise((resolve) => {
+                    db.run(
+                        `INSERT OR IGNORE INTO products (
+                            name, price, category, categoryLabel, description_courte, thumbnail, images
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                        [
+                            p.name,
+                            p.price,
+                            p.category,
+                            p.categoryLabel,
+                            p.description_courte,
+                            p.thumbnail,
+                            JSON.stringify(p.images)
+                        ],
+                        function (err) {
+                            if (!err && this.changes > 0) newCount++;
+                            resolve();
+                        }
+                    );
+                });
+            });
+
+            await Promise.all(insertPromises);
+
+            return res.json({
+                message: `${products.length} produits analysés, ${newCount} nouveaux produits ajoutés !`,
+                suggestion: 'La synchronisation par code source est terminée.'
+            });
+        } catch (e) {
+            console.error('Sync error:', e);
+            return res.status(500).json({ error: 'Erreur lors de l\'analyse du HTML : ' + e.message });
+        }
+    }
+
+    res.json({ message: 'Fonctionnalité de synchronisation URL bientôt disponible avec bypass anti-bot.' });
+});
+
+// Increment product views
+app.post('/api/products/:id/view', (req, res) => {
+    const productId = req.params.id;
+    db.run(`UPDATE products SET views = views + 1 WHERE id = ?`, [productId], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
+});
+
+// Get product recommendations (same category, sorted by views)
+app.get('/api/products/:id/recommendations', (req, res) => {
+    const productId = req.params.id;
+    db.get(`SELECT category FROM products WHERE id = ?`, [productId], (err, product) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!product) return res.status(404).json({ error: 'Produit non trouvé' });
+
+        db.all(
+            `SELECT * FROM products WHERE category = ? AND id != ? ORDER BY views DESC LIMIT 4`,
+            [product.category, productId],
+            (err, recommendations) => {
+                if (err) return res.status(500).json({ error: err.message });
+                const processedRecs = recommendations.map(p => ({
+                    ...p,
+                    caracteristiques: JSON.parse(p.caracteristiques || '[]'),
+                    images: JSON.parse(p.images || '[]')
+                }));
+                res.json(processedRecs);
+            }
+        );
+    });
+});
+
 // ========== PRODUCTS ROUTES ==========
 
 // Get all products
@@ -348,23 +487,23 @@ app.get('/api/products', (req, res) => {
 // Search products with filters
 app.get('/api/products/search', (req, res) => {
     const { q, category, minPrice, maxPrice, sortBy } = req.query;
-    
+
     let sql = "SELECT * FROM products WHERE 1=1";
     let params = [];
-    
+
     // Search query
     if (q) {
         sql += " AND (name LIKE ? OR description_courte LIKE ? OR categoryLabel LIKE ?)";
         const searchTerm = `%${q}%`;
         params.push(searchTerm, searchTerm, searchTerm);
     }
-    
+
     // Category filter
     if (category) {
         sql += " AND category = ?";
         params.push(category);
     }
-    
+
     // Price range
     if (minPrice) {
         sql += " AND price >= ?";
@@ -374,7 +513,7 @@ app.get('/api/products/search', (req, res) => {
         sql += " AND price <= ?";
         params.push(parseFloat(maxPrice));
     }
-    
+
     // Sorting
     if (sortBy === 'price_asc') {
         sql += " ORDER BY price ASC";
@@ -385,7 +524,7 @@ app.get('/api/products/search', (req, res) => {
     } else {
         sql += " ORDER BY id DESC"; // Default: newest first
     }
-    
+
     db.all(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         const products = rows.map(p => ({
@@ -628,9 +767,9 @@ app.get('/api/config', (req, res) => {
 app.get('/api/admin/admins', authenticateToken, authorizeAdmin, (req, res) => {
     db.all(`SELECT id, username, email, role FROM users WHERE role = 'admin'`, [], (err, admins) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ 
+        res.json({
             admins,
-            configuredEmails: ADMIN_EMAILS 
+            configuredEmails: ADMIN_EMAILS
         });
     });
 });
@@ -641,15 +780,15 @@ app.post('/api/admin/admins', authenticateToken, authorizeAdmin, (req, res) => {
     if (!email) return res.status(400).json({ error: 'Email requis' });
 
     const normalizedEmail = email.trim().toLowerCase();
-    
+
     // Update user role to admin if exists
-    db.run(`UPDATE users SET role = 'admin' WHERE LOWER(email) = ?`, [normalizedEmail], function(err) {
+    db.run(`UPDATE users SET role = 'admin' WHERE LOWER(email) = ?`, [normalizedEmail], function (err) {
         if (err) return res.status(500).json({ error: err.message });
-        
+
         if (this.changes > 0) {
             res.json({ message: `Utilisateur ${email} promu administrateur`, changes: this.changes });
         } else {
-            res.status(404).json({ 
+            res.status(404).json({
                 error: 'Utilisateur non trouvé',
                 info: 'L\'utilisateur doit d\'abord créer un compte'
             });
@@ -660,13 +799,13 @@ app.post('/api/admin/admins', authenticateToken, authorizeAdmin, (req, res) => {
 // Remove admin role (admin only)
 app.delete('/api/admin/admins/:userId', authenticateToken, authorizeAdmin, (req, res) => {
     const userId = parseInt(req.params.userId);
-    
+
     // Prevent removing own admin role
     if (userId === req.user.id) {
         return res.status(400).json({ error: 'Vous ne pouvez pas retirer vos propres droits d\'administrateur' });
     }
 
-    db.run(`UPDATE users SET role = 'client' WHERE id = ?`, [userId], function(err) {
+    db.run(`UPDATE users SET role = 'client' WHERE id = ?`, [userId], function (err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: 'Droits administrateur retirés', changes: this.changes });
     });

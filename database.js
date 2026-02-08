@@ -21,13 +21,33 @@ const initDb = () => {
                 description_complete TEXT,
                 caracteristiques TEXT, -- JSON string
                 thumbnail TEXT,
-                images TEXT -- JSON string
+                images TEXT, -- JSON string
+                views INTEGER DEFAULT 0,
+                condition TEXT,
+                images_json TEXT
             )`, (err) => {
                 if (err) {
                     console.error('Error creating table:', err);
                     reject(err);
                     return;
                 }
+
+                // Add columns to existing table if they don't exist
+                const columnsToAdd = [
+                    { name: 'views', type: 'INTEGER DEFAULT 0' },
+                    { name: 'condition', type: 'TEXT' },
+                    { name: 'images_json', type: 'TEXT' }
+                ];
+
+                columnsToAdd.forEach(col => {
+                    db.run(`ALTER TABLE products ADD COLUMN ${col.name} ${col.type}`, (err) => {
+                        if (err && !err.message.includes('duplicate column name')) {
+                            // Ignore error if column already exists
+                            console.log(`Column ${col.name} already exists or error:`, err.message);
+                        }
+                    });
+                });
+
                 console.log('Product table ready.');
 
                 // Create Users Table

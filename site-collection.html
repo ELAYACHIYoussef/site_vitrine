@@ -43,55 +43,8 @@
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-content">
-            <a href="#" onclick="showHome(); return false;" class="logo">Collection</a>
-
-            <ul class="nav-links" id="navLinks">
-                <!-- Dynamic links injected by auth.js -->
-            </ul>
-
-            <div class="nav-icons">
-                <!-- Search -->
-                <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Rechercher...">
-                    <button class="search-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Wishlist -->
-                <div class="nav-icon" onclick="showToast('Fonction favoris en cours de développement')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path
-                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                        </path>
-                    </svg>
-                    <span class="nav-badge" id="wishlistBadge" style="display: none;">0</span>
-                </div>
-
-                <!-- Cart -->
-                <div class="nav-icon" onclick="openCart()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <circle cx="9" cy="21" r="1"></circle>
-                        <circle cx="20" cy="21" r="1"></circle>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                    </svg>
-                    <span class="nav-badge" id="cartBadge" style="display: none;">0</span>
-                </div>
-
-                <!-- Theme Toggle -->
-                <div class="theme-toggle" onclick="toggleTheme()" title="Mode sombre/clair"></div>
-            </div>
-        </div>
-    </nav>
+    <!-- Navigation Centralisée -->
+    <header id="main-header"></header>
 
     <!-- Home Page -->
     <div id="homePage">
@@ -171,33 +124,8 @@
     <!-- Product Detail Pages Container -->
     <div id="productPages"></div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Collection</h3>
-                <p>Votre destination pour des produits premium de qualité exceptionnelle.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Contact</h3>
-                <p>📍 Colombes (92700)</p>
-                <p>✉️ <a href="mailto:ysf.elayachi@gmail.com">ysf.elayachi@gmail.com</a></p>
-                <p>📞 <a href="tel:+33753646781">+33 7 53 64 67 81</a> | <a href="https://wa.me/33753646781"
-                        target="_blank" style="color:#25D366;font-weight:600">💬 WhatsApp</a></p>
-                <p>📞 <a href="tel:+33602911474">+33 6 02 91 14 74</a> | <a href="https://wa.me/33602911474"
-                        target="_blank" style="color:#25D366;font-weight:600">💬 WhatsApp</a></p>
-            </div>
-            <div class="footer-section">
-                <h3>Informations</h3>
-                <p><a href="#">Conditions générales</a></p>
-                <p><a href="#">Politique de confidentialité</a></p>
-                <p><a href="#">Livraison & Retours</a></p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Collection. Tous droits réservés.</p>
-        </div>
-    </footer>
+    <!-- Footer Centralisé -->
+    <footer id="main-footer"></footer>
 
     <!-- WhatsApp Floating Button -->
     <div class="whatsapp-float" onclick="toggleWhatsappMenu()">
@@ -260,10 +188,8 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JavaScript -->
-    <!-- Auth Module -->
+    <script src="js/components.js"></script>
     <script src="js/auth.js"></script>
-
-    <!-- Main Application Script -->
     <script src="js/app.js"></script>
 </body>
 
