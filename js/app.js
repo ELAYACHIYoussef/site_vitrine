@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ========================================
 // Chargement des Produits
 // ========================================
-async function loadProducts() {
+async function loadProducts(limit = null) {
     // Données intégrées pour éviter les problèmes CORS en local
     App.products = [
     {
@@ -275,15 +275,18 @@ async function loadProducts() {
                    ]
     }
 ];
-    renderProducts(App.products);
+    renderProducts(App.products, limit);
     updateStats();
 }
 
-function renderProducts(products) {
+function renderProducts(products, limit = null) {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
 
-    grid.innerHTML = products.map(product => `
+    // Limiter le nombre de produits si spécifié
+    const displayProducts = limit ? products.slice(0, limit) : products;
+
+    grid.innerHTML = displayProducts.map(product => `
         <div class="product-card animate-on-scroll" data-id="${product.id}" data-category="${product.category}">
             <div class="product-image-container">
                 <img 
