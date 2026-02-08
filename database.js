@@ -51,6 +51,11 @@ const db = {
                 const { data, error } = await supabase.from('products').select('*').eq('id', params[0]).single();
                 if (callback) callback(error, data);
             }
+            // User by ID
+            else if (lsql.includes('select id, username, email, role from users where id = ?')) {
+                const { data, error } = await supabase.from('users').select('id, username, email, role').eq('id', params[0]).single();
+                if (callback) callback(error, data);
+            }
             else {
                 console.warn(`[Supabase Wrapper] get: Unsupported query: ${sql}`);
                 if (callback) callback(null, null);
@@ -128,13 +133,41 @@ const db = {
                 const { error } = await supabase.from('password_reset_tokens').update({ used: true }).eq('id', params[0]);
                 if (callback) callback(error);
             }
-            // INSERT products (Leboncoin sync)
+            // INSERT products (Leboncoin sync or manual)
             else if (lsql.includes('insert into products') || lsql.includes('insert or ignore into products')) {
                 const isIgnore = lsql.includes('ignore');
-                const { data, error } = await supabase.from('products').insert({
-                    name: params[0], price: params[1], category: params[2], categorylabel: params[3],
-                    description_courte: params[4], thumbnail: params[5], images: params[6]
-                }).select().single();
+                let productData = {};
+
+                // Detection if it's the manual insert (with slug) or sync (without slug)
+                if (lsql.includes('(name, slug,')) {
+                    // Manual Insert from server.js
+                    // 0:name, 1:slug, 2:category, 3:categorylabel, 4:price, 5:description_courte, 6:thumbnail, 7:images, 8:caracteristiques
+                    productData = {
+                        name: params[0],
+                        slug: params[1],
+                        category: params[2],
+                        categorylabel: params[3],
+                        price: params[4],
+                        description_courte: params[5],
+                        thumbnail: params[6],
+                        images: params[7],
+                        caracteristiques: params[8]
+                    };
+                } else {
+                    // Leboncoin Sync Insert
+                    // 0:name, 1:price, 2:category, 3:categorylabel, 4:description_courte, 5:thumbnail, 6:images
+                    productData = {
+                        name: params[0],
+                        price: params[1],
+                        category: params[2],
+                        categorylabel: params[3],
+                        description_courte: params[4],
+                        thumbnail: params[5],
+                        images: params[6]
+                    };
+                }
+
+                const { data, error } = await supabase.from('products').insert(productData).select().single();
                 if (callback) callback.call({ lastID: data?.id, changes: (error && isIgnore) ? 0 : 1 }, error);
             }
             // UPDATE product views

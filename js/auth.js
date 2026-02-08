@@ -65,11 +65,12 @@ const Auth = {
         if (user) {
             // Logged In User
             if (user.role === 'admin') {
-                html += `<li><a href="admin.html" style="color: var(--accent); font-weight: 600;">Dashboard Admin</a></li>`;
+                html += `<li><a href="admin.html" style="color: var(--accent); font-weight: 600;">DASHBOARD ADMIN</a></li>`;
+            } else {
+                // Only clients see "Mon Profil"
+                html += `<li><a href="profile.html" style="color: var(--primary); font-weight: 500;">👤 MON PROFIL</a></li>`;
             }
-            // Everyone gets "Mon Profil" link
-            html += `<li><a href="profile.html" style="color: var(--primary); font-weight: 500;">👤 Mon Profil</a></li>`;
-            html += `<li><a href="#" onclick="Auth.logout(); return false;">Déconnexion (${user.username})</a></li>`;
+            html += `<li><a href="#" onclick="Auth.logout(); return false;">DÉCONNEXION (${user.username.toUpperCase()})</a></li>`;
         } else {
             // Guest - Show Sign In / Sign Up
             html += `<li><a href="login.html">Connexion</a></li>`;
