@@ -74,7 +74,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 alert('Produit ajouté avec succès !');
                 e.target.reset();
+
+                // Update file input label if present
+                const fileLabel = document.querySelector('.file-label span');
+                if (fileLabel) fileLabel.textContent = 'Choisir une image...';
+
                 loadProducts();
+
+                // Switch to products catalogue section automatically
+                if (typeof showSection === 'function') {
+                    showSection('products');
+                } else {
+                    window.location.hash = 'products';
+                }
             } else {
                 const error = await response.json();
                 alert('Erreur: ' + (error.message || error.error));
@@ -84,30 +96,71 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Erreur de connexion au serveur');
         }
     });
+
+    // Product Image preview/filename handler
+    const productImgInput = document.getElementById('productImage');
+    if (productImgInput) {
+        productImgInput.addEventListener('change', function () {
+            const fileName = this.files[0] ? this.files[0].name : 'Choisir une image...';
+            const labelSpan = this.nextElementSibling ? this.nextElementSibling.querySelector('span') : null;
+            if (labelSpan) labelSpan.textContent = fileName;
+        });
+    }
 });
 
 async function loadProducts() {
+    const grid = document.getElementById('productsList');
+    if (!grid) return;
+
     try {
         const response = await fetch(API_URL);
         const products = await response.json();
 
-        const tbody = document.getElementById('productsList');
-        tbody.innerHTML = products.map(p => `
-            <tr>
-                <td><img src="${p.thumbnail}" alt="${p.name}"></td>
-                <td>${p.name}</td>
-                <td>${p.categoryLabel || p.category}</td>
-                <td>${p.price} €</td>
-                <td>
-                    <button class="btn-delete" onclick="deleteProduct(${p.id})">Supprimer</button>
-                </td>
-            </tr>
+        if (products.length === 0) {
+            grid.innerHTML = `
+                <div class="loading-state">
+                    <i class="fas fa-box-open"></i>
+                    <p>Aucun produit dans le catalogue pour le moment.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = products.map(p => `
+            <div class="product-admin-card" id="product-${p.id}">
+                <div class="product-card-img">
+                    <img src="${p.thumbnail || p.image || 'img/placeholder.jpg'}" alt="${p.name}" onerror="this.src='img/placeholder.jpg'">
+                    <span class="product-category-tag">${p.categoryLabel || p.category}</span>
+                </div>
+                <div class="product-card-info">
+                    <h3>${p.name}</h3>
+                    <div class="product-card-price">${p.price} DH</div>
+                    <p class="product-card-desc">${p.description || 'Pas de description disponible.'}</p>
+                </div>
+                <div class="product-card-actions">
+                    <button class="btn-edit-premium" onclick="editProduct('${p.id}')">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="btn-delete-premium" onclick="deleteProduct('${p.id}')">
+                        <i class="fas fa-trash-alt"></i> SUPPRIMER
+                    </button>
+                </div>
+            </div>
         `).join('');
     } catch (error) {
         console.error('Error loading products:', error);
-        alert('Impossible de charger les produits. Vérifiez que le serveur est lancé (npm start).');
+        grid.innerHTML = `
+            <div class="loading-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erreur lors du chargement des produits.</p>
+            </div>`;
     }
 }
+
+function editProduct(id) {
+    alert('La modification du produit (ID: ' + id + ') sera disponible dans une prochaine version.');
+}
+
+window.editProduct = editProduct;
 
 async function deleteProduct(id) {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return;
@@ -145,13 +198,18 @@ async function loadStats() {
         document.getElementById('statTotalViews').textContent = stats.totalViews;
         document.getElementById('statTotalOrders').textContent = stats.totalOrders;
 
+        const productsElement = document.getElementById('statTotalProducts');
+        if (productsElement) {
+            productsElement.textContent = stats.totalProducts || products.length || '--';
+        }
+
         // Render Top Products
         const topProductsList = document.getElementById('topProductsList');
         if (topProductsList && stats.topProducts) {
             topProductsList.innerHTML = stats.topProducts.map((p, idx) => `
-                <div style="display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; background: ${idx % 2 === 0 ? '#fcfcfc' : 'white'};">
-                    <span style="font-weight: 500;">${idx + 1}. ${p.name}</span>
-                    <span style="color: var(--accent); font-weight: 600;">${p.views} vues</span>
+                <div class="top-product-item">
+                    <span class="top-product-name">${idx + 1}. ${p.name}</span>
+                    <span class="top-product-views">${p.views} vues</span>
                 </div>
             `).join('') || '<p>Aucune donnée de vue disponible.</p>';
         }
