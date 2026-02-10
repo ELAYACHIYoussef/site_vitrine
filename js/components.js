@@ -15,7 +15,55 @@ const Components = {
         header.innerHTML = `
             <nav>
                 <div class="nav-content">
-                    <a href="/" class="logo">Collection</a>
+                    <a href="/" class="logo">
+                        <svg class="logo-svg logo-light" width="220" height="50" viewBox="0 0 220 50" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Shopping bag with house icon -->
+                            <g transform="translate(5, 6)">
+                                <!-- Bag outline -->
+                                <path d="M5 15 L5 35 C5 38 8 40 11 40 L23 40 C26 40 29 38 29 35 L29 15" 
+                                      fill="none" stroke="#FF6B47" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Bag handle -->
+                                <path d="M10 15 C10 9 12 5 17 5 C22 5 24 9 24 15" 
+                                      fill="none" stroke="#FF6B47" stroke-width="3" stroke-linecap="round"/>
+                                <!-- House icon inside -->
+                                <path d="M17 19 L12 24 L12 32 L22 32 L22 24 Z" 
+                                      fill="#FF6B47" opacity="0.9"/>
+                                <path d="M17 19 L22 24" fill="none" stroke="#FF6B47" stroke-width="2.5" stroke-linecap="round"/>
+                                <rect x="15" y="27" width="4" height="5" fill="#FFF"/>
+                            </g>
+                            <!-- AzyMarket text in dark -->
+                            <text x="50" y="34" font-family="'Montserrat', sans-serif" font-size="26" font-weight="700" fill="#1A2332" letter-spacing="0.5">AzyMarket</text>
+                        </svg>
+                        
+                        <svg class="logo-svg logo-dark" width="220" height="50" viewBox="0 0 220 50" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <!-- Glow effect -->
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <!-- Shopping bag with house icon - with glow -->
+                            <g transform="translate(5, 6)" filter="url(#glow)">
+                                <!-- Bag outline -->
+                                <path d="M5 15 L5 35 C5 38 8 40 11 40 L23 40 C26 40 29 38 29 35 L29 15" 
+                                      fill="none" stroke="#FF6B47" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Bag handle -->
+                                <path d="M10 15 C10 9 12 5 17 5 C22 5 24 9 24 15" 
+                                      fill="none" stroke="#FF6B47" stroke-width="3" stroke-linecap="round"/>
+                                <!-- House icon inside -->
+                                <path d="M17 19 L12 24 L12 32 L22 32 L22 24 Z" 
+                                      fill="#FF6B47" opacity="0.9"/>
+                                <path d="M17 19 L22 24" fill="none" stroke="#FF6B47" stroke-width="2.5" stroke-linecap="round"/>
+                                <rect x="15" y="27" width="4" height="5" fill="#2A3142"/>
+                            </g>
+                            <!-- AzyMarket text in white -->
+                            <text x="50" y="34" font-family="'Montserrat', sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" letter-spacing="0.5">AzyMarket</text>
+                        </svg>
+                    </a>
                     <ul class="nav-links" id="navLinks">
                         <!-- Links will be injected by Auth.updateNavigation() -->
                     </ul>
@@ -69,8 +117,8 @@ const Components = {
             <footer>
                 <div class="footer-content">
                     <div class="footer-section">
-                        <h3>Collection Exclusive</h3>
-                        <p>L'excellence et le luxe à votre portée. Une sélection rigoureuse des meilleurs produits premium.</p>
+                        <h3>AzyMarket</h3>
+                        <p>Créez votre propre monde et gagnez de l'argent. Votre marketplace de confiance pour vos trouvailles uniques.</p>
                         <div class="social-links">
                             <a href="#" title="Instagram">IG</a>
                             <a href="#" title="Facebook">FB</a>
@@ -93,7 +141,7 @@ const Components = {
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>&copy; ${currentYear} Collection Exclusive. Tous droits réservés.</p>
+                    <p>&copy; ${currentYear} AzyMarket. Tous droits réservés.</p>
                 </div>
             </footer>
         `;

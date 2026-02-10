@@ -93,6 +93,32 @@ nav {
     color: var(--primary);
     letter-spacing: 2px;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+/* Logo SVG Styles */
+.logo-svg {
+    height: 50px;
+    width: auto;
+    transition: opacity 0.3s ease;
+}
+
+/* Theme-based logo switching */
+[data-theme="light"] .logo-dark {
+    display: none;
+}
+
+[data-theme="light"] .logo-light {
+    display: block;
+}
+
+[data-theme="dark"] .logo-light {
+    display: none;
+}
+
+[data-theme="dark"] .logo-dark {
+    display: block;
 }
 
 .nav-links {
