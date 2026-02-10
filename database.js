@@ -176,6 +176,12 @@ const db = {
                 const { error } = await supabase.from('products').update({ views: (p?.views || 0) + 1 }).eq('id', params[0]);
                 if (callback) callback(error);
             }
+            // DELETE product
+            else if (lsql.includes('delete from products where id = ?')) {
+                const id = Array.isArray(params) ? params[0] : params;
+                const { error } = await supabase.from('products').delete().eq('id', id);
+                if (callback) callback(error);
+            }
             else {
                 console.warn(`[Supabase Wrapper] run: Unsupported query: ${sql}`);
                 if (callback) callback(null);
