@@ -13,6 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
     loadStats();
 
+    // Global handler for unauthorized access
+    window.handleUnauthorized = () => {
+        alert('Votre session a expiré ou est invalide. Par sécurité, vous allez être déconnecté pour rafraîchir vos accès.');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    };
+
     // Leboncoin Sync Form Handler
     document.getElementById('leboncoinSyncForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -71,6 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData
             });
 
+            if (response.status === 401 || response.status === 403) {
+                return handleUnauthorized();
+            }
+
             if (response.ok) {
                 alert('Produit ajouté avec succès !');
                 e.target.reset();
@@ -114,6 +126,11 @@ async function loadProducts() {
 
     try {
         const response = await fetch(API_URL);
+
+        if (response.status === 401 || response.status === 403) {
+            return handleUnauthorized();
+        }
+
         const products = await response.json();
 
         if (products.length === 0) {
@@ -175,11 +192,33 @@ async function deleteProduct(id) {
             }
         });
 
+        if (response.status === 401 || response.status === 403) {
+            return handleUnauthorized();
+        }
+
         if (response.ok) {
-            loadProducts();
+            // Real-time: Remove the card from DOM instantly
+            const card = document.getElementById(`product-${id}`);
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+                card.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    card.remove();
+                    // Brief success notification
+                    const toast = document.createElement('div');
+                    toast.className = 'delete-toast';
+                    toast.innerHTML = '<i class="fas fa-check-circle"></i> Produit supprimé de la base !';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                }, 300);
+            }
+            // Still reload in background to ensure sync
+            // loadProducts(); 
         } else {
             const error = await response.json();
-            alert('Erreur: ' + (error.error || 'Suppression impossible'));
+            const msg = error.details ? `${error.error} (${error.details})` : error.error;
+            alert('Erreur: ' + (msg || 'Suppression impossible'));
         }
     } catch (error) {
         console.error('Error deleting product:', error);
@@ -192,6 +231,11 @@ async function loadStats() {
         const response = await fetch('/api/admin/stats', {
             headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
         });
+
+        if (response.status === 401 || response.status === 403) {
+            return; // Stats failing silently is better, or let other calls handle logout
+        }
+
         const stats = await response.json();
 
         document.getElementById('statTotalClients').textContent = stats.totalClients;

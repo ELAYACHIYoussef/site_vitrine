@@ -178,9 +178,18 @@ const db = {
             }
             // DELETE product
             else if (lsql.includes('delete from products where id = ?')) {
-                const id = Array.isArray(params) ? params[0] : params;
-                const { error } = await supabase.from('products').delete().eq('id', id);
-                if (callback) callback(error);
+                const rawId = Array.isArray(params) ? params[0] : params;
+                const id = parseInt(rawId);
+
+                const { error, count } = await supabase.from('products')
+                    .delete({ count: 'exact' })
+                    .eq('id', id);
+
+                if (!error) {
+                    console.log(`[DATABASE] Produit supprime avec succes (ID: ${id})`);
+                }
+
+                if (callback) callback.call({ changes: error ? 0 : 1 }, error);
             }
             else {
                 console.warn(`[Supabase Wrapper] run: Unsupported query: ${sql}`);

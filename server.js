@@ -119,9 +119,24 @@ app.use((err, req, res, next) => {
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Accès refusé. Token manquant.' });
+    if (!token) {
+        console.warn(`[AUTH] Acces refuse: pas de token pour ${req.method} ${req.path}`);
+        return res.status(401).json({ error: 'Accès refusé. Token manquant.' });
+    }
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: 'Token invalide.' });
+        if (err) {
+            console.error(`[AUTH] Token invalide pour ${req.method} ${req.path}`);
+            console.error(`Reason: ${err.message}`);
+
+            const errorMessage = (err.name === 'TokenExpiredError')
+                ? 'Session expirée. Veuillez vous reconnecter.'
+                : 'Token invalide. Veuillez vous reconnecter.';
+
+            return res.status(403).json({
+                error: errorMessage,
+                details: process.env.NODE_ENV === 'development' ? err.message : undefined
+            });
+        }
         req.user = user;
         next();
     });
