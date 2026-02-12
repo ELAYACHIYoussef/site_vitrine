@@ -27,9 +27,45 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/products")
-    public Product addProduct(@RequestBody Product product) {
-        return productService.saveProduct(product);
+    @PostMapping(value = "/products", consumes = "multipart/form-data")
+    public ResponseEntity<?> addProductWithImages(
+            @RequestParam("name") String name,
+            @RequestParam("category") String category,
+            @RequestParam(value = "categoryLabel", required = false) String categoryLabel,
+            @RequestParam("price") Double price,
+            @RequestParam(value = "stock", defaultValue = "0") Integer stock,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "descriptionCourte", required = false) String descriptionCourte,
+            @RequestParam(value = "images", required = false) List<org.springframework.web.multipart.MultipartFile> images) {
+        try {
+            Product product = productService.createProductWithImages(
+                    name, category, categoryLabel, price, stock,
+                    description, descriptionCourte, images);
+            return ResponseEntity.ok(product);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/products/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateProductWithImages(
+            @PathVariable Long id,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "categoryLabel", required = false) String categoryLabel,
+            @RequestParam(value = "price", required = false) Double price,
+            @RequestParam(value = "stock", required = false) Integer stock,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "descriptionCourte", required = false) String descriptionCourte,
+            @RequestParam(value = "images", required = false) List<org.springframework.web.multipart.MultipartFile> images) {
+        try {
+            Product product = productService.updateProductWithImages(
+                    id, name, category, categoryLabel, price, stock,
+                    description, descriptionCourte, images);
+            return ResponseEntity.ok(product);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/products/{id}/view")

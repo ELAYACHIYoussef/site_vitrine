@@ -7,6 +7,8 @@ import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ProductList from './pages/admin/ProductList';
+import AddProduct from './pages/admin/AddProduct';
 
 function AppContent() {
   const location = useLocation();
@@ -24,7 +26,8 @@ function AppContent() {
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            <Route path="products" element={<div className="p-8">Products Admin Page (Coming Soon)</div>} />
+            <Route path="products" element={<ProductList />} />
+            <Route path="products/new" element={<AddProduct />} />
             <Route path="orders" element={<div className="p-8">Orders Admin Page (Coming Soon)</div>} />
             <Route path="customers" element={<div className="p-8">Customers Admin Page (Coming Soon)</div>} />
             <Route path="analytics" element={<div className="p-8">Analytics Admin Page (Coming Soon)</div>} />
