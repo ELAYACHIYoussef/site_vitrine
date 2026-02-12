@@ -4,7 +4,14 @@ import { authService } from '../api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+    const [user, setUser] = useState(() => {
+        try {
+            const userData = localStorage.getItem('user');
+            return userData && userData !== 'undefined' ? JSON.parse(userData) : null;
+        } catch {
+            return null;
+        }
+    });
     const [token, setToken] = useState(localStorage.getItem('token') || null);
     const [loading, setLoading] = useState(false);
 

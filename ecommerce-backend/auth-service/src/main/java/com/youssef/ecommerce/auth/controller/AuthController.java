@@ -23,7 +23,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         return authService.login(request.get("email"), request.get("password"))
-                .map(token -> ResponseEntity.ok(Map.of("token", token)))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
 }

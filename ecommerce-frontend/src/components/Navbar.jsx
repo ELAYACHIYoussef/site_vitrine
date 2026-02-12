@@ -18,14 +18,40 @@ const Navbar = () => {
                     Accueil
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
                 </Link>
-                <Link to="/products" className="hover:text-indigo-600 transition-colors relative group">
-                    Produits
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
-                </Link>
-                <Link to="/contact" className="hover:text-indigo-600 transition-colors relative group">
-                    Contact
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
-                </Link>
+
+                {user?.role === 'admin' ? (
+                    // Navigation ADMIN
+                    <>
+                        <Link to="/admin" className="hover:text-indigo-600 transition-colors relative group">
+                            Dashboard
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                        </Link>
+                        <Link to="/admin/products" className="hover:text-indigo-600 transition-colors relative group">
+                            Produits
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                        </Link>
+                        <Link to="/admin/orders" className="hover:text-indigo-600 transition-colors relative group">
+                            Commandes
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                        </Link>
+                        <Link to="/admin/customers" className="hover:text-indigo-600 transition-colors relative group">
+                            Clients
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                        </Link>
+                    </>
+                ) : (
+                    // Navigation CLIENT
+                    <>
+                        <Link to="/products" className="hover:text-indigo-600 transition-colors relative group">
+                            Produits
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                        </Link>
+                        <Link to="/contact" className="hover:text-indigo-600 transition-colors relative group">
+                            Contact
+                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                        </Link>
+                    </>
+                )}
             </div>
 
             <div className="flex items-center space-x-6">
@@ -39,7 +65,10 @@ const Navbar = () => {
 
                 {isAuthenticated() ? (
                     <div className="flex items-center space-x-4">
-                        <Link to="/profile" className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200">
+                        <Link
+                            to={user?.role === 'admin' ? '/admin' : '/'}
+                            className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
+                        >
                             <User className="w-4 h-4" />
                             <span>{user?.username}</span>
                         </Link>
