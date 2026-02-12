@@ -5,9 +5,9 @@ spring:
   application:
     name: catalog-service
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/ecommerce_catalog
+    username: postgres
+    password: you123
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

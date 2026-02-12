@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import ProductDetails from './pages/ProductDetails';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <main className="pb-20">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
             {/* Add more routes here as we migrate them */}
           </Routes>
         </main>

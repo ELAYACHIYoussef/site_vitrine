@@ -1,0 +1,6 @@
+com\youssef\ecommerce\catalog\CatalogServiceApplication.class
+com\youssef\ecommerce\catalog\repository\ProductRepository.class
+com\youssef\ecommerce\catalog\controller\ProductController.class
+com\youssef\ecommerce\catalog\service\ProductService.class
+com\youssef\ecommerce\catalog\model\Product$ProductBuilder.class
+com\youssef\ecommerce\catalog\model\Product.class
