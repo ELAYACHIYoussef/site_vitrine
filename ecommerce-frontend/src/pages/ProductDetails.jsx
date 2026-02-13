@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../api';
+import { useCart } from '../context/CartContext';
 import { ArrowLeft, ShoppingBag, Heart, Share2, Star, Check, Truck, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -43,6 +44,14 @@ const ProductDetails = () => {
             </div>
         );
     }
+
+    const { addToCart } = useCart();
+
+    const handleAddToCart = () => {
+        if (product) {
+            addToCart(product);
+        }
+    };
 
     return (
         <div className="container mx-auto px-6 py-12">
@@ -122,7 +131,10 @@ const ProductDetails = () => {
 
                     {/* Actions */}
                     <div className="flex gap-4">
-                        <button className="flex-1 btn-primary flex items-center justify-center gap-2 group">
+                        <button
+                            onClick={handleAddToCart}
+                            className="flex-1 btn-primary flex items-center justify-center gap-2 group"
+                        >
                             <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             Ajouter au panier
                         </button>

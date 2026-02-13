@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ProductCard = ({ product }) => {
+    const { addToCart } = useCart();
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -24,7 +26,11 @@ const ProductCard = ({ product }) => {
                     <button className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Ajouter aux favoris">
                         <Heart className="w-5 h-5" />
                     </button>
-                    <button className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Ajouter au panier">
+                    <button
+                        onClick={() => addToCart(product)}
+                        className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1"
+                        title="Ajouter au panier"
+                    >
                         <ShoppingBag className="w-5 h-5" />
                     </button>
                     <button className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Voir détails">

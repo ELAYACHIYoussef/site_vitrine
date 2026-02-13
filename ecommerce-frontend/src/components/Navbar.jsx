@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import { ShoppingCart, Heart, User, LogOut, Menu } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
+    const { cartCount } = useCart();
 
     return (
         <nav className="glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300">
@@ -73,10 +75,14 @@ const Navbar = () => {
                     <>
                         <div className="flex space-x-4 items-center border-r border-slate-200 pr-6 mr-2">
                             <Heart className="w-5 h-5 cursor-pointer text-slate-400 hover:text-rose-500 hover:scale-110 transition-all" />
-                            <div className="relative group">
+                            <Link to="/cart" className="relative group">
                                 <ShoppingCart className="w-5 h-5 cursor-pointer text-slate-600 hover:text-indigo-600 transition-colors" />
-                                <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">0</span>
-                            </div>
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
                         </div>
 
                         {isAuthenticated() ? (

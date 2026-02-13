@@ -1,0 +1,12 @@
+com\youssef\ecommerce\order\controller\OrderController.class
+com\youssef\ecommerce\order\dto\OrderItemRequest.class
+com\youssef\ecommerce\order\repository\OrderItemRepository.class
+com\youssef\ecommerce\order\service\OrderService.class
+com\youssef\ecommerce\order\model\Order$OrderStatus.class
+com\youssef\ecommerce\order\OrderServiceApplication.class
+com\youssef\ecommerce\order\dto\OrderRequest.class
+com\youssef\ecommerce\order\model\OrderItem.class
+com\youssef\ecommerce\order\model\Order$OrderBuilder.class
+com\youssef\ecommerce\order\repository\OrderRepository.class
+com\youssef\ecommerce\order\model\OrderItem$OrderItemBuilder.class
+com\youssef\ecommerce\order\model\Order.class

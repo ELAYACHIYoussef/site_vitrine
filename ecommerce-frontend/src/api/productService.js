@@ -1,14 +1,11 @@
-import axios from 'axios';
-
-// Direct call to catalog-service (port 8082) to support multipart/form-data
-const API_BASE_URL = 'http://localhost:8082/api/catalog';
+import api from './index';
 
 const productService = {
     /**
      * Get all products
      */
     getAllProducts: async () => {
-        const response = await axios.get(`${API_BASE_URL}/products`);
+        const response = await api.get('/catalog/products');
         return response.data;
     },
 
@@ -16,7 +13,7 @@ const productService = {
      * Get product by ID
      */
     getProductById: async (id) => {
-        const response = await axios.get(`${API_BASE_URL}/products/${id}`);
+        const response = await api.get(`/catalog/products/${id}`);
         return response.data;
     },
 
@@ -44,7 +41,7 @@ const productService = {
             });
         }
 
-        const response = await axios.post(`${API_BASE_URL}/products`, formData, {
+        const response = await api.post('/catalog/products', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -78,7 +75,7 @@ const productService = {
             });
         }
 
-        const response = await axios.put(`${API_BASE_URL}/products/${id}`, formData, {
+        const response = await api.put(`/catalog/products/${id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -91,7 +88,7 @@ const productService = {
      * Delete product
      */
     deleteProduct: async (id) => {
-        const response = await axios.delete(`${API_BASE_URL}/products/${id}`);
+        const response = await api.delete(`/catalog/products/${id}`);
         return response.data;
     }
 };
