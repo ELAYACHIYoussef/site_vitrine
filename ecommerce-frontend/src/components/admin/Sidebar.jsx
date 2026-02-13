@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import {
     LayoutDashboard,
     Package,
@@ -19,6 +20,8 @@ import {
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { logout } = useAuth();
     const [expandedMenus, setExpandedMenus] = useState(['products']);
 
     const toggleMenu = (menuId) => {
@@ -82,9 +85,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     ];
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+        logout();
+        navigate('/login');
     };
 
     return (

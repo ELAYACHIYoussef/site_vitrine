@@ -121,4 +121,29 @@ public class ProductService {
 
         return productRepository.save(product);
     }
+
+    // Stats methods
+    public long getTotalStock() {
+        return productRepository.sumTotalStock();
+    }
+
+    public double getCatalogValue() {
+        return productRepository.sumCatalogValue();
+    }
+
+    public java.util.Map<String, Long> getProductsByCategory() {
+        java.util.Map<String, Long> map = new java.util.LinkedHashMap<>();
+        for (Object[] row : productRepository.countByCategory()) {
+            map.put((String) row[0], (Long) row[1]);
+        }
+        return map;
+    }
+
+    public java.util.List<Product> getTopViewedProducts() {
+        return productRepository.findTop5ByOrderByViewsDesc();
+    }
+
+    public java.util.List<Product> getRecentProducts() {
+        return productRepository.findTop5ByOrderByIdDesc();
+    }
 }

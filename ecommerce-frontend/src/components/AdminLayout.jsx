@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './admin/Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 const AdminLayout = () => {
+    const { isAuthenticated, isAdmin } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    // Redirect to login if not authenticated or not admin
+    if (!isAuthenticated() || !isAdmin()) {
+        return <Navigate to="/login" replace />;
+    }
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -24,3 +31,4 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
+

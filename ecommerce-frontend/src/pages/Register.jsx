@@ -65,21 +65,27 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100">
+        <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-slate-900 relative overflow-hidden">
+            {/* Background Decorations */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#e85d04]/10 blur-[100px]" />
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#3b82f6]/10 blur-[100px]" />
+            </div>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-md"
+                className="w-full max-w-md z-10"
             >
-                <div className="bg-white rounded-3xl shadow-2xl shadow-indigo-100/50 border border-slate-100 overflow-hidden">
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 px-8 py-10 text-center">
-                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <UserPlus className="w-8 h-8 text-white" />
+                    <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] px-8 py-10 text-center border-b border-white/5">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[#e85d04] to-[#f48c06] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#e85d04]/30">
+                            <span className="text-white font-bold text-3xl">A</span>
                         </div>
                         <h2 className="text-3xl font-extrabold text-white mb-2">Inscription</h2>
-                        <p className="text-indigo-100">Créez votre compte en quelques secondes</p>
+                        <p className="text-slate-400">Créez votre compte AzyMarket</p>
                     </div>
 
                     {/* Form */}
@@ -88,7 +94,7 @@ const Register = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl flex items-start gap-2"
+                                className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl flex items-start gap-2"
                             >
                                 <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                                 <span className="text-sm">{error}</span>
@@ -99,26 +105,26 @@ const Register = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex items-start gap-2"
+                                className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl flex items-start gap-2"
                             >
                                 <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                                <span className="text-sm">Inscription réussie ! Redirection vers la connexion...</span>
+                                <span className="text-sm">Inscription réussie ! Redirection...</span>
                             </motion.div>
                         )}
 
                         <div>
-                            <label htmlFor="username" className="block text-sm font-bold text-slate-700 mb-2">
+                            <label htmlFor="username" className="block text-sm font-bold text-slate-300 mb-2">
                                 Nom d'utilisateur
                             </label>
                             <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                                 <input
                                     type="text"
                                     id="username"
                                     name="username"
                                     value={formData.username}
                                     onChange={handleChange}
-                                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-900 placeholder-slate-400"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600"
                                     placeholder="johndoe"
                                     required
                                 />
@@ -126,18 +132,18 @@ const Register = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-bold text-slate-700 mb-2">
+                            <label htmlFor="email" className="block text-sm font-bold text-slate-300 mb-2">
                                 Email
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                                 <input
                                     type="email"
                                     id="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-900 placeholder-slate-400"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600"
                                     placeholder="votre@email.com"
                                     required
                                 />
@@ -145,18 +151,18 @@ const Register = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-bold text-slate-700 mb-2">
+                            <label htmlFor="password" className="block text-sm font-bold text-slate-300 mb-2">
                                 Mot de passe
                             </label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                                 <input
                                     type="password"
                                     id="password"
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-900 placeholder-slate-400"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -164,18 +170,18 @@ const Register = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-bold text-slate-700 mb-2">
+                            <label htmlFor="confirmPassword" className="block text-sm font-bold text-slate-300 mb-2">
                                 Confirmer le mot de passe
                             </label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                                 <input
                                     type="password"
                                     id="confirmPassword"
                                     name="confirmPassword"
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
-                                    className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-900 placeholder-slate-400"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -185,7 +191,7 @@ const Register = () => {
                         <button
                             type="submit"
                             disabled={loading || success}
-                            className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#e85d04] to-[#f48c06] hover:from-[#dc2f02] hover:to-[#e85d04] text-white font-bold shadow-lg shadow-orange-500/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <>
@@ -200,10 +206,10 @@ const Register = () => {
                             )}
                         </button>
 
-                        <div className="text-center pt-4 border-t border-slate-100">
-                            <p className="text-slate-600 text-sm">
+                        <div className="text-center pt-4 border-t border-white/5">
+                            <p className="text-slate-400 text-sm">
                                 Vous avez déjà un compte ?{' '}
-                                <Link to="/login" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">
+                                <Link to="/login" className="text-[#e85d04] font-bold hover:text-[#f48c06] transition-colors">
                                     Se connecter
                                 </Link>
                             </p>
@@ -216,3 +222,4 @@ const Register = () => {
 };
 
 export default Register;
+

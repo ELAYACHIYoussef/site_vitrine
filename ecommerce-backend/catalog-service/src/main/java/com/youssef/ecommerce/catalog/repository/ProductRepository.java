@@ -16,4 +16,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images")
     List<Product> findAllWithImages();
+
+    // Stats queries
+    @Query("SELECT COALESCE(SUM(p.stock), 0) FROM Product p")
+    long sumTotalStock();
+
+    @Query("SELECT COALESCE(SUM(p.price * p.stock), 0) FROM Product p")
+    double sumCatalogValue();
+
+    @Query("SELECT p.category, COUNT(p) FROM Product p GROUP BY p.category")
+    List<Object[]> countByCategory();
+
+    List<Product> findTop5ByOrderByViewsDesc();
+
+    List<Product> findTop5ByOrderByIdDesc();
 }

@@ -83,6 +83,28 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/stats")
+    public ResponseEntity<?> getStats() {
+        long totalProducts = productService.getAllProducts().size();
+        long totalStock = productService.getTotalStock();
+        double catalogValue = productService.getCatalogValue();
+        Map<String, Long> productsByCategory = productService.getProductsByCategory();
+        List<Map<String, Object>> topViewed = productService.getTopViewedProducts()
+                .stream().map(this::toMap).collect(Collectors.toList());
+        List<Map<String, Object>> recentProducts = productService.getRecentProducts()
+                .stream().map(this::toMap).collect(Collectors.toList());
+
+        Map<String, Object> stats = new LinkedHashMap<>();
+        stats.put("totalProducts", totalProducts);
+        stats.put("totalStock", totalStock);
+        stats.put("catalogValue", catalogValue);
+        stats.put("productsByCategory", productsByCategory);
+        stats.put("topViewed", topViewed);
+        stats.put("recentProducts", recentProducts);
+
+        return ResponseEntity.ok(stats);
+    }
+
     /**
      * Convert Product entity to a plain Map to avoid Jackson/Hibernate
      * serialization issues

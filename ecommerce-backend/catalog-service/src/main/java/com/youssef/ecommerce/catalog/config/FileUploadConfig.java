@@ -30,10 +30,12 @@ public class FileUploadConfig implements WebMvcConfigurer {
                 .addResourceLocations(uploadPathStr);
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/uploads/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET");
-    }
+    /*
+     * @Override
+     * public void addCorsMappings(CorsRegistry registry) {
+     * registry.addMapping("/uploads/**")
+     * .allowedOrigins("*")
+     * .allowedMethods("GET");
+     * }
+     */
 }
