@@ -38,7 +38,7 @@ public class Product {
     private String thumbnail;
 
     // List of image URLs (up to 6)
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")
     @lombok.Builder.Default

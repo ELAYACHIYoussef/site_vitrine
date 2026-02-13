@@ -5,10 +5,10 @@ import StatsCard from '../../components/admin/StatsCard';
 const AdminDashboard = () => {
     // Mock data pour démonstration
     const stats = [
-        { title: 'Total Products', value: '48', trend: '+12%', icon: Package, color: 'indigo' },
-        { title: 'Total Orders', value: '124', trend: '+8%', icon: ShoppingCart, color: 'emerald' },
-        { title: 'Total Customers', value: '1.2k', trend: '+15%', icon: Users, color: 'amber' },
-        { title: 'Revenue Today', value: '€12,450', trend: '+23%', icon: DollarSign, color: 'rose' }
+        { title: 'Total Products', value: '48', trend: '+12%', icon: Package, color: 'navy' },
+        { title: 'Total Orders', value: '124', trend: '+8%', icon: ShoppingCart, color: 'orange' },
+        { title: 'Total Customers', value: '1.2k', trend: '+15%', icon: Users, color: 'emerald' },
+        { title: 'Revenue Today', value: '€12,450', trend: '+23%', icon: DollarSign, color: 'amber' }
     ];
 
     const recentOrders = [
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
                         {topProducts.map((product, index) => (
                             <div key={index} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg transition-colors group">
                                 <div className="flex-1">
-                                    <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                                    <h3 className="font-semibold text-slate-900 group-hover:text-[#FF6835] transition-colors">
                                         {product.name}
                                     </h3>
                                     <div className="flex items-center gap-3 mt-1">
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
                         ))}
                     </div>
 
-                    <button className="w-full mt-4 py-2 text-indigo-600 hover:text-indigo-700 font-semibold flex items-center justify-center gap-2 hover:gap-3 transition-all">
+                    <button className="w-full mt-4 py-2 text-[#FF6835] hover:text-orange-700 font-semibold flex items-center justify-center gap-2 hover:gap-3 transition-all">
                         View All Products
                         <ArrowRight className="w-4 h-4" />
                     </button>
@@ -123,7 +123,7 @@ const AdminDashboard = () => {
                         <h2 className="text-xl font-bold text-slate-900">Recent Orders</h2>
                         <p className="text-slate-600 text-sm mt-1">Latest customer orders</p>
                     </div>
-                    <button className="px-4 py-2 text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-2">
+                    <button className="px-4 py-2 text-[#FF6835] hover:text-orange-700 font-semibold flex items-center gap-2">
                         View All
                         <ArrowRight className="w-4 h-4" />
                     </button>

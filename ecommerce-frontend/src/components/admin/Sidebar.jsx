@@ -97,31 +97,33 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 />
             )}
 
-            {/* Sidebar */}
+            {/* Sidebar - AzyMarket Brand Colors */}
             <aside className={`
-                fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 
-                border-r border-slate-700/50 z-50 transition-all duration-300 ease-in-out
+                fixed left-0 top-0 h-screen 
+                bg-gradient-to-b from-[#0f2942] via-[#1a3a52] to-[#0f2942]
+                border-r border-[#FF6835]/20 
+                z-50 transition-all duration-300 ease-in-out
                 ${isOpen ? 'w-72' : 'w-0 lg:w-20'}
                 overflow-hidden
             `}>
                 <div className="flex flex-col h-full">
-                    {/* Header */}
-                    <div className="p-6 border-b border-slate-700/50">
+                    {/* Header with Logo */}
+                    <div className="p-6 border-b border-[#FF6835]/20">
                         <div className="flex items-center justify-between">
                             {isOpen && (
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/50">
-                                        <span className="text-white font-bold text-xl">E</span>
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF6835] to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/50">
+                                        <span className="text-white font-bold text-xl">A</span>
                                     </div>
                                     <div>
-                                        <h1 className="text-white font-bold text-lg">E-commerce</h1>
+                                        <h1 className="text-white font-bold text-lg">AzyMarket</h1>
                                         <p className="text-slate-400 text-xs">Admin Panel</p>
                                     </div>
                                 </div>
                             )}
                             <button
                                 onClick={() => setIsOpen(!isOpen)}
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all lg:hidden"
+                                className="p-2 rounded-lg bg-[#1a3a52] hover:bg-[#FF6835]/20 text-slate-400 hover:text-[#FF6835] transition-all lg:hidden"
                             >
                                 {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                             </button>
@@ -129,7 +131,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                    <nav className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-thin scrollbar-thumb-[#FF6835]/30 scrollbar-track-transparent">
                         {menuItems.map((item) => (
                             <div key={item.id}>
                                 {/* Main Item */}
@@ -139,8 +141,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                         className={`
                                             w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200
                                             ${isMenuActive([item.subItems[0]?.path])
-                                                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50'
-                                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                                ? 'bg-gradient-to-r from-[#FF6835] to-orange-600 text-white shadow-lg shadow-orange-500/50'
+                                                : 'text-slate-400 hover:bg-[#1a3a52] hover:text-white'
                                             }
                                         `}
                                     >
@@ -150,7 +152,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                                 <>
                                                     <span className="font-medium">{item.label}</span>
                                                     {item.badge && (
-                                                        <span className="px-2 py-0.5 text-xs rounded-full bg-red-500 text-white">
+                                                        <span className="px-2 py-0.5 text-xs rounded-full bg-[#FF6835] text-white">
                                                             {item.badge}
                                                         </span>
                                                     )}
@@ -169,8 +171,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                         className={`
                                             flex items-center gap-3 p-3 rounded-xl transition-all duration-200
                                             ${isActive(item.path)
-                                                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50'
-                                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                                ? 'bg-gradient-to-r from-[#FF6835] to-orange-600 text-white shadow-lg shadow-orange-500/50'
+                                                : 'text-slate-400 hover:bg-[#1a3a52] hover:text-white'
                                             }
                                         `}
                                     >
@@ -181,7 +183,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
                                 {/* Sub Items */}
                                 {item.subItems && expandedMenus.includes(item.id) && isOpen && (
-                                    <div className="ml-4 mt-2 space-y-1 border-l-2 border-slate-700 pl-4">
+                                    <div className="ml-4 mt-2 space-y-1 border-l-2 border-[#FF6835]/30 pl-4">
                                         {item.subItems.map((subItem, idx) => (
                                             <Link
                                                 key={idx}
@@ -189,8 +191,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                                 className={`
                                                     flex items-center gap-2 p-2 rounded-lg text-sm transition-all duration-200
                                                     ${isActive(subItem.path)
-                                                        ? 'bg-slate-700 text-white font-medium'
-                                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                                        ? 'bg-[#1a3a52] text-[#FF6835] font-medium'
+                                                        : 'text-slate-400 hover:bg-[#1a3a52] hover:text-white'
                                                     }
                                                 `}
                                             >
@@ -204,8 +206,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         ))}
                     </nav>
 
-                    {/* Footer - User Profile */}
-                    <div className="p-4 border-t border-slate-700/50">
+                    {/* Footer - Logout */}
+                    <div className="p-4 border-t border-[#FF6835]/20">
                         <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
@@ -221,7 +223,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="hidden lg:block fixed left-20 top-6 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all z-40"
+                    className="hidden lg:block fixed left-20 top-6 p-2 rounded-lg bg-[#1a3a52] hover:bg-[#FF6835] text-slate-400 hover:text-white transition-all z-40"
                 >
                     <Menu className="w-5 h-5" />
                 </button>

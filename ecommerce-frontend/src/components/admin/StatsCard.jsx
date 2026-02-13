@@ -1,11 +1,16 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatsCard = ({ title, value, trend, icon: Icon, color = 'indigo', bgPattern = 'gradient' }) => {
+const StatsCard = ({ title, value, trend, icon: Icon, color = 'navy', bgPattern = 'gradient' }) => {
     const colorVariants = {
-        indigo: {
-            bg: 'from-indigo-600 to-purple-600',
-            shadow: 'shadow-indigo-500/50',
+        navy: {
+            bg: 'from-[#1a3a52] to-[#0f2942]',
+            shadow: 'shadow-[#1a3a52]/50',
+            icon: 'bg-white/20'
+        },
+        orange: {
+            bg: 'from-[#FF6835] to-orange-600',
+            shadow: 'shadow-orange-500/50',
             icon: 'bg-white/20'
         },
         emerald: {
@@ -17,15 +22,10 @@ const StatsCard = ({ title, value, trend, icon: Icon, color = 'indigo', bgPatter
             bg: 'from-amber-600 to-orange-600',
             shadow: 'shadow-amber-500/50',
             icon: 'bg-white/20'
-        },
-        rose: {
-            bg: 'from-rose-600 to-pink-600',
-            shadow: 'shadow-rose-500/50',
-            icon: 'bg-white/20'
         }
     };
 
-    const colors = colorVariants[color] || colorVariants.indigo;
+    const colors = colorVariants[color] || colorVariants.navy;
     const isPositive = trend?.startsWith('+');
 
     return (

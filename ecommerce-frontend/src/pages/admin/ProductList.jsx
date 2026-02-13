@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, Package, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 import productService from '../../api/productService';
+import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 
 const ProductList = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, product: null });
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         loadProducts();
@@ -19,24 +23,30 @@ const ProductList = () => {
             setProducts(data);
         } catch (error) {
             console.error('Erreur:', error);
-            alert('Erreur lors du chargement des produits');
+            toast.error('Erreur lors du chargement des produits');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = async (id, name) => {
-        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${name}" ?`)) {
-            return;
-        }
+    const handleDeleteClick = (product) => {
+        setDeleteModal({ isOpen: true, product });
+    };
+
+    const handleDeleteConfirm = async () => {
+        const { product } = deleteModal;
+        setIsDeleting(true);
 
         try {
-            await productService.deleteProduct(id);
-            alert('Produit supprimé avec succès');
-            loadProducts();
+            await productService.deleteProduct(product.id);
+            toast.success(`"${product.name}" supprimé avec succès`);
+            setDeleteModal({ isOpen: false, product: null });
+            loadProducts(); // Refresh list
         } catch (error) {
             console.error('Erreur:', error);
-            alert('Erreur lors de la suppression');
+            toast.error('Erreur lors de la suppression');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -55,7 +65,7 @@ const ProductList = () => {
                 </div>
                 <button
                     onClick={() => navigate('/admin/products/new')}
-                    className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/50 font-semibold"
+                    className="flex items-center gap-2 px-6 py-3 bg-[#FF6835] text-white rounded-lg hover:bg-orange-700 transition-colors shadow-lg shadow-orange-500/30 font-semibold"
                 >
                     <Plus className="w-5 h-5" />
                     Ajouter un Produit
@@ -71,7 +81,7 @@ const ProductList = () => {
                         placeholder="Rechercher par nom ou catégorie..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:border-[#FF6835] focus:ring-2 focus:ring-orange-200 outline-none transition-all"
                     />
                 </div>
             </div>
@@ -94,7 +104,7 @@ const ProductList = () => {
                     {!searchTerm && (
                         <button
                             onClick={() => navigate('/admin/products/new')}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#FF6835] text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
                         >
                             <Plus className="w-5 h-5" />
                             Ajouter un Produit
@@ -131,7 +141,7 @@ const ProductList = () => {
                                 <p className="text-sm text-slate-600 mb-3">{product.categoryLabel || product.category}</p>
 
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-2xl font-bold text-indigo-600">
+                                    <span className="text-2xl font-bold text-[#FF6835]">
                                         {product.price?.toFixed(2)} €
                                     </span>
                                     <span className="text-sm text-slate-600">
@@ -142,17 +152,17 @@ const ProductList = () => {
                                 {/* Actions */}
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => navigate(`/admin/products/${product.id}/edit`)}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-slate-700 font-medium"
+                                        onClick={() => navigate(`/admin/products/edit/${product.id}`)}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#FF6835] hover:bg-orange-700 rounded-lg transition-colors text-white font-medium"
                                     >
                                         <Edit className="w-4 h-4" />
                                         Modifier
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(product.id, product.name)}
-                                        className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors"
+                                        onClick={() => handleDeleteClick(product)}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30"
                                     >
-                                        <Trash2 className="w-5 h-5" />
+                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
@@ -160,6 +170,15 @@ const ProductList = () => {
                     ))}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ isOpen: false, product: null })}
+                onConfirm={handleDeleteConfirm}
+                productName={deleteModal.product?.name || ''}
+                isDeleting={isDeleting}
+            />
         </div>
     );
 };

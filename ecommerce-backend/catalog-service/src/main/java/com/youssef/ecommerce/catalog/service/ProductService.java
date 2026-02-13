@@ -16,7 +16,7 @@ public class ProductService {
     private final ImageService imageService;
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllWithImages();
     }
 
     public List<Product> getProductsByCategory(String category) {
@@ -24,7 +24,7 @@ public class ProductService {
     }
 
     public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+        return productRepository.findByIdWithImages(id);
     }
 
     public Product saveProduct(Product product) {
