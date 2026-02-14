@@ -71,7 +71,7 @@ function AdminDashboard() {
         );
     }
 
-    const { catalog, auth } = stats;
+    const { catalog, auth, orders } = stats;
 
     // Prepare chart data
     const categoryData = catalog.productsByCategory
@@ -90,20 +90,12 @@ function AdminDashboard() {
 
     const kpiCards = [
         {
-            title: 'Total Produits',
-            value: catalog.totalProducts || 0,
-            icon: Package,
-            color: BRAND_COLORS.primary,
-            gradient: 'linear-gradient(135deg, #e85d04 0%, #f48c06 100%)',
-            subtitle: `${catalog.totalStock || 0} en stock`,
-        },
-        {
-            title: 'Valeur Catalogue',
-            value: `${(catalog.catalogValue || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`,
+            title: 'Chiffre d\'Affaires',
+            value: `${(orders?.totalRevenue || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`,
             icon: DollarSign,
             color: BRAND_COLORS.success,
             gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-            subtitle: 'Valeur totale du stock',
+            subtitle: `${orders?.totalOrders || 0} commandes au total`,
         },
         {
             title: 'Utilisateurs',
@@ -111,15 +103,23 @@ function AdminDashboard() {
             icon: Users,
             color: BRAND_COLORS.info,
             gradient: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-            subtitle: `${auth.admins || 0} admin(s) · ${auth.clients || 0} client(s)`,
+            subtitle: `${auth.clients || 0} client(s)`,
         },
         {
-            title: 'Catégories',
-            value: categoryData.length,
+            title: 'Produits',
+            value: catalog.totalProducts || 0,
+            icon: Package,
+            color: BRAND_COLORS.primary,
+            gradient: 'linear-gradient(135deg, #e85d04 0%, #f48c06 100%)',
+            subtitle: `${catalog.totalStock || 0} en stock`,
+        },
+        {
+            title: 'Valeur Stock',
+            value: `${(catalog.catalogValue || 0).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €`,
             icon: Boxes,
             color: BRAND_COLORS.purple,
             gradient: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
-            subtitle: 'Catégories de produits',
+            subtitle: 'Catalog Value',
         },
     ];
 

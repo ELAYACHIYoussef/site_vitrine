@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import AdminLayout from './components/AdminLayout';
 import Home from './pages/Home';
 import ProductCatalog from './pages/ProductCatalog';
@@ -32,14 +33,15 @@ import Settings from './pages/admin/Settings';
 
 function AppContent() {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <Navbar />
-            <main className="pb-20">
+            {!isAdminRoute && <Navbar />}
+            <main className={isAdminRoute ? '' : 'pb-20'}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/products" element={<ProductCatalog />} />
@@ -69,12 +71,11 @@ function AppContent() {
                 </Route>
 
                 {/* Add more routes here as we migrate them */}
+
               </Routes>
             </main>
 
-            <footer className="py-10 border-t bg-white text-center text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} SITE VITRINE E-COMMERCE. Tous droits réservés.
-            </footer>
+            {!isAdminRoute && <Footer />}
 
             {/* Toast Notifications */}
             <Toaster

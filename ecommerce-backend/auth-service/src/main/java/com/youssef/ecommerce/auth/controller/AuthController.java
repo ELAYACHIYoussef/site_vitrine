@@ -63,6 +63,7 @@ public class AuthController {
                     m.put("username", u.getUsername());
                     m.put("email", u.getEmail());
                     m.put("role", u.getRole());
+                    m.put("createdAt", u.getCreatedAt());
                     return m;
                 })
                 .collect(Collectors.toList());
@@ -86,6 +87,7 @@ public class AuthController {
                     m.put("username", u.getUsername());
                     m.put("email", u.getEmail());
                     m.put("role", u.getRole());
+                    m.put("createdAt", u.getCreatedAt());
                     return m;
                 })
                 .collect(Collectors.toList());

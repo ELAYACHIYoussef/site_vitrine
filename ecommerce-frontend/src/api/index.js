@@ -30,6 +30,7 @@ export const authService = {
 export const catalogService = {
     getProducts: () => api.get('/catalog/products'),
     getProduct: (id) => api.get(`/catalog/products/${id}`),
+    getStats: () => api.get('/catalog/stats'),
     incrementView: (id) => api.post(`/catalog/products/${id}/view`),
 };
 

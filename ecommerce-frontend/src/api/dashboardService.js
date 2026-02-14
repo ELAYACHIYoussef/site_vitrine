@@ -11,9 +11,24 @@ export const getAuthStats = async () => {
 };
 
 export const getDashboardStats = async () => {
-    const [catalog, auth] = await Promise.all([
-        getCatalogStats(),
-        getAuthStats()
-    ]);
-    return { catalog, auth };
+    try {
+        const [catalog, auth, orders] = await Promise.all([
+            getCatalogStats(),
+            getAuthStats(),
+            api.get('/orders').then(res => res.data)
+        ]);
+
+        return {
+            catalog,
+            auth,
+            orders: {
+                totalOrders: orders.length,
+                totalRevenue: orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0),
+                recentOrders: orders.slice(-5).reverse()
+            }
+        };
+    } catch (error) {
+        console.error("Error aggregating dashboard stats", error);
+        throw error;
+    }
 };
