@@ -1,11 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ProductCard = ({ product }) => {
     const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const isLoved = isInWishlist(product.id);
+
+    // Fix image path logic
+    const getImageUrl = (url) => {
+        if (!url) return '/products/product_1.jpg'; // Default fallback
+        if (url.startsWith('http')) return url;
+
+        // Use backend URL like in Admin panel
+        return `http://localhost:8082${url}`;
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -16,15 +29,21 @@ const ProductCard = ({ product }) => {
         >
             <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
                 <img
-                    src={product.thumbnail || 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}
+                    src={getImageUrl(product.thumbnail)}
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/products/product_1.jpg'; }}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
 
                 {/* Overlay Buttons */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                    <button className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Ajouter aux favoris">
-                        <Heart className="w-5 h-5" />
+                    <button
+                        onClick={() => toggleWishlist(product)}
+                        className={`p-3 rounded-full shadow-lg transition-all transform hover:scale-110 hover:-translate-y-1 ${isLoved ? 'bg-rose-500 text-white' : 'bg-white text-slate-900 hover:bg-rose-500 hover:text-white'
+                            }`}
+                        title={isLoved ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    >
+                        <Heart className={`w-5 h-5 ${isLoved ? 'fill-current' : ''}`} />
                     </button>
                     <button
                         onClick={() => addToCart(product)}
@@ -33,9 +52,9 @@ const ProductCard = ({ product }) => {
                     >
                         <ShoppingBag className="w-5 h-5" />
                     </button>
-                    <button className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Voir détails">
+                    <Link to={`/products/${product.id}`} className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Voir détails">
                         <Eye className="w-5 h-5" />
-                    </button>
+                    </Link>
                 </div>
 
                 {/* Badges/Tags if needed */}

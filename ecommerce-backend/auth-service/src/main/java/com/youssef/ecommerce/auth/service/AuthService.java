@@ -43,6 +43,7 @@ public class AuthService {
                 .map(user -> {
                     String token = jwtService.generateToken(user.getUsername(), user.getRole());
                     Map<String, Object> userData = Map.of(
+                            "id", user.getId(),
                             "username", user.getUsername(),
                             "email", user.getEmail(),
                             "role", user.getRole());

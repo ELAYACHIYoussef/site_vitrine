@@ -21,5 +21,7 @@ public class ProductDTO {
     private String descriptionCourte;
     private String thumbnail;
     private List<String> images;
+    private List<String> sizes;
+    private List<String> colors;
     private String caracteristiques;
 }

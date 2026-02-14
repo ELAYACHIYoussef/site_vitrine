@@ -60,8 +60,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             icon: ShoppingCart,
             badge: '5',
             subItems: [
-                { label: 'All Orders', path: '/admin/orders' },
-                { label: 'Order Details', path: '/admin/orders/details' }
+                { label: 'All Orders', path: '/admin/orders' }
             ]
         },
         {

@@ -48,7 +48,8 @@ public class ProductService {
     public Product createProductWithImages(
             String name, String category, String categoryLabel,
             Double price, Integer stock, String description,
-            String descriptionCourte, List<org.springframework.web.multipart.MultipartFile> images)
+            String descriptionCourte, List<org.springframework.web.multipart.MultipartFile> images,
+            List<String> sizes, List<String> colors)
             throws java.io.IOException {
 
         // Save images and get URLs
@@ -71,6 +72,8 @@ public class ProductService {
                 .descriptionCourte(descriptionCourte)
                 .thumbnail(!imageUrls.isEmpty() ? imageUrls.get(0) : null)
                 .images(imageUrls)
+                .sizes(sizes)
+                .colors(colors)
                 .build();
 
         return productRepository.save(product);
@@ -82,7 +85,8 @@ public class ProductService {
     public Product updateProductWithImages(
             Long id, String name, String category, String categoryLabel,
             Double price, Integer stock, String description,
-            String descriptionCourte, List<org.springframework.web.multipart.MultipartFile> images)
+            String descriptionCourte, List<org.springframework.web.multipart.MultipartFile> images,
+            List<String> sizes, List<String> colors)
             throws java.io.IOException {
 
         Product product = productRepository.findById(id)
@@ -107,6 +111,10 @@ public class ProductService {
             product.setDescription(description);
         if (descriptionCourte != null)
             product.setDescriptionCourte(descriptionCourte);
+        if (sizes != null)
+            product.setSizes(sizes);
+        if (colors != null)
+            product.setColors(colors);
 
         // Add new images if provided
         if (images != null && !images.isEmpty()) {

@@ -44,6 +44,20 @@ public class Product {
     @lombok.Builder.Default
     private java.util.List<String> images = new java.util.ArrayList<>();
 
+    // Sizes
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "size")
+    @lombok.Builder.Default
+    private java.util.List<String> sizes = new java.util.ArrayList<>();
+
+    // Colors
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_colors", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "color")
+    @lombok.Builder.Default
+    private java.util.List<String> colors = new java.util.ArrayList<>();
+
     @Column(columnDefinition = "TEXT")
     private String caracteristiques; // Store as JSON string
 

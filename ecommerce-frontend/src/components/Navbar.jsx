@@ -1,12 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { ShoppingCart, Heart, User, LogOut, Menu, Package } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
     const { cartCount } = useCart();
+    const { wishlist } = useWishlist();
+    const navigate = useNavigate();
 
     return (
         <nav className="glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300">
@@ -73,17 +77,26 @@ const Navbar = () => {
                 ) : (
                     // Client: Cart, Wishlist, Profile
                     <>
-                        <div className="flex space-x-4 items-center border-r border-slate-200 pr-6 mr-2">
-                            <Heart className="w-5 h-5 cursor-pointer text-slate-400 hover:text-rose-500 hover:scale-110 transition-all" />
-                            <Link to="/cart" className="relative group">
-                                <ShoppingCart className="w-5 h-5 cursor-pointer text-slate-600 hover:text-indigo-600 transition-colors" />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </Link>
-                        </div>
+                        {isAuthenticated() && (
+                            <div className="flex space-x-4 items-center border-r border-slate-200 pr-6 mr-2">
+                                <Link to="/wishlist" className="relative group">
+                                    <Heart className="w-5 h-5 cursor-pointer text-slate-400 hover:text-rose-500 hover:scale-110 transition-all" />
+                                    {wishlist.length > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                            {wishlist.length}
+                                        </span>
+                                    )}
+                                </Link>
+                                <Link to="/cart" className="relative group">
+                                    <ShoppingCart className="w-5 h-5 cursor-pointer text-slate-600 hover:text-indigo-600 transition-colors" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </Link>
+                            </div>
+                        )}
 
                         {isAuthenticated() ? (
                             <div className="flex items-center space-x-4">
@@ -94,11 +107,14 @@ const Navbar = () => {
                                     <Package className="w-4 h-4" />
                                     <span>Mes Commandes</span>
                                 </Link>
-                                <div className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full">
+                                <Link
+                                    to="/account/profile"
+                                    className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
+                                >
                                     <User className="w-4 h-4" />
                                     <span>{user?.username}</span>
-                                </div>
-                                <button onClick={logout} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all">
+                                </Link>
+                                <button onClick={() => { logout(); navigate('/'); }} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all">
                                     <LogOut className="w-5 h-5" />
                                 </button>
                             </div>

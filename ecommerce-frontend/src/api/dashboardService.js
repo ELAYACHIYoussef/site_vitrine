@@ -1,14 +1,12 @@
-import axios from 'axios';
-
-const API = 'http://localhost:8080/api';
+import api from './index';
 
 export const getCatalogStats = async () => {
-    const response = await axios.get(`${API}/catalog/stats`);
+    const response = await api.get('/catalog/stats');
     return response.data;
 };
 
 export const getAuthStats = async () => {
-    const response = await axios.get(`${API}/auth/stats`);
+    const response = await api.get('/auth/stats');
     return response.data;
 };
 

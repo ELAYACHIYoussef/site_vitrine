@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ShoppingCart, Search, Filter, Eye, CheckCircle, Truck, XCircle, Clock } from 'lucide-react';
 import { getAllOrders, updateOrderStatus } from '../../api/orderService';
 
@@ -142,9 +143,9 @@ export default function Orders() {
                                 <StatusBadge status={order.status} />
                             </div>
                             <div style={{ ...styles.col, width: '15%', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                                <button style={styles.actionBtn}>
+                                <Link to={`/admin/orders/${order.id}`} style={styles.actionBtn}>
                                     <Eye size={16} />
-                                </button>
+                                </Link>
                                 {/* Simuler changement statut pour demo */}
                                 <select
                                     value={order.status}
