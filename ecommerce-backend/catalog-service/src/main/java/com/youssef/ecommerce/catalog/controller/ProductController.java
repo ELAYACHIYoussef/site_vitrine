@@ -105,6 +105,16 @@ public class ProductController {
         return ResponseEntity.ok(stats);
     }
 
+    @PostMapping("/products/{id}/reduce-stock")
+    public ResponseEntity<?> reduceStock(@PathVariable("id") Long id, @RequestParam("quantity") Integer quantity) {
+        boolean success = productService.decreaseStock(id, quantity);
+        if (success) {
+            return ResponseEntity.ok().body(Map.of("message", "Stock updated successfully"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "Insufficient stock or product not found"));
+        }
+    }
+
     /**
      * Convert Product entity to a plain Map to avoid Jackson/Hibernate
      * serialization issues

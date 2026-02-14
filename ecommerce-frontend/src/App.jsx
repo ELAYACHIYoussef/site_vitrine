@@ -12,6 +12,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import ClientOrders from './pages/ClientOrders';
+import Payment from './pages/Payment';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProductList from './pages/admin/ProductList';
 import AddProduct from './pages/admin/AddProduct';
@@ -39,6 +41,8 @@ function AppContent() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/account/orders" element={<ClientOrders />} />
+              <Route path="/payment" element={<Payment />} />
 
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminLayout />}>

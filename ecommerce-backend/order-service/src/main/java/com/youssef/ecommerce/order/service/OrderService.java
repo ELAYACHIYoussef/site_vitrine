@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final org.springframework.web.client.RestTemplate restTemplate;
 
     @Transactional
     public Order createOrder(OrderRequest request) {
@@ -41,14 +42,28 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         order.setItems(items);
-        
+
         // Calculate total amount
         double total = items.stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();
         order.setTotalAmount(total);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // Reduce stock in Catalog Service
+        try {
+            items.forEach(item -> {
+                String url = "http://catalog-service/api/catalog/products/" + item.getProductId()
+                        + "/reduce-stock?quantity=" + item.getQuantity();
+                restTemplate.postForEntity(url, null, Void.class);
+            });
+        } catch (Exception e) {
+            // In a real system, we might want to rollback or queue this
+            System.err.println("Failed to update stock: " + e.getMessage());
+        }
+
+        return savedOrder;
     }
 
     public List<Order> getAllOrders() {

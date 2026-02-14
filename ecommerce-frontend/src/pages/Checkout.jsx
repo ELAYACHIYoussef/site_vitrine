@@ -32,38 +32,26 @@ const Checkout = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handlePlaceOrder = async () => {
+    const handleProceedToPayment = () => {
         if (!formData.address || !formData.city || !formData.zipCode) {
             toast.error("Veuillez remplir tous les champs de livraison");
             return;
         }
 
-        setLoading(true);
-        try {
-            const orderData = {
-                userId: user?.id || 999, // Fallback ID if guest
-                customerName: formData.fullName,
-                customerEmail: formData.email,
-                shippingAddress: `${formData.address}, ${formData.zipCode} ${formData.city}, ${formData.country}`,
-                items: cart.map(item => ({
-                    productId: item.id,
-                    productName: item.name,
-                    price: item.price,
-                    quantity: item.quantity
-                }))
-            };
+        const orderData = {
+            userId: user?.id || 999,
+            customerName: formData.fullName,
+            customerEmail: formData.email,
+            shippingAddress: `${formData.address}, ${formData.zipCode} ${formData.city}, ${formData.country}`,
+            items: cart.map(item => ({
+                productId: item.id,
+                productName: item.name,
+                price: item.price,
+                quantity: item.quantity
+            }))
+        };
 
-            await createOrder(orderData);
-            clearCart();
-            toast.success("Commande validée avec succès !");
-            navigate('/admin/orders'); // Redirect to orders page (or a success page)
-            // For now, redirecting to admin orders to see the result, or we could make a user success page.
-        } catch (error) {
-            console.error("Order error", error);
-            toast.error("Erreur lors de la création de la commande");
-        } finally {
-            setLoading(false);
-        }
+        navigate('/payment', { state: { orderData } });
     };
 
     return (
@@ -212,12 +200,10 @@ const Checkout = () => {
                                         Retour
                                     </button>
                                     <button
-                                        onClick={handlePlaceOrder}
-                                        disabled={loading}
-                                        className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                        onClick={handleProceedToPayment}
+                                        className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
                                     >
-                                        {loading ? <Loader className="animate-spin" /> : <CheckCircle />}
-                                        {loading ? 'Traitement...' : `Payer ${cartTotal.toFixed(2)} €`}
+                                        Procéder au paiement <ArrowRight size={20} />
                                     </button>
                                 </div>
                             </div>

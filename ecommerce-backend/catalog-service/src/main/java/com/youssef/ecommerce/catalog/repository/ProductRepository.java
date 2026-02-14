@@ -30,4 +30,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findTop5ByOrderByViewsDesc();
 
     List<Product> findTop5ByOrderByIdDesc();
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE Product p SET p.stock = p.stock - :quantity WHERE p.id = :id AND p.stock >= :quantity")
+    int decreaseStock(@Param("id") Long id, @Param("quantity") int quantity);
 }

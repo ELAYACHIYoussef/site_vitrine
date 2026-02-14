@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Heart, User, LogOut, Menu } from 'lucide-react';
+import { ShoppingCart, Heart, User, LogOut, Menu, Package } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
@@ -88,12 +88,16 @@ const Navbar = () => {
                         {isAuthenticated() ? (
                             <div className="flex items-center space-x-4">
                                 <Link
-                                    to="/"
+                                    to="/account/orders"
                                     className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
                                 >
+                                    <Package className="w-4 h-4" />
+                                    <span>Mes Commandes</span>
+                                </Link>
+                                <div className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full">
                                     <User className="w-4 h-4" />
                                     <span>{user?.username}</span>
-                                </Link>
+                                </div>
                                 <button onClick={logout} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all">
                                     <LogOut className="w-5 h-5" />
                                 </button>

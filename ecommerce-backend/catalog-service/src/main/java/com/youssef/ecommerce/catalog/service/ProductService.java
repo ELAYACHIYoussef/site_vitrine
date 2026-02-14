@@ -146,4 +146,10 @@ public class ProductService {
     public java.util.List<Product> getRecentProducts() {
         return productRepository.findTop5ByOrderByIdDesc();
     }
+
+    @org.springframework.transaction.annotation.Transactional
+    public boolean decreaseStock(Long productId, Integer quantity) {
+        int updatedRows = productRepository.decreaseStock(productId, quantity);
+        return updatedRows > 0;
+    }
 }
