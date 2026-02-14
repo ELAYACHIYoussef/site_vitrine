@@ -36,6 +36,12 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(name = "product_size")
+    private String size;
+
+    @Column(name = "product_color")
+    private String color;
+
     public Double getSubtotal() {
         return price * quantity;
     }

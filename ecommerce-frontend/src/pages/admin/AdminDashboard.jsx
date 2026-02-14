@@ -9,6 +9,7 @@ import {
     PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
 import { getDashboardStats } from '../../api/dashboardService';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const BRAND_COLORS = {
     primary: '#e85d04',
@@ -258,7 +259,7 @@ function AdminDashboard() {
                                 <div style={styles.listItemLeft}>
                                     {product.thumbnail ? (
                                         <img
-                                            src={`http://localhost:8082${product.thumbnail}`}
+                                            src={getImageUrl(product.thumbnail)}
                                             alt={product.name}
                                             style={styles.productThumb}
                                         />

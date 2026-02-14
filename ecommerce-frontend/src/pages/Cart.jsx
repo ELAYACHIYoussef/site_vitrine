@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Cart = () => {
     const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
@@ -44,7 +45,7 @@ const Cart = () => {
                             <div className="w-24 h-24 bg-slate-100 rounded-xl overflow-hidden flex-shrink-0">
                                 {item.thumbnail ? (
                                     <img
-                                        src={`http://localhost:8082${item.thumbnail}`}
+                                        src={getImageUrl(item.thumbnail)}
                                         alt={item.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />

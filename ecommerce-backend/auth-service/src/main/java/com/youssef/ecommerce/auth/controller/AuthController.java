@@ -30,6 +30,25 @@ public class AuthController {
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        return userRepository.findByUsername(username)
+                .map(u -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id", u.getId());
+                    m.put("username", u.getUsername());
+                    m.put("email", u.getEmail());
+                    m.put("role", u.getRole());
+                    return ResponseEntity.ok(m);
+                })
+                .orElse(ResponseEntity.status(404).build());
+    }
+
     @GetMapping("/stats")
     public ResponseEntity<?> getStats() {
         long totalUsers = userRepository.count();

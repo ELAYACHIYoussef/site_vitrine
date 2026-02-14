@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../api/orderService';
 import toast from 'react-hot-toast';
 import { CheckCircle, MapPin, CreditCard, ShoppingBag, ArrowRight, Loader } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Checkout = () => {
     const { cart, cartTotal, clearCart } = useCart();
@@ -47,7 +48,9 @@ const Checkout = () => {
                 productId: item.id,
                 productName: item.name,
                 price: item.price,
-                quantity: item.quantity
+                quantity: item.quantity,
+                size: item.selectedSize,
+                color: item.selectedColor
             }))
         };
 
@@ -222,7 +225,7 @@ const Checkout = () => {
                             {cart.map(item => (
                                 <div key={item.id} className="flex gap-4 items-start">
                                     <div className="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
-                                        <img src={`http://localhost:8082${item.thumbnail}`} alt={item.name} className="w-full h-full object-cover" />
+                                        <img src={getImageUrl(item.thumbnail)} alt={item.name} className="w-full h-full object-cover" />
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-slate-800 line-clamp-2">{item.name}</p>

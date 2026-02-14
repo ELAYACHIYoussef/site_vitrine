@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ImageUpload from '../../components/ImageUpload';
 import productService from '../../api/productService';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const EditProduct = () => {
     const navigate = useNavigate();
@@ -246,7 +247,7 @@ const EditProduct = () => {
                                         {existingImages.map((img, idx) => (
                                             <div key={idx} className="aspect-square rounded-lg overflow-hidden border border-slate-200">
                                                 <img
-                                                    src={`http://localhost:8082${img}`}
+                                                    src={getImageUrl(img)}
                                                     alt={`Image ${idx + 1}`}
                                                     className="w-full h-full object-cover"
                                                 />

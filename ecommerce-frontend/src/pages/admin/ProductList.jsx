@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, Package, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import productService from '../../api/productService';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const ProductList = () => {
     const navigate = useNavigate();
@@ -119,7 +120,7 @@ const ProductList = () => {
                             <div className="aspect-square bg-slate-100 overflow-hidden">
                                 {product.thumbnail || product.images?.[0] ? (
                                     <img
-                                        src={`http://localhost:8082${product.thumbnail || product.images[0]}`}
+                                        src={getImageUrl(product.thumbnail || product.images[0])}
                                         alt={product.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />

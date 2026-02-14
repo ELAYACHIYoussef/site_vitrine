@@ -11,6 +11,7 @@ import ProductCatalog from './pages/ProductCatalog';
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
@@ -48,6 +49,7 @@ function AppContent() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/account/orders" element={<ClientOrders />} />
                 <Route path="/account/profile" element={<UserProfile />} />
