@@ -25,6 +25,7 @@ export const authService = {
     login: (email, password) => api.post('/auth/login', { email, password }),
     register: (userData) => api.post('/auth/register', userData),
     getProfile: () => api.get('/auth/me'),
+    deleteAccount: () => api.delete('/auth/users/me'),
 };
 
 export const catalogService = {

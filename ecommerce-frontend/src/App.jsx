@@ -7,12 +7,15 @@ import { WishlistProvider } from './context/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdminLayout from './components/AdminLayout';
+import CookieConsent from './components/CookieConsent';
 import Home from './pages/Home';
 import ProductCatalog from './pages/ProductCatalog';
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
+import MentionsLegales from './pages/MentionsLegales';
+import CGV from './pages/CGV';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
@@ -56,6 +59,8 @@ function AppContent() {
                 <Route path="/account/orders" element={<ClientOrders />} />
                 <Route path="/account/profile" element={<UserProfile />} />
                 <Route path="/payment" element={<Payment />} />
+                <Route path="/mentions-legales" element={<MentionsLegales />} />
+                <Route path="/cgv" element={<CGV />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
@@ -101,6 +106,7 @@ function AppContent() {
                 },
               }}
             />
+            <CookieConsent />
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

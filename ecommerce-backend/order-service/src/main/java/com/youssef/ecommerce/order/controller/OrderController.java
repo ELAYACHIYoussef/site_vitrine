@@ -28,17 +28,19 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrdersByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
+    public List<Order> getOrdersByUser(@PathVariable("userId") Long userId) {
+        return orderService.findByUserId(userId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.getOrderById(id));
+    public ResponseEntity<Order> getOrderById(@PathVariable("id") Long id) {
+        return orderService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Order> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusMap) {
+    public ResponseEntity<Order> updateStatus(@PathVariable("id") Long id, @RequestBody Map<String, String> statusMap) {
         String status = statusMap.get("status");
         return ResponseEntity.ok(orderService.updateStatus(id, status));
     }

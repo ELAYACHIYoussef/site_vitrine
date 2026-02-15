@@ -5,7 +5,7 @@ import { User, Mail, MapPin, Package, CreditCard, Shield, Edit2, Camera } from '
 import toast from 'react-hot-toast';
 
 const UserProfile = () => {
-    const { user } = useAuth();
+    const { user, deleteAccount } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
 
     // Mock data for display - in real app, fetch from API
@@ -196,22 +196,41 @@ const UserProfile = () => {
                                     </div>
                                 </div>
 
-                                {isEditing && (
-                                    <div className="pt-4 flex justify-end">
-                                        <button
-                                            type="submit"
-                                            className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-200 hover:-translate-y-1 transition-all"
-                                        >
-                                            Enregistrer les modifications
-                                        </button>
-                                    </div>
                                 )}
+                                {/* Danger Zone */}
+                                <div className="border-t-2 border-red-100 mt-12 pt-8">
+                                    <h3 className="text-lg font-bold text-red-600 mb-4 flex items-center gap-2">
+                                        <Shield className="w-5 h-5" />
+                                        Zone de Danger
+                                    </h3>
+                                    <p className="text-sm text-slate-500 mb-4">
+                                        La suppression de votre compte est irréversible. Toutes vos données personnelles seront effacées conformément au RGPD.
+                                        Vos commandes passées seront conservées à des fins comptables uniquement.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (window.confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
+                                                const result = await deleteAccount();
+                                                if (result.success) {
+                                                    toast.success("Compte supprimé avec succès");
+                                                    // Redirection handled by AuthContext cleanup or wrapper
+                                                } else {
+                                                    toast.error(result.error);
+                                                }
+                                            }
+                                        }}
+                                        className="px-6 py-3 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 font-medium transition-colors"
+                                    >
+                                        Supprimer mon compte
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

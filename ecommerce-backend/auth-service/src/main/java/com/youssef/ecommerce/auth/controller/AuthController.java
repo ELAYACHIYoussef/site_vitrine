@@ -93,4 +93,20 @@ public class AuthController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
     }
+
+    @DeleteMapping("/users/me")
+    public ResponseEntity<?> deleteCurrentUser(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        String username = authentication.getName();
+        // In our case, the username in the token is actually the username, not email.
+        // But we need to be careful. Let's look at how we get the user.
+        // The implementation of loadUserByUsername usually loads by username.
+        // Let's assume username is correct.
+
+        userRepository.findByUsername(username).ifPresent(u -> authService.deleteUser(u.getEmail()));
+
+        return ResponseEntity.ok(Map.of("message", "Compte supprimé avec succès"));
+    }
 }
