@@ -23,31 +23,47 @@ export const CartProvider = ({ children }) => {
     }, [cart]);
 
     const addToCart = (product, quantity = 1) => {
-        setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id);
-            if (existingItem) {
-                toast.success(`Quantité mise à jour : ${product.name}`);
-                return prevCart.map(item =>
-                    item.id === product.id
+        const existingItem = cart.find(item =>
+            item.id === product.id &&
+            item.selectedSize === product.selectedSize &&
+            item.selectedColor === product.selectedColor
+        );
+
+        if (existingItem) {
+            toast.success(`Quantité mise à jour : ${product.name}`);
+            setCart(prevCart =>
+                prevCart.map(item =>
+                    (item.id === product.id &&
+                        item.selectedSize === product.selectedSize &&
+                        item.selectedColor === product.selectedColor)
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
-                );
-            }
+                )
+            );
+        } else {
             toast.success(`Ajouté au panier : ${product.name}`);
-            return [...prevCart, { ...product, quantity }];
-        });
+            setCart(prevCart => [...prevCart, { ...product, quantity }]);
+        }
     };
 
-    const removeFromCart = (productId) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== productId));
+    const removeFromCart = (productId, selectedSize, selectedColor) => {
+        setCart(prevCart => prevCart.filter(item =>
+            !(item.id === productId &&
+                item.selectedSize === selectedSize &&
+                item.selectedColor === selectedColor)
+        ));
         toast.success("Produit retiré du panier");
     };
 
-    const updateQuantity = (productId, newQuantity) => {
+    const updateQuantity = (productId, selectedSize, selectedColor, newQuantity) => {
         if (newQuantity < 1) return;
         setCart(prevCart =>
             prevCart.map(item =>
-                item.id === productId ? { ...item, quantity: newQuantity } : item
+                (item.id === productId &&
+                    item.selectedSize === selectedSize &&
+                    item.selectedColor === selectedColor)
+                    ? { ...item, quantity: newQuantity }
+                    : item
             )
         );
     };

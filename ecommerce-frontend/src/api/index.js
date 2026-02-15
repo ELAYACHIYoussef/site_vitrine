@@ -24,11 +24,14 @@ api.interceptors.request.use(
 export const authService = {
     login: (email, password) => api.post('/auth/login', { email, password }),
     register: (userData) => api.post('/auth/register', userData),
+    getProfile: () => api.get('/auth/me'),
+    deleteAccount: () => api.delete('/auth/users/me'),
 };
 
 export const catalogService = {
     getProducts: () => api.get('/catalog/products'),
     getProduct: (id) => api.get(`/catalog/products/${id}`),
+    getStats: () => api.get('/catalog/stats'),
     incrementView: (id) => api.post(`/catalog/products/${id}/view`),
 };
 

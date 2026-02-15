@@ -42,8 +42,18 @@ export const AuthProvider = ({ children }) => {
     const isAuthenticated = () => !!token;
     const isAdmin = () => user?.role === 'admin';
 
+    const deleteAccount = async () => {
+        try {
+            await authService.deleteAccount();
+            logout();
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.error || 'Erreur lors de la suppression' };
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout, isAuthenticated, isAdmin }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout, deleteAccount, isAuthenticated, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );

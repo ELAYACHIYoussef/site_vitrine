@@ -1,66 +1,82 @@
 import React from 'react';
 import ProductGrid from '../components/ProductGrid';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Zap, Globe, Server, CheckCircle, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Truck, HeadphonesIcon, ArrowRight, Star, Smartphone, Laptop, Watch, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Home = () => {
     return (
-        <div className="space-y-24 pb-20">
+        <div className="font-sans">
             {/* Hero Section */}
-            <section className="relative min-h-[90vh] flex items-center justify-center px-6 overflow-hidden hero-gradient">
-                {/* Abstract Shapes */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-30 pointer-events-none">
-                    <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-600 rounded-full blur-[150px] animate-pulse"></div>
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-rose-600 rounded-full blur-[150px] animate-pulse delay-700"></div>
+            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-slate-900">
+                {/* Background Gradient & Shapes */}
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
+                    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-rose-600/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
                 </div>
 
-                <div className="container mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
+                <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="text-left"
+                        transition={{ duration: 0.8 }}
                     >
-                        <span className="inline-flex items-center gap-2 py-1 px-4 rounded-full bg-white/10 border border-white/20 text-white text-sm font-semibold mb-8 backdrop-blur-md shadow-lg">
-                            <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
-                            Nouvelle Collection 2026 Disponible
-                        </span>
-                        <h1 className="text-6xl md:text-8xl font-black text-white mb-8 leading-[1.05] tracking-tight drop-shadow-sm">
-                            L'Art du <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-rose-300">Commerce.</span>
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-indigo-300 text-sm font-semibold mb-8 backdrop-blur-md">
+                            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                            Nouvelle Collection Hiver 2026
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-black text-white leading-tight mb-6">
+                            L'Élégance <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-rose-400">Technologique.</span>
                         </h1>
-                        <p className="text-indigo-100 text-lg md:text-2xl mb-10 max-w-xl leading-relaxed font-light">
-                            Découvrez une expérience d'achat fluide, propulsée par une technologie de pointe et un design d'exception.
+                        <p className="text-slate-300 text-lg md:text-xl mb-10 max-w-lg leading-relaxed">
+                            Découvrez une sélection exclusive de produits high-tech et lifestyle. Qualité premium, design innovant et performance inégalée.
                         </p>
-                        <div className="flex flex-wrap gap-5">
-                            <Link to="/products" className="px-8 py-4 bg-white text-indigo-900 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center gap-2">
-                                Explorer le catalogue
-                                <ArrowRight className="w-5 h-5" />
+                        <div className="flex flex-wrap gap-4">
+                            <Link to="/products" className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold text-lg hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 group">
+                                Acheter Maintenant
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
-                            <Link to="/contact" className="px-8 py-4 bg-transparent border-2 border-white/30 text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm">
-                                Nous contacter
+                            <Link to="/products?category=promo" className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-md">
+                                Voir les Promos
                             </Link>
+                        </div>
+
+                        <div className="mt-12 flex items-center gap-8 text-slate-400 text-sm font-medium">
+                            <div className="flex items-center gap-2">
+                                <Truck className="w-5 h-5 text-indigo-400" /> Livraison Gratuite
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="w-5 h-5 text-indigo-400" /> Garantie 2 Ans
+                            </div>
                         </div>
                     </motion.div>
 
-                    {/* Hero Visual */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
-                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                        transition={{ duration: 1, delay: 0.2 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
                         className="relative hidden lg:block"
                     >
-                        <div className="relative z-10 bg-white/5 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/20 shadow-2xl rotate-3 hover:rotate-0 transition-all duration-700 group">
-                            <div className="aspect-[4/5] bg-slate-900 rounded-[2rem] overflow-hidden relative shadow-inner">
-                                <img
-                                    src="https://images.unsplash.com/photo-1600185365483-26d7a042b7f3?q=80&w=1000&auto=format&fit=crop"
-                                    alt="Hero Product"
-                                    className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-1000"
-                                />
-                                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-                                    <h3 className="text-white text-2xl font-bold">Nike Air Zoom</h3>
-                                    <p className="text-indigo-300">Performance & Style</p>
+                        {/* Main Hero Image */}
+                        <div className="relative z-10 w-full aspect-square max-w-3xl mx-auto">
+                            <div className="absolute inset-4 bg-gradient-to-tr from-indigo-500/20 to-rose-500/20 rounded-[3rem] blur-2xl"></div>
+                            <img
+                                src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=1000&auto=format&fit=crop"
+                                alt="Modern Tech Lifestyle"
+                                className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border border-white/10 relative z-20"
+                            />
+
+                            {/* Floating Stats Card */}
+                            <div className="absolute -bottom-8 -left-8 z-30 bg-white p-6 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce-slow">
+                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                    <Star className="w-6 h-6 fill-current" />
+                                </div>
+                                <div>
+                                    <p className="text-slate-900 font-bold text-xl">4.9/5</p>
+                                    <p className="text-slate-500 text-sm">Avis Clients</p>
                                 </div>
                             </div>
                         </div>
@@ -68,120 +84,98 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Architecture & Technologies Section */}
-            <section className="container mx-auto px-6 py-10">
-                <div className="text-center mb-16">
-                    <span className="text-indigo-600 font-bold tracking-widest text-sm uppercase bg-indigo-50 px-3 py-1 rounded-full">Innovation</span>
-                    <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mt-4 mb-4">Une Puissance Technologique</h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto text-lg"> Notre plateforme repose sur une architecture moderne pour garantir rapidité et sécurité.</p>
-                </div>
+            {/* Featured Categories */}
+            <section className="py-20 bg-slate-50">
+                <div className="container mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold text-slate-900">Explorez par Catégorie</h2>
+                        <p className="text-slate-500 mt-2">Trouvez exactement ce que vous cherchez</p>
+                    </div>
 
-                <div className="grid md:grid-cols-3 gap-8">
-                    <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-indigo-100/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <Server className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-3">Microservices</h3>
-                        <p className="text-slate-500 leading-relaxed">
-                            Architecture distribuée robuste (Spring Boot) assurant une disponibilité maximale et une évolutivité sans faille.
-                        </p>
-                    </div>
-                    <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-rose-100/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-                            <Zap className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-3">Performance React</h3>
-                        <p className="text-slate-500 leading-relaxed">
-                            Interface ultra-rapide et réactive offrant une expérience utilisateur fluide et instantanée.
-                        </p>
-                    </div>
-                    <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-green-100/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
-                        <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mb-6 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                            <ShieldCheck className="w-8 h-8" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-3">Sécurité Avant Tout</h3>
-                        <p className="text-slate-500 leading-relaxed">
-                            Authentification sécurisée et protection des données de bout en bout pour une confiance totale.
-                        </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {[
+                            { name: 'Smartphones', icon: Smartphone, color: 'bg-blue-100 text-blue-600', link: '/products?category=smartphones' },
+                            { name: 'Ordinateurs', icon: Laptop, color: 'bg-purple-100 text-purple-600', link: '/products?category=laptops' },
+                            { name: 'Montres', icon: Watch, color: 'bg-rose-100 text-rose-600', link: '/products?category=smartwatches' },
+                            { name: 'Accessoires', icon: HeadphonesIcon, color: 'bg-amber-100 text-amber-600', link: '/products?category=accessories' },
+                        ].map((cat, i) => (
+                            <Link key={i} to={cat.link} className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center gap-4 group text-center">
+                                <div className={`w-16 h-16 rounded-2xl ${cat.color} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                                    <cat.icon size={32} />
+                                </div>
+                                <h3 className="font-bold text-slate-800">{cat.name}</h3>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* Advantages Grid */}
-            <section className="bg-slate-900 text-white py-24 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px]"></div>
-                <div className="container mx-auto px-6 relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Product Showcase */}
+            <section className="py-20">
+                <div className="container mx-auto px-6">
+                    <div className="flex justify-between items-end mb-12">
                         <div>
-                            <h2 className="text-3xl md:text-5xl font-extrabold mb-8 leading-tight">Pourquoi choisir <br /><span className="text-indigo-400">VITRINE.IO ?</span></h2>
-                            <ul className="space-y-6">
-                                {[
-                                    "Catalogue produits mis à jour en temps réel",
-                                    "Suivi de commande détaillé étape par étape",
-                                    "Support client réactif et personnalisé",
-                                    "Expérience mobile optimale"
-                                ].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-4 text-lg text-slate-300">
-                                        <div className="w-8 h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center border border-green-500/30">
-                                            <CheckCircle className="w-5 h-5" />
-                                        </div>
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                            <div className="mt-10">
-                                <Link to="/register" className="inline-block px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold text-white transition-colors shadow-lg shadow-indigo-600/30">
-                                    Rejoindre la communauté
-                                </Link>
-                            </div>
+                            <span className="text-indigo-600 font-bold text-sm tracking-wider uppercase">Tendance</span>
+                            <h2 className="text-3xl font-bold text-slate-900 mt-2">Les Mieux Notés</h2>
                         </div>
-                        <div className="relative">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-4 translate-y-8">
-                                    <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
-                                        <Globe className="w-10 h-10 text-indigo-400 mb-4" />
-                                        <h4 className="font-bold text-xl mb-2">Global</h4>
-                                        <p className="text-slate-400 text-sm">Livraison partout dans le monde</p>
-                                    </div>
-                                    <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
-                                        <Zap className="w-10 h-10 text-yellow-400 mb-4" />
-                                        <h4 className="font-bold text-xl mb-2">Rapide</h4>
-                                        <p className="text-slate-400 text-sm">Expédition en 24/48h</p>
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
-                                        <ShieldCheck className="w-10 h-10 text-green-400 mb-4" />
-                                        <h4 className="font-bold text-xl mb-2">Sécurisé</h4>
-                                        <p className="text-slate-400 text-sm">Paiements cryptés</p>
-                                    </div>
-                                    <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
-                                        <Server className="w-10 h-10 text-rose-400 mb-4" />
-                                        <h4 className="font-bold text-xl mb-2">Fiable</h4>
-                                        <p className="text-slate-400 text-sm">99.9% Uptime</p>
-                                    </div>
-                                </div>
+                        <Link to="/products" className="text-indigo-600 font-semibold hover:text-indigo-700 flex items-center gap-1 group">
+                            Voir tout <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+                    <ProductGrid limit={4} />
+                </div>
+            </section>
+
+            {/* Benefits Banner */}
+            <section className="bg-slate-900 py-16 text-white overflow-hidden">
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="grid md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-800">
+                        <div className="p-4">
+                            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
+                                <Truck size={32} />
                             </div>
+                            <h3 className="text-xl font-bold mb-2">Livraison Express</h3>
+                            <p className="text-slate-400">Expédition le jour même pour toute commande avant 14h.</p>
+                        </div>
+                        <div className="p-4">
+                            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
+                                <ShieldCheck size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold mb-2">Paiement Sécurisé</h3>
+                            <p className="text-slate-400">Transactions 100% sécurisées via Stripe et PayPal.</p>
+                        </div>
+                        <div className="p-4">
+                            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
+                                <HeadphonesIcon size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold mb-2">Support 24/7</h3>
+                            <p className="text-slate-400">Une équipe dédiée pour répondre à toutes vos questions.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Products Section */}
-            <section id="collection" className="container mx-auto px-6 pt-10">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                    <div>
-                        <span className="text-indigo-600 font-bold tracking-widest text-sm uppercase bg-indigo-50 px-3 py-1 rounded-full">Collection Exclusive</span>
-                        <h2 className="text-4xl font-extrabold text-slate-900 mt-4">Nos Meilleurs Produits</h2>
+            {/* Newsletter */}
+            <section className="py-20 bg-indigo-50 border-t border-indigo-100">
+                <div className="container mx-auto px-6 text-center max-w-3xl">
+                    <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600">
+                        <ShoppingBag size={40} />
                     </div>
-                    <Link to="/products" className="group flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-bold transition-colors">
-                        Voir tout le catalogue
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
-                    </Link>
-                </div>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4">Ne ratez aucune offre !</h2>
+                    <p className="text-slate-600 mb-8 text-lg">Inscrivez-vous à notre newsletter pour recevoir nos dernières nouveautés et des codes promo exclusifs.</p>
 
-                <div className="p-1">
-                    <ProductGrid />
+                    <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+                        <input
+                            type="email"
+                            placeholder="Votre adresse email"
+                            className="flex-1 px-6 py-4 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
+                            required
+                        />
+                        <button type="submit" className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20">
+                            S'inscrire
+                        </button>
+                    </form>
+                    <p className="text-xs text-slate-400 mt-4">Nous ne spammerons jamais votre boîte mail. Promis.</p>
                 </div>
             </section>
         </div>

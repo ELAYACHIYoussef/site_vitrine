@@ -52,4 +52,8 @@ public class AuthService {
                             "user", userData);
                 });
     }
+
+    public void deleteUser(String email) {
+        userRepository.findByEmail(email).ifPresent(userRepository::delete);
+    }
 }

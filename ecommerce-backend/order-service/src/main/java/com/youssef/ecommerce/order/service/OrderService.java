@@ -38,6 +38,8 @@ public class OrderService {
                         .productName(itemRequest.getProductName())
                         .price(itemRequest.getPrice())
                         .quantity(itemRequest.getQuantity())
+                        .size(itemRequest.getSize())
+                        .color(itemRequest.getColor())
                         .build())
                 .collect(Collectors.toList());
 

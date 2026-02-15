@@ -155,6 +155,10 @@ public class ProductService {
         return productRepository.findTop5ByOrderByIdDesc();
     }
 
+    public long getTotalViews() {
+        return productRepository.sumTotalViews();
+    }
+
     @org.springframework.transaction.annotation.Transactional
     public boolean decreaseStock(Long productId, Integer quantity) {
         int updatedRows = productRepository.decreaseStock(productId, quantity);

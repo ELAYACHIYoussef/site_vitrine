@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import productService from '../../api/productService';
+import { getCategories } from '../../api/categoryService';
 
 const AddProduct = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
         category: '',
@@ -18,13 +20,23 @@ const AddProduct = () => {
         descriptionCourte: ''
     });
 
-    const categories = [
-        { value: 'smartphones', label: 'Smartphones' },
-        { value: 'laptops', label: 'Ordinateurs Portables' },
-        { value: 'tablets', label: 'Tablettes' },
-        { value: 'accessories', label: 'Accessoires' },
-        { value: 'audio', label: 'Audio' },
-    ];
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                // Map to format { value: 'name', label: 'Label' }
+                const formatted = data.map(cat => ({
+                    value: cat.name,
+                    label: cat.label || cat.name
+                }));
+                setCategories(formatted);
+            } catch (error) {
+                console.error("Failed to load categories", error);
+                // Fallback or empty
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

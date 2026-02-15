@@ -16,16 +16,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String username;
-    
+
     @Column(unique = true, nullable = false)
     private String email;
-    
+
     @Column(nullable = false)
     private String password;
-    
+
     @Column(nullable = false)
     private String role; // "admin" or "client"
+
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(updatable = false)
+    private java.time.LocalDateTime createdAt;
 }

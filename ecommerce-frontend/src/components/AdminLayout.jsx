@@ -3,6 +3,9 @@ import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './admin/Sidebar';
 import { useAuth } from '../context/AuthContext';
 
+import Navbar from './Navbar';
+import Footer from './Footer';
+
 const AdminLayout = () => {
     const { isAuthenticated, isAdmin } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -21,10 +24,15 @@ const AdminLayout = () => {
             <main className={`
                 transition-all duration-300
                 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-20'}
+                flex flex-col min-h-screen
             `}>
-                <div className="min-h-screen">
+                <Navbar />
+
+                <div className="flex-1">
                     <Outlet />
                 </div>
+
+                <Footer />
             </main>
         </div>
     );

@@ -4,6 +4,7 @@ import { catalogService } from '../api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ArrowLeft, ShoppingBag, Heart, Share2, Star, Check, Truck, Shield } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 import { motion } from 'framer-motion';
 
 const ProductDetails = () => {
@@ -62,11 +63,7 @@ const ProductDetails = () => {
         }
     };
 
-    const getImageUrl = (url) => {
-        if (!url) return 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-        if (url.startsWith('http')) return url;
-        return `http://localhost:8082${url}`;
-    };
+
 
     if (loading) {
         return (
