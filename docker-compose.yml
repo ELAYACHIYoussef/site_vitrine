@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # INFRASTRUCTURE
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: azymarket-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=you123
+      - POSTGRES_DB=ecommerce_auth
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - azymarket-net
+
+  discovery-service:
+    build:
+      context: ./ecommerce-backend
+      dockerfile: discovery-service/Dockerfile
+    container_name: azymarket-discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - azymarket-net
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # CORE SERVICES
+  # ---------------------------------------------------------------------------
+  api-gateway:
+    build:
+      context: ./ecommerce-backend
+      dockerfile: api-gateway/Dockerfile
+    container_name: azymarket-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    networks:
+      - azymarket-net
+
+  # ---------------------------------------------------------------------------
+  # MICROSERVICES
+  # ---------------------------------------------------------------------------
+  auth-service:
+    build:
+      context: ./ecommerce-backend
+      dockerfile: auth-service/Dockerfile
+    container_name: azymarket-auth
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ecommerce_auth
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=you123
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - azymarket-net
+
+  catalog-service:
+    build:
+      context: ./ecommerce-backend
+      dockerfile: catalog-service/Dockerfile
+    container_name: azymarket-catalog
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ecommerce_catalog
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=you123
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - azymarket-net
+
+  order-service:
+    build:
+      context: ./ecommerce-backend
+      dockerfile: order-service/Dockerfile
+    container_name: azymarket-order
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ecommerce_order
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=you123
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - azymarket-net
+
+  # ---------------------------------------------------------------------------
+  # FRONTEND
+  # ---------------------------------------------------------------------------
+  frontend:
+    build: ./ecommerce-frontend
+    container_name: azymarket-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - azymarket-net
+
+volumes:
+  postgres_data:
+
+
+networks:
+  azymarket-net:
+    driver: bridge

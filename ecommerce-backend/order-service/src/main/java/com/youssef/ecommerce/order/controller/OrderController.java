@@ -29,14 +29,12 @@ public class OrderController {
 
     @GetMapping("/user/{userId}")
     public List<Order> getOrdersByUser(@PathVariable("userId") Long userId) {
-        return orderService.findByUserId(userId);
+        return orderService.getOrdersByUserId(userId);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable("id") Long id) {
-        return orderService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     @PutMapping("/{id}/status")
