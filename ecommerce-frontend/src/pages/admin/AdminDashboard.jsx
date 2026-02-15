@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
     Package, ShoppingCart, Users, DollarSign, TrendingUp,
     Eye, ArrowUpRight, ArrowDownRight, RefreshCw, Boxes,
-    BarChart3, Clock, Star
+    BarChart3, Clock, Star, ShoppingBag
 } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
 import { getDashboardStats } from '../../api/dashboardService';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const BRAND_COLORS = {
     primary: '#e85d04',
@@ -24,6 +25,15 @@ const BRAND_COLORS = {
 };
 
 const PIE_COLORS = ['#e85d04', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
+
+const getMockSalesData = () => {
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    return months.map(m => ({
+        name: m,
+        revenue: Math.floor(Math.random() * 5000) + 1000,
+        orders: Math.floor(Math.random() * 50) + 10,
+    }));
+};
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -70,7 +80,7 @@ function AdminDashboard() {
         );
     }
 
-    const { catalog, auth } = stats;
+    const { catalog, auth, orders } = stats;
 
     // Prepare chart data
     const categoryData = catalog.productsByCategory
@@ -89,20 +99,12 @@ function AdminDashboard() {
 
     const kpiCards = [
         {
-            title: 'Total Produits',
-            value: catalog.totalProducts || 0,
-            icon: Package,
-            color: BRAND_COLORS.primary,
-            gradient: 'linear-gradient(135deg, #e85d04 0%, #f48c06 100%)',
-            subtitle: `${catalog.totalStock || 0} en stock`,
-        },
-        {
-            title: 'Valeur Catalogue',
-            value: `${(catalog.catalogValue || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`,
+            title: 'Chiffre d\'Affaires',
+            value: `${(orders?.totalRevenue || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`,
             icon: DollarSign,
             color: BRAND_COLORS.success,
             gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-            subtitle: 'Valeur totale du stock',
+            subtitle: `${orders?.totalOrders || 0} commandes au total`,
         },
         {
             title: 'Utilisateurs',
@@ -110,15 +112,23 @@ function AdminDashboard() {
             icon: Users,
             color: BRAND_COLORS.info,
             gradient: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-            subtitle: `${auth.admins || 0} admin(s) · ${auth.clients || 0} client(s)`,
+            subtitle: `${auth.clients || 0} client(s)`,
         },
         {
-            title: 'Catégories',
-            value: categoryData.length,
+            title: 'Produits',
+            value: catalog.totalProducts || 0,
+            icon: Package,
+            color: BRAND_COLORS.primary,
+            gradient: 'linear-gradient(135deg, #e85d04 0%, #f48c06 100%)',
+            subtitle: `${catalog.totalStock || 0} en stock`,
+        },
+        {
+            title: 'Valeur Stock',
+            value: `${(catalog.catalogValue || 0).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €`,
             icon: Boxes,
             color: BRAND_COLORS.purple,
             gradient: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
-            subtitle: 'Catégories de produits',
+            subtitle: 'Catalog Value',
         },
     ];
 
@@ -149,7 +159,97 @@ function AdminDashboard() {
                 ))}
             </div>
 
-            {/* Charts Row */}
+            {/* Main Charts Row */}
+            <div style={styles.chartsRow}>
+                {/* Sales Performance - Area Chart */}
+                <div style={styles.chartCard}>
+                    <div style={styles.chartHeader}>
+                        <TrendingUp size={20} style={{ color: BRAND_COLORS.success }} />
+                        <h3 style={styles.chartTitle}>Performance des Ventes (12 derniers mois)</h3>
+                    </div>
+                    <ResponsiveContainer width="100%" height={280}>
+                        <AreaChart data={getMockSalesData()}>
+                            <defs>
+                                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={BRAND_COLORS.success} stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor={BRAND_COLORS.success} stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                            <XAxis
+                                dataKey="name"
+                                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                axisLine={{ stroke: '#334155' }}
+                            />
+                            <YAxis
+                                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                axisLine={{ stroke: '#334155' }}
+                                tickFormatter={(value) => `${value / 1000}k`}
+                            />
+                            <Tooltip
+                                contentStyle={{
+                                    background: '#1e293b',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    color: '#fff',
+                                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+                                }}
+                                formatter={(value) => [`${value} €`, 'Revenu']}
+                            />
+                            <Area
+                                type="monotone"
+                                dataKey="revenue"
+                                stroke={BRAND_COLORS.success}
+                                fillOpacity={1}
+                                fill="url(#colorRevenue)"
+                                strokeWidth={2}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Orders Status - Pie Chart */}
+                <div style={styles.chartCard}>
+                    <div style={styles.chartHeader}>
+                        <ShoppingBag size={20} style={{ color: BRAND_COLORS.purple }} />
+                        <h3 style={styles.chartTitle}>État des Commandes</h3>
+                    </div>
+                    <ResponsiveContainer width="100%" height={280}>
+                        <PieChart>
+                            <Pie
+                                data={[
+                                    { name: 'En attente', value: 12, color: '#f59e0b' },
+                                    { name: 'Validée', value: 19, color: '#3b82f6' },
+                                    { name: 'Expédiée', value: 8, color: '#8b5cf6' },
+                                    { name: 'Livrée', value: 45, color: '#10b981' },
+                                    { name: 'Annulée', value: 3, color: '#ef4444' },
+                                ]}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={60}
+                                outerRadius={80}
+                                paddingAngle={5}
+                                dataKey="value"
+                            >
+                                {PIE_COLORS.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry} />
+                                ))}
+                            </Pie>
+                            <Tooltip
+                                contentStyle={{
+                                    background: '#1e293b',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    color: '#fff',
+                                }}
+                            />
+                            <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* Existing Charts Row (Products) */}
             <div style={styles.chartsRow}>
                 {/* Products by Category - Pie Chart */}
                 <div style={styles.chartCard}>
@@ -258,7 +358,7 @@ function AdminDashboard() {
                                 <div style={styles.listItemLeft}>
                                     {product.thumbnail ? (
                                         <img
-                                            src={`http://localhost:8082${product.thumbnail}`}
+                                            src={getImageUrl(product.thumbnail)}
                                             alt={product.name}
                                             style={styles.productThumb}
                                         />

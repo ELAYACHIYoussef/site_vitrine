@@ -5,12 +5,17 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import AdminLayout from './components/AdminLayout';
+import CookieConsent from './components/CookieConsent';
 import Home from './pages/Home';
 import ProductCatalog from './pages/ProductCatalog';
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
+import MentionsLegales from './pages/MentionsLegales';
+import CGV from './pages/CGV';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
@@ -31,14 +36,15 @@ import Settings from './pages/admin/Settings';
 
 function AppContent() {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <Navbar />
-            <main className="pb-20">
+            {!isAdminRoute && <Navbar />}
+            <main className={isAdminRoute ? '' : 'pb-20'}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/products" element={<ProductCatalog />} />
@@ -48,10 +54,13 @@ function AppContent() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/account/orders" element={<ClientOrders />} />
                 <Route path="/account/profile" element={<UserProfile />} />
                 <Route path="/payment" element={<Payment />} />
+                <Route path="/mentions-legales" element={<MentionsLegales />} />
+                <Route path="/cgv" element={<CGV />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
@@ -67,12 +76,11 @@ function AppContent() {
                 </Route>
 
                 {/* Add more routes here as we migrate them */}
+
               </Routes>
             </main>
 
-            <footer className="py-10 border-t bg-white text-center text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} SITE VITRINE E-COMMERCE. Tous droits réservés.
-            </footer>
+            {!isAdminRoute && <Footer />}
 
             {/* Toast Notifications */}
             <Toaster
@@ -98,6 +106,7 @@ function AppContent() {
                 },
               }}
             />
+            <CookieConsent />
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

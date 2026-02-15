@@ -34,4 +34,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @org.springframework.data.jpa.repository.Modifying
     @Query("UPDATE Product p SET p.stock = p.stock - :quantity WHERE p.id = :id AND p.stock >= :quantity")
     int decreaseStock(@Param("id") Long id, @Param("quantity") int quantity);
+
+    @Query("SELECT COALESCE(SUM(p.views), 0) FROM Product p")
+    long sumTotalViews();
 }

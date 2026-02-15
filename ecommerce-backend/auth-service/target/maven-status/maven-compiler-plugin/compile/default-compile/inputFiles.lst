@@ -1,6 +1,9 @@
 C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\repository\UserRepository.java
+C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\config\JwtAuthenticationFilter.java
 C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\model\User.java
 C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\config\SecurityConfig.java
+C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\service\CustomUserDetailsService.java
+C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\security\OAuth2LoginSuccessHandler.java
 C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\service\AuthService.java
 C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\service\JwtService.java
 C:\Users\Administrator\OneDrive\Desktop\site_vitrine\site_vitrine\ecommerce-backend\auth-service\src\main\java\com\youssef\ecommerce\auth\controller\AuthController.java

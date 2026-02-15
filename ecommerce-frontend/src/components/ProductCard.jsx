@@ -4,6 +4,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductCard = ({ product }) => {
     const { addToCart } = useCart();
@@ -11,13 +12,8 @@ const ProductCard = ({ product }) => {
     const isLoved = isInWishlist(product.id);
 
     // Fix image path logic
-    const getImageUrl = (url) => {
-        if (!url) return '/products/product_1.jpg'; // Default fallback
-        if (url.startsWith('http')) return url;
+    // Using utility function imported
 
-        // Use backend URL like in Admin panel
-        return `http://localhost:8082${url}`;
-    };
 
     return (
         <motion.div

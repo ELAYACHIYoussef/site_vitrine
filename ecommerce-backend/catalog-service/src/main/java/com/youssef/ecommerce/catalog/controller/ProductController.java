@@ -102,6 +102,7 @@ public class ProductController {
         stats.put("totalProducts", totalProducts);
         stats.put("totalStock", totalStock);
         stats.put("catalogValue", catalogValue);
+        stats.put("totalViews", productService.getTotalViews());
         stats.put("productsByCategory", productsByCategory);
         stats.put("topViewed", topViewed);
         stats.put("recentProducts", recentProducts);

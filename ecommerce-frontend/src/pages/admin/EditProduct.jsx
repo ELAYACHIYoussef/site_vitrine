@@ -4,6 +4,8 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ImageUpload from '../../components/ImageUpload';
 import productService from '../../api/productService';
+import { getCategories } from '../../api/categoryService';
+import { getImageUrl } from '../../utils/imageUtils';
 
 const EditProduct = () => {
     const navigate = useNavigate();
@@ -12,6 +14,7 @@ const EditProduct = () => {
     const [loadingProduct, setLoadingProduct] = useState(true);
     const [images, setImages] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
         category: '',
@@ -22,13 +25,34 @@ const EditProduct = () => {
         descriptionCourte: ''
     });
 
-    const categories = [
-        { value: 'smartphones', label: 'Smartphones' },
-        { value: 'laptops', label: 'Ordinateurs Portables' },
-        { value: 'tablets', label: 'Tablettes' },
-        { value: 'accessories', label: 'Accessoires' },
-        { value: 'audio', label: 'Audio' },
-    ];
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                const formatted = data.map(cat => ({
+                    value: cat.name,
+                    label: cat.label || cat.name
+                }));
+                // If no categories in DB yet, maybe keep defaults? 
+                // Decision: Better to rely on DB, if empty, user should create one.
+                if (formatted.length > 0) {
+                    setCategories(formatted);
+                } else {
+                    // Fallback to static if DB is empty to avoid broken UI during migration
+                    setCategories([
+                        { value: 'smartphones', label: 'Smartphones' },
+                        { value: 'laptops', label: 'Ordinateurs Portables' },
+                        { value: 'tablets', label: 'Tablettes' },
+                        { value: 'accessories', label: 'Accessoires' },
+                        { value: 'audio', label: 'Audio' },
+                    ]);
+                }
+            } catch (error) {
+                console.error("Failed to load categories", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         loadProduct();
@@ -246,7 +270,7 @@ const EditProduct = () => {
                                         {existingImages.map((img, idx) => (
                                             <div key={idx} className="aspect-square rounded-lg overflow-hidden border border-slate-200">
                                                 <img
-                                                    src={`http://localhost:8082${img}`}
+                                                    src={getImageUrl(img)}
                                                     alt={`Image ${idx + 1}`}
                                                     className="w-full h-full object-cover"
                                                 />
