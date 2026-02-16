@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -108,5 +108,10 @@ public class AuthController {
         userRepository.findByUsername(username).ifPresent(u -> authService.deleteUser(u.getEmail()));
 
         return ResponseEntity.ok(Map.of("message", "Compte supprimé avec succès"));
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping() {
+        return ResponseEntity.ok(Map.of("message", "pong"));
     }
 }

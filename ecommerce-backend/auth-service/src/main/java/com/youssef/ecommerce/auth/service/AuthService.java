@@ -24,6 +24,12 @@ public class AuthService {
             "selmanim113@gmail.com");
 
     public String register(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Cet email est déjà utilisé");
+        }
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new RuntimeException("Ce nom d'utilisateur est déjà pris");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // Attribution automatique du rôle en fonction de l'email
