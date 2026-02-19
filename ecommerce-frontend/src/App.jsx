@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdminLayout from './components/AdminLayout';
 import CookieConsent from './components/CookieConsent';
+import CartDrawer from './components/CartDrawer';
 import Home from './pages/Home';
 import ProductCatalog from './pages/ProductCatalog';
 import ProductDetails from './pages/ProductDetails';
@@ -106,7 +107,12 @@ function AppContent() {
                 },
               }}
             />
+            import CartDrawer from './components/CartDrawer';
+
+            // ... (in AppContent)
+
             <CookieConsent />
+            <CartDrawer />
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

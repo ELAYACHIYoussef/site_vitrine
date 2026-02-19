@@ -8,7 +8,7 @@ import { ShoppingCart, Heart, User, LogOut, Menu, Package } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
-    const { cartCount } = useCart();
+    const { cartCount, setIsCartOpen } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
 
@@ -87,14 +87,17 @@ const Navbar = () => {
                                         </span>
                                     )}
                                 </Link>
-                                <Link to="/cart" className="relative group">
-                                    <ShoppingCart className="w-5 h-5 cursor-pointer text-slate-600 hover:text-indigo-600 transition-colors" />
+                                <button
+                                    onClick={() => setIsCartOpen(true)}
+                                    className="relative group bg-transparent border-none p-0 cursor-pointer"
+                                >
+                                    <ShoppingCart className="w-5 h-5 text-slate-600 hover:text-indigo-600 transition-colors" />
                                     {cartCount > 0 && (
                                         <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                                             {cartCount}
                                         </span>
                                     )}
-                                </Link>
+                                </button>
                             </div>
                         )}
 

@@ -13,18 +13,33 @@ export const getAuthStats = async () => {
 export const getDashboardStats = async () => {
     try {
         const [catalog, auth, orders] = await Promise.all([
-            getCatalogStats(),
-            getAuthStats(),
-            api.get('/orders').then(res => res.data)
+            getCatalogStats().catch(err => {
+                console.error("Failed to fetch catalog stats:", err);
+                return null;
+            }),
+            getAuthStats().catch(err => {
+                console.error("Failed to fetch auth stats:", err);
+                return null;
+            }),
+            api.get('/orders').then(res => {
+                if (Array.isArray(res.data)) {
+                    return res.data;
+                }
+                console.error("Orders response is not an array:", res.data);
+                return [];
+            }).catch(err => {
+                console.error("Failed to fetch orders:", err);
+                return [];
+            })
         ]);
 
         return {
-            catalog,
-            auth,
+            catalog: catalog || {},
+            auth: auth || {},
             orders: {
-                totalOrders: orders.length,
-                totalRevenue: orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0),
-                recentOrders: orders.slice(-5).reverse()
+                totalOrders: Array.isArray(orders) ? orders.length : 0,
+                totalRevenue: (Array.isArray(orders) ? orders : []).reduce((sum, order) => sum + (order.totalAmount || 0), 0),
+                recentOrders: (Array.isArray(orders) ? orders : []).slice(-5).reverse()
             }
         };
     } catch (error) {

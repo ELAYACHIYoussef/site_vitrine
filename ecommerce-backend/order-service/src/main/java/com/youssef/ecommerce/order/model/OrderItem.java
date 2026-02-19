@@ -1,50 +1,37 @@
 package com.youssef.ecommerce.order.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
-@Table(name = "order_items")
-@Getter
-@Setter
+@Table(name = "t_order_items")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    @JsonIgnore
-    private Order order;
-
-    @Column(nullable = false)
-    private Long productId; // ID from Catalog Service
-
-    @Column(nullable = false)
+    private String productId; // Link to Catalog Service Product ID (mongo ID is string usually, but let's
+                              // check catalog)
     private String productName;
+    private String productThumbnail; // Snapshot for history
 
-    @Column(nullable = false)
-    private Double price;
-
-    @Column(nullable = false)
     private Integer quantity;
+    private BigDecimal price;
 
-    @Column(name = "product_size")
-    private String size;
-
-    @Column(name = "product_color")
-    private String color;
-
-    public Double getSubtotal() {
-        return price * quantity;
-    }
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @lombok.ToString.Exclude
+    private Order order;
 }

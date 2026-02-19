@@ -6,13 +6,31 @@ export const createOrder = async (orderData) => {
 };
 
 export const getAllOrders = async () => {
-    const response = await api.get('/orders');
-    return response.data;
+    try {
+        const response = await api.get('/orders');
+        if (Array.isArray(response.data)) {
+            return response.data;
+        }
+        console.error("getAllOrders: API did not return an array", response.data);
+        return [];
+    } catch (error) {
+        console.error("getAllOrders: Request failed", error);
+        return [];
+    }
 };
 
 export const getOrdersByUser = async (userId) => {
-    const response = await api.get(`/orders/user/${userId}`);
-    return response.data;
+    try {
+        const response = await api.get(`/orders/user/${userId}`);
+        if (Array.isArray(response.data)) {
+            return response.data;
+        }
+        console.error("getOrdersByUser: API did not return an array", response.data);
+        return [];
+    } catch (error) {
+        console.error("getOrdersByUser: Request failed", error);
+        return [];
+    }
 };
 
 export const getOrderById = async (id) => {

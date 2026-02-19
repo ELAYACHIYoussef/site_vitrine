@@ -1,64 +1,71 @@
-# 🔄 Guide de Synchronisation des Données (Toi & Ton Pote)
+# 🔄 Guide : Persistance & Synchronisation des Données
 
-Vous travaillez à deux sur le projet, mais chacun a sa propre base de données locale (dans son Docker). Voici comment s'assurer que vous voyez la même chose.
-
-## 1. La Méthode "Automatique" (Recommandée) : Le DataSeeder 🌱
-
-C'est la méthode que je viens de mettre en place.
-
-*   **Le Principe :** Les données de test (Produits, Catégories, Admins par défaut) sont définies **DANS LE CODE** (Java).
-*   **Avantage :** Si tu ajoutes un nouveau produit dans le code (`DataSeeder.java`) et que tu pousses sur Git, ton pote récupère le code, lance le projet, et **POUF**, le produit apparaît chez lui aussi.
-*   **Comment faire ?**
-    1.  Modifiez le fichier `ecommerce-backend/catalog-service/.../DataSeeder.java`.
-    2.  Ajoutez vos produits/catégories là-dedans.
-    3.  Faites un `git commit` et `git push`.
-    4.  Votre pote fait `git pull` et `docker-compose up --build`.
-
-✅ **C'est la meilleure méthode pour les données de développement.** Tout le monde a toujours la même base propre au démarrage.
+Ce guide explique **comment vos données sont sauvegardées** et **comment les partager** avec votre binôme (ton pote).
 
 ---
 
-## 2. La Méthode "Manuelle" (Pour les données temporaires) 💾
+## 1. 🧠 Comment ça marche ? (La Technique)
 
-Parfois, tu crées un compte utilisateur ou une commande manuellement via le site, et tu veux que ton pote voie exactement ça pour debugger. Comme c'est dans ta base locale, il ne peut pas le voir.
+Quand tu crées une commande ou un utilisateur sur le site, voici le chemin parcouru :
 
-**Solution : Exporter/Importer la base de données.**
+1.  **Frontend (React)** : Envoie le JSON au Backend (ex: `POST /api/orders`).
+2.  **Backend (Spring Boot)** : Reçoit la donnée, vérifie tout, et utilise **Hibernate/JPA** pour transformer l'objet Java en requête SQL.
+3.  **Base de Données (PostgreSQL)** : Exécute le SQL (`INSERT INTO...`) et stocke la donnée sur le disque dur.
 
-### Étape A : Exporter tes données (Toi)
-Ouvre un terminal dans le dossier du projet :
+### 📍 Où sont stockés les fichiers ?
+
+⚠️ **Important :** Les données NE SONT PAS dans votre dossier `site_vitrine` Windows.
+
+Elles sont dans un **Volume Docker**.
+*   Docker crée un espace disque virtuel séparé et sécurisé.
+*   Dans votre `docker-compose.yml`, c'est la ligne :
+    ```yaml
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ```
+*   Cela permet de **garder les données** même si vous supprimez les conteneurs (`docker-compose down`).
+
+---
+
+## 2. 🤝 Comment travailler à deux ? (Synchronisation)
+
+Comme chacun a son propre Docker, chacun a sa propre base de données. Voici comment rester synchronisés.
+
+### Méthode A : Le "DataSeeder" (Pour le démarrage) 🌱
+**C'est la méthode recommandée pour le développement.**
+*   Les produits de base (T-shirts, Pantalons...) sont codés en DUR dans `DataSeeder.java`.
+*   **Si ton pote ajoute un produit :**
+    1.  Il modifie `DataSeeder.java`.
+    2.  Il push sur Git.
+    3.  Tu pull et tu redémarres ton Docker.
+    4.  **Résultat :** Le produit apparaît chez toi.
+
+### Méthode B : L'Export Manuel (Pour montrer un bug) 💾
+Si tu as créé une commande spécifique "à la main" et que tu veux que ton pote la voie pour t'aider :
+
+#### 📤 1. Exporter TA base (Toi)
+Ouvre un terminal **PowerShell** dans le dossier du projet :
 ```powershell
-# Créer un fichier de sauvegarde "backup.sql"
-docker exec -t azymarket-postgres pg_dumpall -c -U postgres > backup.sql
+# Créer le fichier "backup.sql"
+docker exec -i azymarket-postgres pg_dump -U postgres ecommerce_auth > backup.sql
 ```
-Envoie ce fichier `backup.sql` à ton pote (par Discord, Slack, email...).
+👉 Envoie ce fichier `backup.sql` à ton pote.
 
-### Étape B : Importer les données (Ton Pote)
-Il reçoit le fichier `backup.sql` et le met dans son dossier projet.
-Ensuite, il lance :
+#### 📥 2. Importer chez LUI (Ton Pote)
+Il place le fichier dans le dossier du projet et lance :
 ```powershell
-# ⚠️ ATTENTION : Ça efface sa base actuelle pour mettre la tienne !
-cat backup.sql | docker exec -i azymarket-postgres psql -U postgres
+# ⚠️ ATTENTION : Ça efface sa base actuelle !
+cat backup.sql | docker exec -i azymarket-postgres psql -U postgres ecommerce_auth
 ```
-(Sur Windows PowerShell, `cat` peut être remplacé par `Get-Content`).
+*(Si `cat` ne marche pas, utilisez `Get-Content backup.sql | ...`)*
 
 ---
 
-## 3. La Méthode "Cloud" (Avancée) ☁️
+## 3. ☁️ La Vraie Synchronisation (Option Cloud)
 
-Si vous en avez marre de synchroniser, la solution finale est d'héberger la base de données en ligne (ex: Supabase, Railway, NeonDB).
+Si vous voulez voir **exactement la même chose en temps réel** sans faire d'export :
+1.  Louez une base de données PostgreSQL gratuite en ligne (ex: **Supabase**, **Railway**, **Neon**).
+2.  Changez l'URL `SPRING_DATASOURCE_URL` dans vos fichiers `.env` pour pointer vers cette base en ligne.
+3.  **Résultat :** Quand tu crées une commande, elle apparaît INSTANTANÉMENT chez lui.
 
-1.  Vous créez une base Postgres gratuite en ligne.
-2.  Dans votre fichier `.env` ou `docker-compose.yml`, vous remplacez l'URL `jdbc:postgresql://postgres:5432/...` par l'URL de la base en ligne.
-3.  **Résultat :** Vous tapez tous les deux sur la MÊME base en temps réel.
-
-❌ **Inconvénient :** Si tu casses la base, tu casses celle de ton pote aussi. À éviter en phase de développement intensif.
-
----
-
-## 🧩 Résumé
-
-| Cas d'usage | Méthode Recommandée |
-| :--- | :--- |
-| **Ajouter des produits/catégories fixes** | **DataSeeder** (Code Java) |
-| **Montrer un bug bizarre sur un client** | **Export SQL** (Fichier .sql) |
-| **Production / Démo finale** | **Base de données Cloud** |
+> **Conseil :** Restez sur Docker local pour l'instant, c'est plus rapide et plus sûr pour apprendre.
