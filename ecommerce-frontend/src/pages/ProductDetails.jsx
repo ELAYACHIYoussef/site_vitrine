@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, ShoppingBag, Heart, Share2, Star, Check, Truck, Shield } from 'lucide-react';
 import { getImageUrl } from '../utils/imageUtils';
 import { motion } from 'framer-motion';
@@ -13,6 +14,7 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);
 
     // Hooks must be at the top level
+    const { user } = useAuth();
     const { addToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
     const [activeImage, setActiveImage] = useState(null);
@@ -325,7 +327,7 @@ const ProductDetails = () => {
 
                                 <div className="pt-4 flex justify-center">
                                     <button
-                                        onClick={() => toggleWishlist(product)}
+                                        onClick={() => toggleWishlist(product, user?.id)}
                                         className={`flex items-center gap-2 text-sm font-medium transition-colors ${isInWishlist(product.id) ? 'text-rose-500' : 'text-slate-500 hover:text-rose-600'
                                             }`}
                                     >

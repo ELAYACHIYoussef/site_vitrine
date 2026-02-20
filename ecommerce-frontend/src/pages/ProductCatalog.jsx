@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import productService from '../api/productService';
 import ProductCard from '../components/ProductCard';
 import { Loader, Search, Filter } from 'lucide-react';
@@ -6,8 +7,17 @@ import { Loader, Search, Filter } from 'lucide-react';
 const ProductCatalog = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchParams, setSearchParams] = useSearchParams();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+
+    // Sync state with URL params
+    useEffect(() => {
+        const querySearch = searchParams.get('search') || '';
+        const queryCategory = searchParams.get('category') || 'All';
+        setSearchTerm(querySearch);
+        setSelectedCategory(queryCategory);
+    }, [searchParams]);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -26,8 +36,17 @@ const ProductCatalog = () => {
 
     // Filter logic
     const filteredProducts = products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory || product.categoryLabel === selectedCategory;
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        // Normalize comparison for categories (case insensitive)
+        const productCat = (product.categoryLabel || product.category || '').toLowerCase();
+        const selectedCatLower = selectedCategory.toLowerCase();
+
+        const matchesCategory = selectedCategory === 'All' ||
+            productCat === selectedCatLower ||
+            productCat.includes(selectedCatLower); // Partial match for safety
+
         return matchesSearch && matchesCategory;
     });
 
@@ -64,7 +83,11 @@ const ProductCatalog = () => {
                             type="text"
                             placeholder="Rechercher un produit..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setSearchTerm(val);
+                                setSearchParams({ search: val, category: selectedCategory === 'All' ? '' : selectedCategory });
+                            }}
                             className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:border-[#FF6835] focus:ring-2 focus:ring-orange-100 outline-none transition-all"
                         />
                     </div>
@@ -76,10 +99,13 @@ const ProductCatalog = () => {
                             {categories.map(cat => (
                                 <button
                                     key={cat}
-                                    onClick={() => setSelectedCategory(cat)}
+                                    onClick={() => {
+                                        setSelectedCategory(cat);
+                                        setSearchParams({ search: searchTerm, category: cat === 'All' ? '' : cat });
+                                    }}
                                     className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat
-                                            ? 'bg-[#0f172a] text-white shadow-lg'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        ? 'bg-[#0f172a] text-white shadow-lg'
+                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                         }`}
                                 >
                                     {cat}

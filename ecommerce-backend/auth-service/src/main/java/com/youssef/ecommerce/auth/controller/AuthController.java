@@ -17,6 +17,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final com.youssef.ecommerce.auth.repository.AuditLogRepository auditLogRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
@@ -25,8 +26,20 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        return authService.login(request.get("email"), request.get("password"))
-                .map(ResponseEntity::ok)
+        String email = request.get("email");
+        return authService.login(email, request.get("password"))
+                .map(token -> {
+                    // Log the login event
+                    userRepository.findByEmail(email).ifPresent(u -> {
+                        auditLogRepository.save(com.youssef.ecommerce.auth.model.AuditLog.builder()
+                                .eventType("LOGIN")
+                                .userId(u.getId())
+                                .username(u.getUsername())
+                                .details("User logged in via Web")
+                                .build());
+                    });
+                    return ResponseEntity.ok(token);
+                })
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
 

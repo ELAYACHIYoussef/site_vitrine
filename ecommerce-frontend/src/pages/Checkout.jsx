@@ -12,15 +12,16 @@ const Checkout = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [step, setStep] = useState(1); // 1: Shipping, 2: Payment/Confirm
+    const [step, setStep] = useState(1); // 1: Shipping, 2: Delivery, 3: Payment/Confirm
 
     const [formData, setFormData] = useState({
-        fullName: user?.username || '', // Pre-fill if able
+        fullName: user?.username || '',
         email: user?.email || '',
         address: '',
         city: '',
         zipCode: '',
-        country: 'France'
+        country: 'France',
+        deliveryMethod: 'carrier' // 'carrier' or 'hand'
     });
 
     if (cart.length === 0) {
@@ -43,7 +44,7 @@ const Checkout = () => {
             userId: user?.id || 999,
             customerName: formData.fullName,
             customerEmail: formData.email,
-            shippingAddress: `${formData.address}, ${formData.zipCode} ${formData.city}, ${formData.country}`,
+            shippingAddress: `[${formData.deliveryMethod === 'hand' ? 'MAIN PROPRE' : 'LIVRAISON'}] ${formData.address}, ${formData.zipCode} ${formData.city}, ${formData.country}`,
             items: cart.map(item => ({
                 productId: item.id,
                 productName: item.name,
@@ -66,13 +67,11 @@ const Checkout = () => {
                 <div className="flex-1">
                     {/* Steps Indicator */}
                     <div className="flex items-center mb-10">
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                            1
-                        </div>
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>1</div>
                         <div className={`h-1 flex-1 mx-4 rounded ${step >= 2 ? 'bg-indigo-600' : 'bg-slate-200'}`}></div>
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                            2
-                        </div>
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>2</div>
+                        <div className={`h-1 flex-1 mx-4 rounded ${step >= 3 ? 'bg-indigo-600' : 'bg-slate-200'}`}></div>
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${step >= 3 ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>3</div>
                     </div>
 
                     <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
@@ -162,8 +161,49 @@ const Checkout = () => {
                                         onClick={() => setStep(2)}
                                         className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
                                     >
-                                        Continuer vers le paiement
-                                        <ArrowRight size={20} />
+                                        Continuer <ArrowRight size={20} />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : step === 2 ? (
+                            <div className="animation-fade-in">
+                                <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                    <Truck className="text-indigo-600" />
+                                    Mode de Livraison
+                                </h2>
+                                <div className="space-y-4">
+                                    <div
+                                        onClick={() => setFormData({ ...formData, deliveryMethod: 'carrier' })}
+                                        className={`p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4 ${formData.deliveryMethod === 'carrier' ? 'border-indigo-600 bg-indigo-50' : 'border-slate-200 hover:border-indigo-300'}`}
+                                    >
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.deliveryMethod === 'carrier' ? 'border-indigo-600' : 'border-slate-300'}`}>
+                                            {formData.deliveryMethod === 'carrier' && <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-slate-900">Livraison Standard</h3>
+                                            <p className="text-slate-500 text-sm">Livré sous 3-5 jours ouvrables par transporteur.</p>
+                                        </div>
+                                        <span className="font-bold text-green-600">Gratuit</span>
+                                    </div>
+
+                                    <div
+                                        onClick={() => setFormData({ ...formData, deliveryMethod: 'hand' })}
+                                        className={`p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4 ${formData.deliveryMethod === 'hand' ? 'border-indigo-600 bg-indigo-50' : 'border-slate-200 hover:border-indigo-300'}`}
+                                    >
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.deliveryMethod === 'hand' ? 'border-indigo-600' : 'border-slate-300'}`}>
+                                            {formData.deliveryMethod === 'hand' && <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-slate-900">Remise en Main Propre</h3>
+                                            <p className="text-slate-500 text-sm">Récupérez votre commande directement au point de retrait.</p>
+                                        </div>
+                                        <span className="font-bold text-green-600">Gratuit</span>
+                                    </div>
+                                </div>
+                                <div className="mt-8 flex justify-between items-center">
+                                    <button onClick={() => setStep(1)} className="text-slate-500 hover:text-slate-800 font-medium">Retour</button>
+                                    <button onClick={() => setStep(3)} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+                                        Continuer <ArrowRight size={20} />
                                     </button>
                                 </div>
                             </div>
@@ -174,30 +214,26 @@ const Checkout = () => {
                                     Paiement & Confirmation
                                 </h2>
 
-                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 mb-6">
-                                    <h3 className="font-semibold text-slate-800 mb-3">Récapitulatif Livraison</h3>
-                                    <p className="text-slate-600">{formData.fullName}</p>
-                                    <p className="text-slate-600">{formData.address}</p>
-                                    <p className="text-slate-600">{formData.zipCode} {formData.city}, {formData.country}</p>
-                                    <button onClick={() => setStep(1)} className="text-indigo-600 text-sm font-medium hover:underline mt-2">Modifier</button>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="p-4 border border-indigo-600 bg-indigo-50 rounded-xl flex items-center gap-4 cursor-pointer relative">
-                                        <div className="w-5 h-5 rounded-full border-2 border-indigo-600 flex items-center justify-center">
-                                            <div className="w-2.5 h-2.5 bg-indigo-600 rounded-full"></div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <CreditCard className="text-indigo-600" />
-                                            <span className="font-semibold text-indigo-900">Carte Bancaire (Démo)</span>
-                                        </div>
-                                        <span className="absolute right-4 text-xs font-bold text-indigo-500 bg-white px-2 py-1 rounded">SIMULÉ</span>
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 mb-6 space-y-3">
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide opacity-70">Livraison</h3>
+                                        <p className="text-slate-700 font-medium">{formData.fullName}</p>
+                                        <p className="text-slate-600">{formData.address}</p>
+                                        <p className="text-slate-600">{formData.zipCode} {formData.city}, {formData.country}</p>
                                     </div>
+                                    <div className="pt-3 border-t border-slate-200">
+                                        <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide opacity-70">Mode</h3>
+                                        <p className="text-indigo-600 font-bold flex items-center gap-2">
+                                            {formData.deliveryMethod === 'carrier' ? <Truck size={16} /> : <CheckCircle size={16} />}
+                                            {formData.deliveryMethod === 'carrier' ? 'Livraison Standard' : 'Remise en Main Propre'}
+                                        </p>
+                                    </div>
+                                    <button onClick={() => setStep(1)} className="text-indigo-600 text-sm font-medium hover:underline mt-2">Modifier</button>
                                 </div>
 
                                 <div className="mt-8 flex justify-between items-center">
                                     <button
-                                        onClick={() => setStep(1)}
+                                        onClick={() => setStep(2)}
                                         className="text-slate-500 hover:text-slate-800 font-medium"
                                     >
                                         Retour

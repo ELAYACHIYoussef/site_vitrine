@@ -1,0 +1,265 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import ImageUpload from '../../components/ImageUpload';
+import productService from '../../api/productService';
+import { getCategories } from '../../api/categoryService';
+
+const AddProduct = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [images, setImages] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [formData, setFormData] = useState({
+        name: '',
+        category: '',
+        categoryLabel: '',
+        price: '',
+        stock: '',
+        description: '',
+        descriptionCourte: ''
+    });
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                // Map to format { value: 'name', label: 'Label' }
+                const formatted = data.map(cat => ({
+                    value: cat.name,
+                    label: cat.label || cat.name
+                }));
+                setCategories(formatted);
+            } catch (error) {
+                console.error("Failed to load categories", error);
+                // Fallback or empty
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Validation
+        if (!formData.name || !formData.category || !formData.price) {
+            alert('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+
+        if (images.length === 0) {
+            alert('Veuillez ajouter au moins une image');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await productService.createProduct(formData, images);
+            alert('Produit créé avec succès !');
+            navigate('/admin/products');
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la création du produit: ' + (error.response?.data || error.message));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <button
+                        onClick={() => navigate('/admin/products')}
+                        className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="text-sm font-medium">Retour à la liste</span>
+                    </button>
+                    <h1 className="text-3xl font-bold text-slate-900">Ajouter un Produit</h1>
+                    <p className="text-slate-600 mt-2">Créez un nouveau produit avec images et informations</p>
+                </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Main Card */}
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+                    <div className="grid md:grid-cols-2 gap-8">
+                        {/* Left Column - Product Info */}
+                        <div className="space-y-6">
+                            <h2 className="text-lg font-bold text-slate-900 border-b pb-3">
+                                Informations du Produit
+                            </h2>
+
+                            {/* Name */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    Nom du Produit <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Ex: iPhone 13 Pro"
+                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                    required
+                                />
+                            </div>
+
+                            {/* Category */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    Catégorie <span className="text-rose-500">*</span>
+                                </label>
+                                <select
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                    required
+                                >
+                                    <option value="">Sélectionner une catégorie</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Category Label */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    Label Catégorie
+                                </label>
+                                <input
+                                    type="text"
+                                    name="categoryLabel"
+                                    value={formData.categoryLabel}
+                                    onChange={handleChange}
+                                    placeholder="Ex: Apple"
+                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                />
+                            </div>
+
+                            {/* Price & Stock */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                        Prix (€) <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleChange}
+                                        placeholder="1099"
+                                        step="0.01"
+                                        className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                        Stock
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="stock"
+                                        value={formData.stock}
+                                        onChange={handleChange}
+                                        placeholder="50"
+                                        className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Short Description */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    Description Courte
+                                </label>
+                                <textarea
+                                    name="descriptionCourte"
+                                    value={formData.descriptionCourte}
+                                    onChange={handleChange}
+                                    placeholder="Brève description pour la carte produit..."
+                                    rows="3"
+                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Right Column - Images */}
+                        <div className="space-y-6">
+                            <h2 className="text-lg font-bold text-slate-900 border-b pb-3">
+                                Images du Produit
+                            </h2>
+
+                            <ImageUpload
+                                images={images}
+                                onChange={setImages}
+                                maxImages={6}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Full Width Description */}
+                    <div className="mt-8 pt-8 border-t">
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            Description Détaillée
+                        </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            placeholder="Description complète du produit avec toutes les caractéristiques techniques..."
+                            rows="6"
+                            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
+                        />
+                    </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-end gap-4">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/admin/products')}
+                        className="px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
+                    >
+                        Annuler
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/50"
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Création...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-5 h-5" />
+                                Créer le Produit
+                            </>
+                        )}
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+export default AddProduct;

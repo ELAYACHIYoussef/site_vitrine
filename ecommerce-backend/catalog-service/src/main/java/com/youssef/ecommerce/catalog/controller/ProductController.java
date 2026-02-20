@@ -141,6 +141,7 @@ public class ProductController {
         map.put("colors", product.getColors() != null ? new ArrayList<>(product.getColors()) : new ArrayList<>());
         map.put("caracteristiques", product.getCaracteristiques());
         map.put("views", product.getViews());
+        map.put("likes", product.getLikes());
         map.put("createdAt", product.getCreatedAt());
         map.put("updatedAt", product.getUpdatedAt());
         return map;

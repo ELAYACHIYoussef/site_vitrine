@@ -1,64 +1,43 @@
-# 🔄 Guide de Synchronisation des Données (Toi & Ton Pote)
+# Guide de Synchronisation de Base de Données (Sans Supabase)
 
-Vous travaillez à deux sur le projet, mais chacun a sa propre base de données locale (dans son Docker). Voici comment s'assurer que vous voyez la même chose.
+Ce guide explique comment partager les données de la base de données (produits, utilisateurs, etc.) avec vos collaborateurs via Git.
 
-## 1. La Méthode "Automatique" (Recommandée) : Le DataSeeder 🌱
+## Principe
 
-C'est la méthode que je viens de mettre en place.
+Nous n'utilisons pas de base de données Cloud (comme Supabase). À la place, nous avons deux scripts pour "sauvegarder" et "charger" les données locales dans un fichier partagé.
 
-*   **Le Principe :** Les données de test (Produits, Catégories, Admins par défaut) sont définies **DANS LE CODE** (Java).
-*   **Avantage :** Si tu ajoutes un nouveau produit dans le code (`DataSeeder.java`) et que tu pousses sur Git, ton pote récupère le code, lance le projet, et **POUF**, le produit apparaît chez lui aussi.
-*   **Comment faire ?**
-    1.  Modifiez le fichier `ecommerce-backend/catalog-service/.../DataSeeder.java`.
-    2.  Ajoutez vos produits/catégories là-dedans.
-    3.  Faites un `git commit` et `git push`.
-    4.  Votre pote fait `git pull` et `docker-compose up --build`.
+## Scénarios
 
-✅ **C'est la meilleure méthode pour les données de développement.** Tout le monde a toujours la même base propre au démarrage.
+### 1. J'ai ajouté des produits et je veux les envoyer à mon pote
 
----
+1.  Assurez-vous que votre Docker tourne (`docker-compose up`).
+2.  Lancez le script de sauvegarde :
+    ```powershell
+    .\save-db.ps1
+    ```
+    Cela va créer ou mettre à jour le fichier `db-dump.sql`.
+3.  Envoyez le tout sur Git :
+    ```powershell
+    git add db-dump.sql
+    git commit -m "Mise à jour des produits dans la DB"
+    git push
+    ```
 
-## 2. La Méthode "Manuelle" (Pour les données temporaires) 💾
+### 2. Je viens de récupérer le code de mon pote et je veux ses données
 
-Parfois, tu crées un compte utilisateur ou une commande manuellement via le site, et tu veux que ton pote voie exactement ça pour debugger. Comme c'est dans ta base locale, il ne peut pas le voir.
+1.  Récupérez le code :
+    ```powershell
+    git pull
+    ```
+2.  Assurez-vous que votre Docker tourne.
+3.  Lancez le script de chargement :
+    ```powershell
+    .\load-db.ps1
+    ```
+    ⚠️ **Attention** : Cela va remplacer vos données locales par celles du fichier.
 
-**Solution : Exporter/Importer la base de données.**
+## Fichiers
 
-### Étape A : Exporter tes données (Toi)
-Ouvre un terminal dans le dossier du projet :
-```powershell
-# Créer un fichier de sauvegarde "backup.sql"
-docker exec -t azymarket-postgres pg_dumpall -c -U postgres > backup.sql
-```
-Envoie ce fichier `backup.sql` à ton pote (par Discord, Slack, email...).
-
-### Étape B : Importer les données (Ton Pote)
-Il reçoit le fichier `backup.sql` et le met dans son dossier projet.
-Ensuite, il lance :
-```powershell
-# ⚠️ ATTENTION : Ça efface sa base actuelle pour mettre la tienne !
-cat backup.sql | docker exec -i azymarket-postgres psql -U postgres
-```
-(Sur Windows PowerShell, `cat` peut être remplacé par `Get-Content`).
-
----
-
-## 3. La Méthode "Cloud" (Avancée) ☁️
-
-Si vous en avez marre de synchroniser, la solution finale est d'héberger la base de données en ligne (ex: Supabase, Railway, NeonDB).
-
-1.  Vous créez une base Postgres gratuite en ligne.
-2.  Dans votre fichier `.env` ou `docker-compose.yml`, vous remplacez l'URL `jdbc:postgresql://postgres:5432/...` par l'URL de la base en ligne.
-3.  **Résultat :** Vous tapez tous les deux sur la MÊME base en temps réel.
-
-❌ **Inconvénient :** Si tu casses la base, tu casses celle de ton pote aussi. À éviter en phase de développement intensif.
-
----
-
-## 🧩 Résumé
-
-| Cas d'usage | Méthode Recommandée |
-| :--- | :--- |
-| **Ajouter des produits/catégories fixes** | **DataSeeder** (Code Java) |
-| **Montrer un bug bizarre sur un client** | **Export SQL** (Fichier .sql) |
-| **Production / Démo finale** | **Base de données Cloud** |
+- `save-db.ps1` : Crée le fichier `db-dump.sql` à partir de votre Docker.
+- `load-db.ps1` : Lit `db-dump.sql` et l'injecte dans votre Docker.
+- `db-dump.sql` : Le fichier qui contient les données (à ne pas modifier manuellement).
