@@ -60,6 +60,7 @@ function AppContent() {
                 <Route path="/account/orders" element={<ClientOrders />} />
                 <Route path="/account/messages" element={<ClientMessages />} />
                 <Route path="/account/profile" element={<UserProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/mentions-legales" element={<MentionsLegales />} />
                 <Route path="/cgv" element={<CGV />} />

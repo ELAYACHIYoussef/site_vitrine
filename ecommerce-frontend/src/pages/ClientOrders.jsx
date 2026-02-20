@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getOrdersByUser } from '../api/orderService';
 import { useAuth } from '../context/AuthContext';
-import { Package, Clock, CheckCircle, Truck, XCircle, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle, ChevronRight, ShoppingBag, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const ClientOrders = () => {
     const { user } = useAuth();
@@ -28,6 +30,57 @@ const ClientOrders = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const downloadInvoice = (order) => {
+        const doc = new jsPDF();
+
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(79, 70, 229); // Indigo-600
+        doc.text("VITRINE.IO", 14, 20);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text("Facture #" + (order.orderNumber || order.id), 14, 30);
+        doc.text("Date: " + format(new Date(order.createdAt), 'dd/MM/yyyy'), 14, 35);
+
+        // Client Details
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text("Client:", 14, 45);
+        doc.setFontSize(10);
+        doc.text(user.username || "Client", 14, 50);
+        doc.text(user.email || "", 14, 55);
+
+        // Table
+        const tableColumn = ["Produit", "Quantité", "Prix Unit.", "Total"];
+        const tableRows = [];
+
+        order.items.forEach(item => {
+            const itemData = [
+                item.productName,
+                item.quantity,
+                item.price?.toFixed(2) + " €",
+                (item.quantity * item.price)?.toFixed(2) + " €"
+            ];
+            tableRows.push(itemData);
+        });
+
+        autoTable(doc, {
+            startY: 65,
+            head: [tableColumn],
+            body: tableRows,
+            theme: 'striped',
+            headStyles: { fillColor: [79, 70, 229] },
+        });
+
+        // Total
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(14);
+        doc.text("Total: " + order.totalAmount?.toFixed(2) + " €", 14, finalY);
+
+        doc.save(`facture_${order.orderNumber || order.id}.pdf`);
     };
 
     const getStatusColor = (status) => {
@@ -114,9 +167,18 @@ const ClientOrders = () => {
                                             Passée le {order.createdAt ? format(new Date(order.createdAt), 'dd MMMM yyyy à HH:mm', { locale: fr }) : 'Date inconnue'}
                                         </p>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-slate-500">Total</p>
-                                        <p className="text-xl font-bold text-indigo-600">{order.totalAmount?.toFixed(2)} €</p>
+                                    <div className="flex items-center gap-6">
+                                        <div className="text-right">
+                                            <p className="text-sm text-slate-500">Total</p>
+                                            <p className="text-xl font-bold text-indigo-600">{order.totalAmount?.toFixed(2)} €</p>
+                                        </div>
+                                        <button
+                                            onClick={() => downloadInvoice(order)}
+                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors tooltip"
+                                            title="Télécharger la facture"
+                                        >
+                                            <Download className="w-5 h-5" />
+                                        </button>
                                     </div>
                                 </div>
 

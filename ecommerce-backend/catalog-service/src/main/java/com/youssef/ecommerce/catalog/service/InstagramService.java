@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -19,6 +20,9 @@ public class InstagramService {
 
     @Value("${instagram.access.token:}")
     private String pageAccessToken;
+
+    @Value("${instagram.page.url:https://www.instagram.com/azyymarket/}")
+    private String instagramPageUrl;
 
     @Value("${instagram.account.id:}")
     private String instagramAccountId;
@@ -84,8 +88,39 @@ public class InstagramService {
          }
     }
 
+    public Map<String, Object> getInstagramStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("profileUrl", instagramPageUrl);
+        
+        if (pageAccessToken == null || pageAccessToken.isEmpty()) {
+            // Return mock/default data if not connected
+            stats.put("followers", 1250);
+            stats.put("following", 45);
+            stats.put("posts", 12);
+            stats.put("connected", false);
+            return stats;
+        }
+
+        try {
+            String url = String.format("%s/%s?fields=followers_count,follows_count,media_count&access_token=%s", 
+                graphApiUrl, instagramAccountId, pageAccessToken);
+            
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            if (response != null) {
+                stats.put("followers", response.get("followers_count"));
+                stats.put("following", response.get("follows_count"));
+                stats.put("posts", response.get("media_count"));
+                stats.put("connected", true);
+            }
+        } catch (Exception e) {
+            log.error("Failed to fetch Instagram stats", e);
+            stats.put("error", "Could not fetch stats");
+        }
+        return stats;
+    }
+
     private String buildCaption(Product product) {
         return String.format("%s\n\n%s\n\nPrice: %.2f €\n\n#AzyMarket #Ecommerce #NewArrival", 
-            product.getName(), product.getDescriptionCourte(), product.getPrice());
+            product.getName(), product.getDescription(), product.getPrice());
     }
 }

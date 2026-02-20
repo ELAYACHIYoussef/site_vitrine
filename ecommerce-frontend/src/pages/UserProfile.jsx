@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, MapPin, Package, CreditCard, Shield, Edit2, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import InstagramSyncPanel from '../components/InstagramSyncPanel';
 
 const UserProfile = () => {
-    const { user, deleteAccount } = useAuth();
+    const { user, deleteAccount, token } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    // Mock data for display - in real app, fetch from API
+    // All useState calls must be before useEffect (Rules of Hooks)
     const [formData, setFormData] = useState({
         username: user?.username || '',
         email: user?.email || '',
@@ -18,6 +20,16 @@ const UserProfile = () => {
         zipCode: '75008',
         country: 'France'
     });
+
+    useEffect(() => {
+        if (searchParams.get('instagram_connected') === 'true') {
+            toast.success('Compte Instagram connecté avec succès !');
+            setSearchParams({});
+        } else if (searchParams.get('error')) {
+            toast.error('Erreur lors de la connexion Instagram : ' + searchParams.get('error'));
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -196,30 +208,13 @@ const UserProfile = () => {
                                     </div>
                                 </div>
 
-                                {/* Linked Accounts */}
+                                {/* Linked Accounts - Instagram Sync */}
                                 <div className="border-t border-slate-100 pt-6">
                                     <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                                         <Camera className="w-5 h-5 text-indigo-600" />
                                         Comptes liés
                                     </h3>
-                                    <div className="bg-slate-50 rounded-xl p-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-lg flex items-center justify-center text-white">
-                                                <Camera className="w-6 h-6" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-slate-900">Instagram</h4>
-                                                <p className="text-sm text-slate-500">Connectez votre compte pour synchroniser vos produits</p>
-                                            </div>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => window.location.href = "http://localhost:8080/api/auth/instagram/connect"}
-                                            className="px-4 py-2 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors"
-                                        >
-                                            Se connecter
-                                        </button>
-                                    </div>
+                                    <InstagramSyncPanel />
                                 </div>
                                 {/* Danger Zone */}
                                 <div className="border-t-2 border-red-100 mt-12 pt-8">

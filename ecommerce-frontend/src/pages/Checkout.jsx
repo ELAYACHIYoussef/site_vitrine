@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder } from '../api/orderService';
 import toast from 'react-hot-toast';
-import { CheckCircle, MapPin, CreditCard, ShoppingBag, ArrowRight, Loader } from 'lucide-react';
+import { CheckCircle, MapPin, CreditCard, ShoppingBag, ArrowRight } from 'lucide-react';
 import { getImageUrl } from '../utils/imageUtils';
 
 const Checkout = () => {
@@ -18,15 +18,20 @@ const Checkout = () => {
         fullName: user?.username || '',
         email: user?.email || '',
         address: '',
+        deliveryMethod: 'carrier', // 'carrier' or 'hand'
         city: '',
         zipCode: '',
-        country: 'France',
-        deliveryMethod: 'carrier' // 'carrier' or 'hand'
+        country: 'France'
     });
 
+    useEffect(() => {
+        if (cart.length === 0) {
+            navigate('/cart');
+        }
+    }, [cart, navigate]);
+
     if (cart.length === 0) {
-        navigate('/cart');
-        return null; // Redirect empty cart
+        return null;
     }
 
     const handleInputChange = (e) => {
@@ -57,6 +62,9 @@ const Checkout = () => {
 
         navigate('/payment', { state: { orderData } });
     };
+
+    // Debug View
+    console.log("Checkout Render: ", { cart, user, step, formData });
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -168,7 +176,7 @@ const Checkout = () => {
                         ) : step === 2 ? (
                             <div className="animation-fade-in">
                                 <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                    <Truck className="text-indigo-600" />
+                                    <span>🚚</span>
                                     Mode de Livraison
                                 </h2>
                                 <div className="space-y-4">
@@ -224,7 +232,7 @@ const Checkout = () => {
                                     <div className="pt-3 border-t border-slate-200">
                                         <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide opacity-70">Mode</h3>
                                         <p className="text-indigo-600 font-bold flex items-center gap-2">
-                                            {formData.deliveryMethod === 'carrier' ? <Truck size={16} /> : <CheckCircle size={16} />}
+                                            {formData.deliveryMethod === 'carrier' ? <span>🚚</span> : <CheckCircle size={16} />}
                                             {formData.deliveryMethod === 'carrier' ? 'Livraison Standard' : 'Remise en Main Propre'}
                                         </p>
                                     </div>
@@ -278,7 +286,7 @@ const Checkout = () => {
                             </div>
                             <div className="flex justify-between text-slate-600 text-sm">
                                 <span>Livraison</span>
-                                <span className="text-green-600">Gratuite</span>
+                                <span>Gratuite</span>
                             </div>
                             <div className="flex justify-between font-bold text-lg text-slate-900 pt-2">
                                 <span>Total</span>

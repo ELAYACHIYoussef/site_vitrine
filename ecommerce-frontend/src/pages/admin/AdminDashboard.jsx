@@ -25,6 +25,8 @@ const BRAND_COLORS = {
     instagram: '#E1306C'
 };
 
+const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/azyymarket/";
+
 const PIE_COLORS = ['#e85d04', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
 
 const getMockSalesData = () => {
@@ -47,8 +49,12 @@ function AdminDashboard() {
             if (isRefresh) setRefreshing(true);
             else setLoading(true);
 
-            const data = await getDashboardStats();
-            setStats(data);
+            const [dashboardData, instagramData] = await Promise.all([
+                getDashboardStats(),
+                fetch('http://localhost:8080/api/catalog/instagram/stats').then(r => r.ok ? r.json() : null).catch(() => null)
+            ]);
+
+            setStats({ ...dashboardData, instagram: instagramData });
             setError(null);
         } catch (err) {
             console.error('Failed to fetch stats:', err);
@@ -136,7 +142,7 @@ function AdminDashboard() {
         );
     }
 
-    const { catalog, auth, orders } = stats;
+    const { catalog, auth, orders, instagram } = stats;
 
     // Prepare chart data
     const categoryData = catalog.productsByCategory
@@ -188,11 +194,12 @@ function AdminDashboard() {
         },
         {
             title: 'Instagram',
-            value: '1.2k', // Mocked for now
+            value: instagram?.followers ? `${instagram.followers}` : 'Connexion...',
             icon: Instagram,
             color: BRAND_COLORS.instagram, // Defined above
             gradient: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCAF45 100%)',
-            subtitle: '+12% followers',
+            subtitle: instagram?.connected ? `${instagram.posts} publications` : 'Non connecté',
+            onClick: () => window.open(instagram?.profileUrl || INSTAGRAM_PROFILE_URL, '_blank')
         },
     ];
 
