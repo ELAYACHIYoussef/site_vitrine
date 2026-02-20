@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getGlobalConfig } from '../api/configService';
 
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -11,12 +12,19 @@ const Navbar = () => {
     const { cartCount, setIsCartOpen } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
+    const [storeName, setStoreName] = useState('VITRINE.IO');
+
+    useEffect(() => {
+        getGlobalConfig().then(config => {
+            if (config?.STORE_NAME) setStoreName(config.STORE_NAME);
+        });
+    }, []);
 
     return (
         <nav className="glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300">
             <Link to="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-2 group">
-                <span className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg group-hover:rotate-12 transition-transform">V</span>
-                <span className="text-slate-900">VITRINE<span className="text-indigo-600">.IO</span></span>
+                <span className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg group-hover:rotate-12 transition-transform">{storeName.charAt(0)}</span>
+                <span className="text-slate-900">{storeName}</span>
             </Link>
 
             <div className="hidden md:flex space-x-10 items-center font-medium text-slate-600">

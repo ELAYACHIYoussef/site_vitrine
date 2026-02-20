@@ -67,3 +67,255 @@ body {
 .card-hover {
   @apply transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl;
 }
+
+/* ---- Instagram Sync Panel ---- */
+.instagram-panel {
+  background: linear-gradient(135deg, #fff 0%, #fdf2f8 100%);
+  border: 1.5px solid #fbcfe8;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 4px 24px -4px rgba(220, 39, 67, 0.10);
+}
+
+.instagram-panel.loading {
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #94a3b8;
+  gap: 0.75rem;
+}
+
+.ig-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #fbcfe8;
+  border-top-color: #e6683c;
+  border-radius: 50%;
+  animation: ig-spin 0.7s linear infinite;
+}
+
+@keyframes ig-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ig-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.ig-logo-wrap {
+  flex-shrink: 0;
+}
+
+.ig-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.ig-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ig-subtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ig-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ig-dot.connected {
+  background: #22c55e;
+}
+
+.ig-dot.disconnected {
+  background: #94a3b8;
+}
+
+.ig-badge {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+}
+
+.ig-badge.connected {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.ig-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.ig-stat-card {
+  background: white;
+  border: 1px solid #fce7f3;
+  border-radius: 0.875rem;
+  padding: 0.85rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.ig-stat-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #dc2743, #bc1888);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ig-stat-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ig-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: white;
+  border-radius: 0.875rem;
+  border: 1px solid #fbcfe8;
+  padding: 0.85rem 1rem;
+}
+
+.ig-flow-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ig-flow-icon {
+  font-size: 1.4rem;
+}
+
+.ig-flow-label {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ig-flow-arrow {
+  font-size: 1.2rem;
+  color: #e6683c;
+  font-weight: 700;
+}
+
+.ig-connect-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.ig-input {
+  border: 1.5px solid #fbcfe8;
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border 0.2s;
+  color: #1e293b;
+  background: white;
+}
+
+.ig-input:focus {
+  border-color: #e6683c;
+  box-shadow: 0 0 0 3px rgba(230, 104, 60, 0.12);
+}
+
+.ig-btn {
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 0.875rem;
+  padding: 0.7rem 1.2rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.ig-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ig-btn.connect {
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 39, 67, 0.35);
+}
+
+.ig-btn.connect:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(220, 39, 67, 0.45);
+}
+
+.ig-btn.view {
+  background: white;
+  border: 1.5px solid #fbcfe8;
+  color: #dc2743;
+  flex: 1;
+}
+
+.ig-btn.view:hover {
+  background: #fdf2f8;
+}
+
+.ig-btn.disconnect {
+  background: #f1f5f9;
+  color: #64748b;
+  flex: 1;
+}
+
+.ig-btn.disconnect:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.ig-connected-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ig-note {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-align: center;
+  margin: 0;
+}

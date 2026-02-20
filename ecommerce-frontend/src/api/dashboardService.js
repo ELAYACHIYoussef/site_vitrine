@@ -11,39 +11,37 @@ export const getAuthStats = async () => {
 };
 
 export const getDashboardStats = async () => {
-    try {
-        const [catalog, auth, orders] = await Promise.all([
-            getCatalogStats().catch(err => {
-                console.error("Failed to fetch catalog stats:", err);
-                return null;
-            }),
-            getAuthStats().catch(err => {
-                console.error("Failed to fetch auth stats:", err);
-                return null;
-            }),
-            api.get('/orders').then(res => {
-                if (Array.isArray(res.data)) {
-                    return res.data;
-                }
-                console.error("Orders response is not an array:", res.data);
-                return [];
-            }).catch(err => {
-                console.error("Failed to fetch orders:", err);
-                return [];
-            })
-        ]);
+    // Use allSettled so a single failure doesn't crash the entire dashboard
+    const [catalogResult, authResult, ordersResult] = await Promise.allSettled([
+        getCatalogStats(),
+        getAuthStats(),
+        api.get('/orders').then(res => res.data)
+    ]);
 
-        return {
-            catalog: catalog || {},
-            auth: auth || {},
-            orders: {
-                totalOrders: Array.isArray(orders) ? orders.length : 0,
-                totalRevenue: (Array.isArray(orders) ? orders : []).reduce((sum, order) => sum + (order.totalAmount || 0), 0),
-                recentOrders: (Array.isArray(orders) ? orders : []).slice(-5).reverse()
-            }
-        };
-    } catch (error) {
-        console.error("Error aggregating dashboard stats", error);
-        throw error;
-    }
+    const catalog = catalogResult.status === 'fulfilled' ? catalogResult.value : {
+        totalProducts: 0, totalStock: 0, catalogValue: 0, totalViews: 0, productsByCategory: {}
+    };
+
+    const auth = authResult.status === 'fulfilled' ? authResult.value : {
+        totalUsers: 0, admins: 0, clients: 0, recentUsers: []
+    };
+
+    const ordersData = ordersResult.status === 'fulfilled' ? ordersResult.value : [];
+
+    if (catalogResult.status === 'rejected') console.warn('catalog/stats failed:', catalogResult.reason?.message);
+    if (authResult.status === 'rejected') console.warn('auth/stats failed:', authResult.reason?.message);
+    if (ordersResult.status === 'rejected') console.warn('orders failed:', ordersResult.reason?.message);
+
+    return {
+        catalog,
+        auth,
+        orders: {
+            totalOrders: Array.isArray(ordersData) ? ordersData.length : 0,
+            totalRevenue: Array.isArray(ordersData)
+                ? ordersData.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+                : 0,
+            recentOrders: Array.isArray(ordersData) ? ordersData.slice(-5).reverse() : []
+        }
+    };
 };
+

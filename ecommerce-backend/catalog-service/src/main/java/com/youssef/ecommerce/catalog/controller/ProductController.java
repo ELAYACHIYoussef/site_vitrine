@@ -2,6 +2,7 @@ package com.youssef.ecommerce.catalog.controller;
 
 import com.youssef.ecommerce.catalog.model.Product;
 import com.youssef.ecommerce.catalog.service.ProductService;
+import com.youssef.ecommerce.catalog.service.InstagramService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final ProductService productService;
+    private final InstagramService instagramService;
 
     @GetMapping("/products")
     public List<Map<String, Object>> getAllProducts() {
@@ -109,6 +111,12 @@ public class ProductController {
 
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/instagram/stats")
+    public ResponseEntity<?> getInstagramStats() {
+        return ResponseEntity.ok(instagramService.getInstagramStats());
+    }
+
 
     @PostMapping("/products/{id}/reduce-stock")
     public ResponseEntity<?> reduceStock(@PathVariable("id") Long id, @RequestParam("quantity") Integer quantity) {
