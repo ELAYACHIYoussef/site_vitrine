@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -12,6 +12,14 @@ const Login = () => {
         password: ''
     });
     const [error, setError] = useState('');
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        const urlError = searchParams.get('error');
+        if (urlError) {
+            setError('Échec de la connexion Google. Vérifiez la configuration console.');
+        }
+    }, [searchParams]);
 
     const handleChange = (e) => {
         setFormData({

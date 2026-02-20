@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Package, ShoppingCart, Users, DollarSign, TrendingUp,
     Eye, ArrowUpRight, ArrowDownRight, RefreshCw, Boxes,
-    BarChart3, Clock, Star, ShoppingBag
+    BarChart3, Clock, Star, ShoppingBag, Heart, Instagram
 } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -22,6 +22,7 @@ const BRAND_COLORS = {
     info: '#3b82f6',
     purple: '#8b5cf6',
     pink: '#ec4899',
+    instagram: '#E1306C'
 };
 
 const PIE_COLORS = ['#e85d04', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
@@ -60,6 +61,61 @@ function AdminDashboard() {
 
     useEffect(() => {
         fetchStats();
+    }, []);
+
+    // NEW: Live Activity Feed Logic
+    const [activities, setActivities] = useState([]);
+
+    const fetchActivities = async () => {
+        try {
+            const [authLogs, catalogLogs] = await Promise.all([
+                fetch('http://localhost:8080/api/auth/audit').then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('http://localhost:8080/api/catalog/interactions').then(r => r.ok ? r.json() : []).catch(() => [])
+            ]);
+
+            // Unify formats
+            const unified = [
+                ...authLogs.map(l => ({ ...l, type: 'LOGIN', text: `Connexion de ${l.username}`, color: 'text-blue-500', icon: Users })),
+                ...catalogLogs.map(l => {
+                    let text = `Action sur ${l.productName}`;
+                    let color = 'text-slate-400';
+                    let Icon = Eye;
+
+                    if (l.type === 'LIKE') {
+                        text = `Nouveau favori sur ${l.productName}`;
+                        color = 'text-pink-500';
+                        Icon = Heart;
+                    } else if (l.type === 'INSTAGRAM_LIKE') {
+                        text = `Like Instagram sur ${l.productName}`;
+                        color = 'text-pink-600'; // Instagram pink/purple
+                        Icon = Instagram;
+                    } else if (l.type === 'INSTAGRAM_COMMENT') {
+                        text = `Commentaire Instagram sur ${l.productName}`;
+                        color = 'text-purple-500';
+                        Icon = Instagram;
+                    } else {
+                        text = `Vue sur ${l.productName}`;
+                    }
+
+                    return {
+                        ...l,
+                        text,
+                        color,
+                        icon: Icon
+                    };
+                })
+            ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20);
+
+            setActivities(unified);
+        } catch (e) {
+            console.error("Failed to fetch activities", e);
+        }
+    };
+
+    useEffect(() => {
+        fetchActivities();
+        const interval = setInterval(fetchActivities, 30000); // Poll every 30s
+        return () => clearInterval(interval);
     }, []);
 
     if (loading) {
@@ -129,6 +185,14 @@ function AdminDashboard() {
             color: BRAND_COLORS.purple,
             gradient: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
             subtitle: 'Catalog Value',
+        },
+        {
+            title: 'Instagram',
+            value: '1.2k', // Mocked for now
+            icon: Instagram,
+            color: BRAND_COLORS.instagram, // Defined above
+            gradient: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCAF45 100%)',
+            subtitle: '+12% followers',
         },
     ];
 
@@ -341,7 +405,7 @@ function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Bottom Row - Recent Products + Recent Users */}
+            {/* Bottom Row - Recent Products + Recent Users + Live Activity */}
             <div style={styles.chartsRow}>
                 {/* Recent Products */}
                 <div style={styles.chartCard}>
@@ -349,6 +413,7 @@ function AdminDashboard() {
                         <Clock size={20} style={{ color: BRAND_COLORS.accent }} />
                         <h3 style={styles.chartTitle}>Derniers Produits Ajoutés</h3>
                     </div>
+                    {/* ... (existing product list content) ... */}
                     <div style={styles.listContainer}>
                         {(catalog.recentProducts || []).map((product, i) => (
                             <div key={product.id} style={{
@@ -416,6 +481,41 @@ function AdminDashboard() {
                         ))}
                         {(!auth.recentUsers || auth.recentUsers.length === 0) && (
                             <div style={styles.noData}>Aucun utilisateur</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* NEW: Live Activity Feed */}
+                <div style={styles.chartCard}>
+                    <div style={styles.chartHeader}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <span style={{ position: 'relative', display: 'flex', height: 8, width: 8 }}>
+                                <span style={{ animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite', position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', backgroundColor: '#22c55e', opacity: 0.75 }}></span>
+                                <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: 8, width: 8, backgroundColor: '#22c55e' }}></span>
+                            </span>
+                            <h3 style={styles.chartTitle}>Activité en Direct</h3>
+                        </div>
+                    </div>
+                    <div style={{ ...styles.listContainer, maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+                        {activities.map((act, i) => (
+                            <div key={i} style={{
+                                ...styles.listItem,
+                                animationDelay: `${i * 0.05}s`,
+                                borderLeft: `3px solid ${act.type === 'LOGIN' ? '#3b82f6' : act.type === 'LIKE' ? '#ec4899' : '#94a3b8'}`
+                            }}>
+                                <div style={styles.listItemLeft}>
+                                    <act.icon size={16} />
+                                    <div>
+                                        <p style={{ ...styles.listItemName, fontSize: '13px' }}>{act.text}</p>
+                                        <p style={{ ...styles.listItemSub, fontSize: '11px' }}>
+                                            {new Date(act.timestamp).toLocaleTimeString()} - {new Date(act.timestamp).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {activities.length === 0 && (
+                            <div style={styles.noData}>Aucune activité récente</div>
                         )}
                     </div>
                 </div>

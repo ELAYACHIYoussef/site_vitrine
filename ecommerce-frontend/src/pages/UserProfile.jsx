@@ -107,7 +107,7 @@ const UserProfile = () => {
                     </div>
 
                     {/* Main Form */}
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-2 space-y-8">
                         <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                                 <User className="w-5 h-5 text-indigo-600" />
@@ -196,7 +196,31 @@ const UserProfile = () => {
                                     </div>
                                 </div>
 
-                                )}
+                                {/* Linked Accounts */}
+                                <div className="border-t border-slate-100 pt-6">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                        <Camera className="w-5 h-5 text-indigo-600" />
+                                        Comptes liés
+                                    </h3>
+                                    <div className="bg-slate-50 rounded-xl p-4 flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-lg flex items-center justify-center text-white">
+                                                <Camera className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-slate-900">Instagram</h4>
+                                                <p className="text-sm text-slate-500">Connectez votre compte pour synchroniser vos produits</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => window.location.href = "http://localhost:8080/api/auth/instagram/connect"}
+                                            className="px-4 py-2 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+                                        >
+                                            Se connecter
+                                        </button>
+                                    </div>
+                                </div>
                                 {/* Danger Zone */}
                                 <div className="border-t-2 border-red-100 mt-12 pt-8">
                                     <h3 className="text-lg font-bold text-red-600 mb-4 flex items-center gap-2">
@@ -230,7 +254,7 @@ const UserProfile = () => {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
