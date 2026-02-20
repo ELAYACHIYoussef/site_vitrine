@@ -90,4 +90,14 @@ public class OrderService {
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
+
+    public Order updateOrderStatus(UUID id, String status) {
+        Order order = getOrderById(id);
+        try {
+            order.setStatus(OrderStatus.valueOf(status));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+        return orderRepository.save(order);
+    }
 }

@@ -2,23 +2,8 @@ version: '3.8'
 
 services:
   # ---------------------------------------------------------------------------
-  # INFRASTRUCTURE
+  # INFRASTRUCTURE - Supabase est utilisé comme DB cloud (pas de postgres local)
   # ---------------------------------------------------------------------------
-  postgres:
-    image: postgres:15-alpine
-    container_name: azymarket-postgres
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=you123
-      - POSTGRES_DB=ecommerce_auth
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-    networks:
-      - azymarket-net
-
   discovery-service:
     build:
       context: ./ecommerce-backend
@@ -48,7 +33,7 @@ services:
       - azymarket-net
 
   # ---------------------------------------------------------------------------
-  # MICROSERVICES
+  # MICROSERVICES - Connectés à Supabase Cloud
   # ---------------------------------------------------------------------------
   auth-service:
     build:
@@ -58,17 +43,25 @@ services:
     ports:
       - "8081:8081"
     environment:
+      # Supabase Pooler (Transaction Mode, IPv4, port 6543)
       - SPRING_DATASOURCE_URL=${AUTH_DB_URL}
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      # Hibernate
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      # Eureka
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      # OAuth2 Google
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - JAVA_OPTS=-Djava.net.preferIPv4Stack=true
+      # Force IPv4 dans la JVM (variable reconnue par les JVMs dans Docker)
+      - JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true
     depends_on:
-      - postgres
       - discovery-service
     networks:
       - azymarket-net
+    restart: on-failure
 
   catalog-service:
     build:
@@ -78,16 +71,23 @@ services:
     ports:
       - "8082:8082"
     environment:
+      # Supabase Pooler
       - SPRING_DATASOURCE_URL=${CATALOG_DB_URL}
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      # Hibernate
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      # Eureka
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - JAVA_OPTS=-Djava.net.preferIPv4Stack=true
+      # Force IPv4
+      - JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true
     depends_on:
-      - postgres
       - discovery-service
     networks:
       - azymarket-net
+    restart: on-failure
 
   order-service:
     build:
@@ -97,16 +97,27 @@ services:
     ports:
       - "8083:8083"
     environment:
+      # Supabase Pooler
       - SPRING_DATASOURCE_URL=${ORDER_DB_URL}
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      # Hibernate
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      # Eureka
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - JAVA_OPTS=-Djava.net.preferIPv4Stack=true
+      # Force IPv4
+      - JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true
+      # Debug logging
+      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
+      - LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL=TRACE
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
     depends_on:
-      - postgres
       - discovery-service
     networks:
       - azymarket-net
+    restart: on-failure
 
   # ---------------------------------------------------------------------------
   # FRONTEND
@@ -120,10 +131,6 @@ services:
       - api-gateway
     networks:
       - azymarket-net
-
-volumes:
-  postgres_data:
-
 
 networks:
   azymarket-net:
