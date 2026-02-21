@@ -6,6 +6,8 @@ import { getGlobalConfig } from '../api/configService';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ShoppingCart, Heart, User, LogOut, Menu, Package, MessageCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fadeInLeft, fadeInRight } from '../hooks/animations';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
@@ -13,6 +15,15 @@ const Navbar = () => {
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
     const [storeName, setStoreName] = useState('VITRINE.IO');
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         getGlobalConfig().then(config => {
@@ -21,11 +32,18 @@ const Navbar = () => {
     }, []);
 
     return (
-        <nav className="glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300">
-            <Link to="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-2 group">
-                <span className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg group-hover:rotate-12 transition-transform">{storeName.charAt(0)}</span>
-                <span className="text-slate-900">{storeName}</span>
-            </Link>
+        <nav className={`glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300 ${isScrolled ? 'py-3 shadow-md bg-white/95' : 'py-5 bg-white/80'}`}>
+            <motion.div variants={fadeInLeft} initial="initial" animate="animate">
+                <Link to="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-2 group">
+                    <motion.span
+                        whileHover={{ rotate: 12, scale: 1.1 }}
+                        className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg"
+                    >
+                        {storeName.charAt(0)}
+                    </motion.span>
+                    <span className="text-slate-900 group-hover:text-indigo-600 transition-colors">{storeName}</span>
+                </Link>
+            </motion.div>
 
             <div className="hidden md:flex space-x-10 items-center font-medium text-slate-600">
                 {user?.role === 'admin' ? (
@@ -71,7 +89,7 @@ const Navbar = () => {
                 </form>
             </div>
 
-            <div className="flex items-center space-x-6">
+            <motion.div variants={fadeInRight} initial="initial" animate="animate" className="flex items-center space-x-6">
                 {user?.role === 'admin' ? (
                     // Admin: Notifications + Profile
                     <div className="flex items-center space-x-4">
@@ -158,7 +176,7 @@ const Navbar = () => {
                 )}
 
                 <Menu className="w-6 h-6 md:hidden cursor-pointer text-slate-900" />
-            </div>
+            </motion.div>
         </nav>
     );
 };

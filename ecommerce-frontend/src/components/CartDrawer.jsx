@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
-import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { staggerContainer, staggerItem, slideInRight } from '../hooks/animations';
 
 const CartDrawer = () => {
     const {
@@ -37,10 +37,10 @@ const CartDrawer = () => {
 
                     {/* Drawer */}
                     <motion.div
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        variants={slideInRight}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
                         className="fixed top-0 right-0 h-full w-full md:w-[450px] bg-white z-50 shadow-2xl flex flex-col"
                     >
                         {/* Header */}
@@ -58,7 +58,12 @@ const CartDrawer = () => {
                         </div>
 
                         {/* Cart Items */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="initial"
+                            animate="animate"
+                            className="flex-1 overflow-y-auto p-6 space-y-6"
+                        >
                             {cart.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
                                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center">
@@ -79,8 +84,7 @@ const CartDrawer = () => {
                                 cart.map((item) => (
                                     <motion.div
                                         layout
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                        variants={staggerItem}
                                         exit={{ opacity: 0, x: -50 }}
                                         key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
                                         className="flex gap-4 p-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors border border-transparent hover:border-indigo-100 group"
@@ -137,7 +141,7 @@ const CartDrawer = () => {
                                     </motion.div>
                                 ))
                             )}
-                        </div>
+                        </motion.div>
 
                         {/* Footer */}
                         {cart.length > 0 && (
@@ -159,7 +163,7 @@ const CartDrawer = () => {
 
                                 <button
                                     onClick={handleCheckout}
-                                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 group transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 group transition-all hover:scale-[1.02] active:scale-[0.98] animate-pulse-glow"
                                 >
                                     Passer la commande
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

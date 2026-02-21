@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Search, Filter, Eye, CheckCircle, Truck, XCircle, Clock } from 'lucide-react';
 import { getAllOrders, updateOrderStatus } from '../../api/orderService';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '../../hooks/animations';
 
 const BRAND_COLORS = {
     primary: '#e85d04',
@@ -62,27 +64,40 @@ export default function Orders() {
     });
 
     if (loading) return (
-        <div style={styles.loadingContainer}>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={styles.loadingContainer}
+        >
             <div style={styles.spinner} />
             <p style={{ color: BRAND_COLORS.text }}>Chargement des commandes...</p>
-        </div>
+        </motion.div>
     );
 
     return (
-        <div style={styles.container}>
+        <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            style={styles.container}
+        >
             {/* Header */}
-            <div style={styles.header}>
+            <motion.div variants={fadeInUp} style={styles.header}>
                 <div>
                     <h1 style={styles.title}>Gestion des Commandes</h1>
                     <p style={styles.subtitle}>{orders.length} commandes totales</p>
                 </div>
-                <button style={styles.exportBtn}>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={styles.exportBtn}
+                >
                     Exporter CSV
-                </button>
-            </div>
+                </motion.button>
+            </motion.div>
 
             {/* Filters & Search */}
-            <div style={styles.toolbar}>
+            <motion.div variants={fadeInUp} style={styles.toolbar}>
                 <div style={styles.searchBox}>
                     <Search size={18} color={BRAND_COLORS.text} />
                     <input
@@ -107,10 +122,10 @@ export default function Orders() {
                         ))}
                     </select>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Orders Table */}
-            <div style={styles.tableCard}>
+            <motion.div variants={scaleIn} style={styles.tableCard}>
                 <div style={styles.tableHeader}>
                     <div style={{ ...styles.col, width: '10%' }}>ID</div>
                     <div style={{ ...styles.col, width: '25%' }}>Client</div>
@@ -121,50 +136,61 @@ export default function Orders() {
                 </div>
 
                 <div style={styles.tableBody}>
-                    {filteredOrders.length > 0 ? filteredOrders.map((order, index) => (
-                        <div key={order.id} style={{
-                            ...styles.row,
-                            animationDelay: `${index * 0.05}s`
-                        }}>
-                            <div style={{ ...styles.col, width: '10%', fontWeight: '600', color: BRAND_COLORS.white }}>
-                                #{order.id}
-                            </div>
-                            <div style={{ ...styles.col, width: '25%' }}>
-                                <div style={{ fontWeight: '500', color: BRAND_COLORS.white }}>{order.customerName}</div>
-                                <div style={{ fontSize: '12px', color: BRAND_COLORS.text }}>{order.customerEmail}</div>
-                            </div>
-                            <div style={{ ...styles.col, width: '15%', color: BRAND_COLORS.text }}>
-                                {new Date(order.createdAt).toLocaleDateString()}
-                            </div>
-                            <div style={{ ...styles.col, width: '15%', fontWeight: '600', color: BRAND_COLORS.primary }}>
-                                {order.totalAmount.toFixed(2)} €
-                            </div>
-                            <div style={{ ...styles.col, width: '20%' }}>
-                                <StatusBadge status={order.status} />
-                            </div>
-                            <div style={{ ...styles.col, width: '15%', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                                <Link to={`/admin/orders/${order.id}`} style={styles.actionBtn}>
-                                    <Eye size={16} />
-                                </Link>
-                                {/* Simuler changement statut pour demo */}
-                                <select
-                                    value={order.status}
-                                    onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
-                                    style={styles.miniSelect}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    {Object.keys(STATUS_CONFIG).map(s => (
-                                        <option key={s} value={s}>{s}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    )) : (
-                        <div style={styles.noData}>Aucune commande trouvée</div>
-                    )}
+                    <AnimatePresence>
+                        {filteredOrders.length > 0 ? filteredOrders.map((order, index) => (
+                            <motion.div
+                                variants={staggerItem}
+                                layout
+                                key={order.id}
+                                style={styles.row}
+                            >
+                                <div style={{ ...styles.col, width: '10%', fontWeight: '600', color: BRAND_COLORS.white }}>
+                                    #{order.id}
+                                </div>
+                                <div style={{ ...styles.col, width: '25%' }}>
+                                    <div style={{ fontWeight: '500', color: BRAND_COLORS.white }}>{order.customerName}</div>
+                                    <div style={{ fontSize: '12px', color: BRAND_COLORS.text }}>{order.customerEmail}</div>
+                                </div>
+                                <div style={{ ...styles.col, width: '15%', color: BRAND_COLORS.text }}>
+                                    {new Date(order.createdAt).toLocaleDateString()}
+                                </div>
+                                <div style={{ ...styles.col, width: '15%', fontWeight: '600', color: BRAND_COLORS.primary }}>
+                                    {order.totalAmount.toFixed(2)} €
+                                </div>
+                                <div style={{ ...styles.col, width: '20%' }}>
+                                    <StatusBadge status={order.status} />
+                                </div>
+                                <div style={{ ...styles.col, width: '15%', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                                    <Link to={`/admin/orders/${order.id}`} style={styles.actionBtn}>
+                                        <Eye size={16} />
+                                    </Link>
+                                    {/* Simuler changement statut pour demo */}
+                                    <select
+                                        value={order.status}
+                                        onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                                        style={styles.miniSelect}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {Object.keys(STATUS_CONFIG).map(s => (
+                                            <option key={s} value={s}>{s}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </motion.div>
+                        )) : (
+                            <motion.div
+                                key="no-data"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                style={styles.noData}
+                            >
+                                Aucune commande trouvée
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 }
 

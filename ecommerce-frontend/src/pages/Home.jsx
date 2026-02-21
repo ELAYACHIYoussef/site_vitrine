@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Truck, HeadphonesIcon, ArrowRight, Star, Smartphone, Laptop, Watch, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '../utils/imageUtils';
+import { fadeInUp, fadeInLeft, fadeInRight, scaleIn, staggerContainer, staggerItem } from '../hooks/animations';
 
 const Home = () => {
     return (
@@ -19,9 +20,9 @@ const Home = () => {
 
                 <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
                     <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8 }}
+                        variants={fadeInLeft}
+                        initial="initial"
+                        animate="animate"
                     >
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-indigo-300 text-sm font-semibold mb-8 backdrop-blur-md">
                             <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
@@ -55,8 +56,9 @@ const Home = () => {
                     </motion.div>
 
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        variants={scaleIn}
+                        initial="initial"
+                        animate="animate"
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="relative hidden lg:block"
                     >
@@ -66,7 +68,7 @@ const Home = () => {
                             <img
                                 src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?q=80&w=1000&auto=format&fit=crop"
                                 alt="Modern Tech Lifestyle"
-                                className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border border-white/10 relative z-20"
+                                className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border border-white/10 relative z-20 animate-float"
                             />
 
                             {/* Floating Stats Card */}
@@ -92,21 +94,29 @@ const Home = () => {
                         <p className="text-slate-500 mt-2">Trouvez exactement ce que vous cherchez</p>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <motion.div
+                        variants={staggerContainer}
+                        initial="initial"
+                        whileInView="animate"
+                        viewport={{ once: true, amount: 0.2 }}
+                        className="grid grid-cols-2 md:grid-cols-4 gap-6"
+                    >
                         {[
                             { name: 'Smartphones', icon: Smartphone, color: 'bg-blue-100 text-blue-600', link: '/products?category=smartphones' },
                             { name: 'Ordinateurs', icon: Laptop, color: 'bg-purple-100 text-purple-600', link: '/products?category=laptops' },
                             { name: 'Montres', icon: Watch, color: 'bg-rose-100 text-rose-600', link: '/products?category=smartwatches' },
                             { name: 'Accessoires', icon: HeadphonesIcon, color: 'bg-amber-100 text-amber-600', link: '/products?category=accessories' },
                         ].map((cat, i) => (
-                            <Link key={i} to={cat.link} className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col items-center gap-4 group text-center">
-                                <div className={`w-16 h-16 rounded-2xl ${cat.color} flex items-center justify-center transition-transform group-hover:scale-110`}>
-                                    <cat.icon size={32} />
-                                </div>
-                                <h3 className="font-bold text-slate-800">{cat.name}</h3>
-                            </Link>
+                            <motion.div variants={staggerItem} key={i}>
+                                <Link to={cat.link} className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all flex flex-col items-center gap-4 group text-center h-full">
+                                    <div className={`w-16 h-16 rounded-2xl ${cat.color} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                                        <cat.icon size={32} />
+                                    </div>
+                                    <h3 className="font-bold text-slate-800">{cat.name}</h3>
+                                </Link>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -128,36 +138,48 @@ const Home = () => {
 
             {/* Benefits Banner */}
             <section className="bg-slate-900 py-16 text-white overflow-hidden">
-                <div className="container mx-auto px-6 relative z-10">
+                <motion.div
+                    variants={staggerContainer}
+                    initial="initial"
+                    whileInView="animate"
+                    viewport={{ once: true }}
+                    className="container mx-auto px-6 relative z-10"
+                >
                     <div className="grid md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-800">
-                        <div className="p-4">
+                        <motion.div variants={fadeInUp} className="p-4">
                             <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
                                 <Truck size={32} />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Livraison Express</h3>
                             <p className="text-slate-400">Expédition le jour même pour toute commande avant 14h.</p>
-                        </div>
-                        <div className="p-4">
+                        </motion.div>
+                        <motion.div variants={fadeInUp} className="p-4">
                             <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
                                 <ShieldCheck size={32} />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Paiement Sécurisé</h3>
                             <p className="text-slate-400">Transactions 100% sécurisées via Stripe et PayPal.</p>
-                        </div>
-                        <div className="p-4">
+                        </motion.div>
+                        <motion.div variants={fadeInUp} className="p-4">
                             <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-400">
                                 <HeadphonesIcon size={32} />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Support 24/7</h3>
                             <p className="text-slate-400">Une équipe dédiée pour répondre à toutes vos questions.</p>
-                        </div>
+                        </motion.div>
                     </div>
-                </div>
+                </motion.div>
             </section>
 
             {/* Newsletter */}
             <section className="py-20 bg-indigo-50 border-t border-indigo-100">
-                <div className="container mx-auto px-6 text-center max-w-3xl">
+                <motion.div
+                    variants={fadeInUp}
+                    initial="initial"
+                    whileInView="animate"
+                    viewport={{ once: true }}
+                    className="container mx-auto px-6 text-center max-w-3xl"
+                >
                     <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600">
                         <ShoppingBag size={40} />
                     </div>
@@ -171,12 +193,12 @@ const Home = () => {
                             className="flex-1 px-6 py-4 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
                             required
                         />
-                        <button type="submit" className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20">
+                        <button type="submit" className="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20 animate-pulse-glow">
                             S'inscrire
                         </button>
                     </form>
                     <p className="text-xs text-slate-400 mt-4">Nous ne spammerons jamais votre boîte mail. Promis.</p>
-                </div>
+                </motion.div>
             </section>
         </div>
     );

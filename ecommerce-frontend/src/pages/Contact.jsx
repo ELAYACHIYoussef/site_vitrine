@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '../hooks/animations';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -43,61 +45,55 @@ const Contact = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Info Card */}
-                    <div className="local-area lg:col-span-1 space-y-8">
-                        <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 h-full">
-                            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <MessageSquare className="w-5 h-5 text-indigo-600" />
+                    <motion.div variants={fadeInUp} className="local-area lg:col-span-1 space-y-8">
+                        <div className="bg-slate-50/50 p-8 rounded-3xl border border-slate-100 h-full">
+                            <h3 className="text-xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                                <div className="p-2 bg-indigo-50 rounded-xl">
+                                    <MessageSquare className="w-5 h-5 text-indigo-600" />
+                                </div>
                                 Informations
                             </h3>
 
-                            <div className="space-y-6">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
-                                        <Mail className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">Email</h4>
-                                        <p className="text-slate-600">support@vitrine.io</p>
-                                        <p className="text-slate-500 text-sm mt-1">Réponse sous 24h</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
-                                        <Phone className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">Téléphone</h4>
-                                        <p className="text-slate-600">+33 1 23 45 67 89</p>
-                                        <p className="text-slate-500 text-sm mt-1">Lun-Ven, 9h-18h</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
-                                        <MapPin className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">Adresse</h4>
-                                        <p className="text-slate-600">
-                                            123 Avenue de l'Innovation<br />
-                                            75000 Paris, France
-                                        </p>
-                                    </div>
-                                </div>
+                            <div className="space-y-8">
+                                {[
+                                    { icon: Mail, title: 'Email', value: 'support@vitrine.io', sub: 'Réponse sous 24h' },
+                                    { icon: Phone, title: 'Téléphone', value: '+33 1 23 45 67 89', sub: 'Lun-Ven, 9h-18h' },
+                                    { icon: MapPin, title: 'Adresse', value: '123 Avenue de l’Innovation, 75000 Paris', sub: 'Siège social' }
+                                ].map((item, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        whileHover={{ x: 5 }}
+                                        className="flex items-start gap-4 group"
+                                    >
+                                        <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-indigo-600 flex-shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                                            <item.icon className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-slate-900 uppercase text-xs tracking-widest opacity-40 mb-1">{item.title}</h4>
+                                            <p className="text-slate-900 font-bold">{item.value}</p>
+                                            <p className="text-slate-400 text-sm mt-0.5 font-medium">{item.sub}</p>
+                                        </div>
+                                    </motion.div>
+                                ))}
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Contact Form */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl shadow-indigo-100/50 border border-slate-100">
-                            <h2 className="text-2xl font-bold text-slate-900 mb-6">Envoyez-nous un message</h2>
+                    <motion.div variants={fadeInUp} className="lg:col-span-2">
+                        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-2xl shadow-indigo-100/50 border border-slate-50">
+                            <h2 className="text-2xl font-black text-slate-900 mb-8 tracking-tight">Envoyez-nous un message</h2>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                            <motion.form
+                                variants={staggerContainer}
+                                initial="initial"
+                                animate="animate"
+                                onSubmit={handleSubmit}
+                                className="space-y-6"
+                            >
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-slate-700">Nom complet</label>
+                                    <motion.div variants={staggerItem} className="space-y-2">
+                                        <label className="text-sm font-black text-slate-700 uppercase tracking-widest opacity-40 ml-1">Nom complet</label>
                                         <input
                                             type="text"
                                             name="name"
@@ -105,11 +101,11 @@ const Contact = () => {
                                             value={formData.name}
                                             onChange={handleChange}
                                             placeholder="John Doe"
-                                            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                                            className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 border border-slate-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-medium"
                                         />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-slate-700">Email</label>
+                                    </motion.div>
+                                    <motion.div variants={staggerItem} className="space-y-2">
+                                        <label className="text-sm font-black text-slate-700 uppercase tracking-widest opacity-40 ml-1">Email</label>
                                         <input
                                             type="email"
                                             name="email"
@@ -117,18 +113,18 @@ const Contact = () => {
                                             value={formData.email}
                                             onChange={handleChange}
                                             placeholder="john@example.com"
-                                            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                                            className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 border border-slate-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-medium"
                                         />
-                                    </div>
+                                    </motion.div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-slate-700">Sujet</label>
+                                <motion.div variants={staggerItem} className="space-y-2">
+                                    <label className="text-sm font-black text-slate-700 uppercase tracking-widest opacity-40 ml-1">Sujet</label>
                                     <select
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all cursor-pointer"
+                                        className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 border border-slate-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all cursor-pointer font-medium appearance-none"
                                     >
                                         <option value="">Sélectionnez un sujet</option>
                                         <option value="order">Question sur une commande</option>
@@ -136,10 +132,10 @@ const Contact = () => {
                                         <option value="return">Retours & Remboursements</option>
                                         <option value="other">Autre demande</option>
                                     </select>
-                                </div>
+                                </motion.div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-slate-700">Message</label>
+                                <motion.div variants={staggerItem} className="space-y-2">
+                                    <label className="text-sm font-black text-slate-700 uppercase tracking-widest opacity-40 ml-1">Message</label>
                                     <textarea
                                         name="message"
                                         required
@@ -147,34 +143,42 @@ const Contact = () => {
                                         value={formData.message}
                                         onChange={handleChange}
                                         placeholder="Comment pouvons-nous vous aider ?"
-                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none"
+                                        className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 border border-slate-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none font-medium"
                                     ></textarea>
-                                </div>
+                                </motion.div>
 
-                                <button
+                                <motion.button
+                                    variants={staggerItem}
+                                    whileHover={{ scale: 1.01, backgroundColor: '#4338ca' }}
+                                    whileTap={{ scale: 0.99 }}
                                     type="submit"
                                     disabled={loading}
                                     className={`
-                                        w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/30 
-                                        hover:bg-indigo-700 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all
-                                        flex items-center justify-center gap-2
+                                        w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-100 
+                                        transition-all flex items-center justify-center gap-3
                                         ${loading ? 'opacity-70 cursor-wait' : ''}
                                     `}
                                 >
                                     {loading ? (
-                                        <>Envoi en cours...</>
+                                        <span className="flex items-center gap-2">
+                                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Envoi en cours...
+                                        </span>
                                     ) : (
                                         <>
                                             Envoyer le message
                                             <Send className="w-5 h-5" />
                                         </>
                                     )}
-                                </button>
-                            </form>
+                                </motion.button>
+                            </motion.form>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

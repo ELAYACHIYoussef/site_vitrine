@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import productService from '../api/productService';
 import ProductCard from '../components/ProductCard';
 import { Loader, Search, Filter } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem } from '../hooks/animations';
 
 const ProductCatalog = () => {
     const [products, setProducts] = useState([]);
@@ -65,17 +67,26 @@ const ProductCatalog = () => {
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="container mx-auto px-4">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <motion.div
+                    variants={fadeInUp}
+                    initial="initial"
+                    animate="animate"
+                    className="text-center mb-12"
+                >
                     <h1 className="text-4xl font-extrabold text-[#0f172a] mb-4">
                         Notre Collection
                     </h1>
                     <p className="text-slate-600 max-w-2xl mx-auto">
                         Découvrez nos produits sélectionnés avec soin pour vous offrir le meilleur de la qualité.
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Filters & Search */}
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between"
+                >
                     {/* Search */}
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -113,7 +124,7 @@ const ProductCatalog = () => {
                             ))}
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Grid */}
                 {filteredProducts.length === 0 ? (
@@ -127,11 +138,18 @@ const ProductCatalog = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <motion.div
+                        variants={staggerContainer}
+                        initial="initial"
+                        animate="animate"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+                    >
                         {filteredProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
+                            <motion.div variants={staggerItem} key={product.id}>
+                                <ProductCard product={product} />
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>

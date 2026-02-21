@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getImageUrl } from '../utils/imageUtils';
+import { fadeInUp, staggerItem } from '../hooks/animations';
 
 const ProductCard = ({ product }) => {
     const { user } = useAuth();
@@ -19,11 +20,12 @@ const ProductCard = ({ product }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5 }}
-            className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm card-hover"
+            whileHover={{ y: -8, transition: { duration: 0.3 } }}
+            className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500"
         >
             <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
                 <img
@@ -35,29 +37,33 @@ const ProductCard = ({ product }) => {
 
                 {/* Overlay Buttons */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                    <button
+                    <motion.button
+                        variants={staggerItem}
                         onClick={() => toggleWishlist(product, user?.id)}
-                        className={`p-3 rounded-full shadow-lg transition-all transform hover:scale-110 hover:-translate-y-1 ${isLoved ? 'bg-rose-500 text-white' : 'bg-white text-slate-900 hover:bg-rose-500 hover:text-white'
+                        className={`p-3 rounded-full shadow-lg transition-all transform hover:scale-110 active:scale-90 ${isLoved ? 'bg-rose-500 text-white' : 'bg-white text-slate-900 hover:bg-rose-500 hover:text-white'
                             }`}
                         title={isLoved ? "Retirer des favoris" : "Ajouter aux favoris"}
                     >
                         <Heart className={`w-5 h-5 ${isLoved ? 'fill-current' : ''}`} />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                        variants={staggerItem}
                         onClick={() => addToCart(product)}
-                        className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1"
+                        className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 active:scale-90"
                         title="Ajouter au panier"
                     >
                         <ShoppingBag className="w-5 h-5" />
-                    </button>
-                    <Link to={`/products/${product.id}`} className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-110 hover:-translate-y-1" title="Voir détails">
-                        <Eye className="w-5 h-5" />
-                    </Link>
+                    </motion.button>
+                    <motion.div variants={staggerItem}>
+                        <Link to={`/products/${product.id}`} className="p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-indigo-600 hover:text-white transition-all block transform hover:scale-110 active:scale-90" title="Voir détails">
+                            <Eye className="w-5 h-5" />
+                        </Link>
+                    </motion.div>
                 </div>
 
                 {/* Badges/Tags if needed */}
                 {product.new && (
-                    <span className="absolute top-3 left-3 bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">
+                    <span className="absolute top-3 left-3 bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg animate-shimmer">
                         NOUVEAU
                     </span>
                 )}
@@ -84,7 +90,7 @@ const ProductCard = ({ product }) => {
                 <div className="flex justify-between items-end border-t border-slate-100 pt-4 mt-2">
                     <div className="flex flex-col">
                         <span className="text-xs text-slate-400 font-medium">Prix</span>
-                        <span className="text-xl font-extrabold text-slate-900">{product.price} €</span>
+                        <span className="text-xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">{product.price} €</span>
                     </div>
                     <Link to={`/products/${product.id}`} className="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1 group/btn">
                         Voir le produit

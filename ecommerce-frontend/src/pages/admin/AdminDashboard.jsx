@@ -8,6 +8,8 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '../../hooks/animations';
 import { getDashboardStats } from '../../api/dashboardService';
 import { getImageUrl } from '../../utils/imageUtils';
 
@@ -204,36 +206,43 @@ function AdminDashboard() {
     ];
 
     return (
-        <div style={styles.container}>
+        <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            style={styles.container}
+        >
             {/* Header */}
-            <div style={styles.header}>
+            <motion.div variants={fadeInUp} style={styles.header}>
                 <div>
                     <h1 style={styles.title}>Tableau de Bord</h1>
                     <p style={styles.subtitle}>Vue d'ensemble de votre boutique AzyMarket</p>
                 </div>
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => fetchStats(true)}
                     style={{
                         ...styles.refreshBtn,
                         ...(refreshing ? { opacity: 0.6, pointerEvents: 'none' } : {})
                     }}
                 >
-                    <RefreshCw size={16} style={refreshing ? { animation: 'spin 1s linear infinite' } : {}} />
+                    <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
                     {refreshing ? 'Actualisation...' : 'Actualiser'}
-                </button>
-            </div>
+                </motion.button>
+            </motion.div>
 
             {/* KPI Cards */}
-            <div style={styles.kpiGrid}>
+            <motion.div variants={staggerContainer} style={styles.kpiGrid}>
                 {kpiCards.map((card, i) => (
                     <KPICard key={i} {...card} index={i} />
                 ))}
-            </div>
+            </motion.div>
 
             {/* Main Charts Row */}
-            <div style={styles.chartsRow}>
+            <motion.div variants={staggerContainer} style={styles.chartsRow}>
                 {/* Sales Performance - Area Chart */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <TrendingUp size={20} style={{ color: BRAND_COLORS.success }} />
                         <h3 style={styles.chartTitle}>Performance des Ventes (12 derniers mois)</h3>
@@ -277,10 +286,10 @@ function AdminDashboard() {
                             />
                         </AreaChart>
                     </ResponsiveContainer>
-                </div>
+                </motion.div>
 
                 {/* Orders Status - Pie Chart */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <ShoppingBag size={20} style={{ color: BRAND_COLORS.purple }} />
                         <h3 style={styles.chartTitle}>État des Commandes</h3>
@@ -317,13 +326,13 @@ function AdminDashboard() {
                             <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
                         </PieChart>
                     </ResponsiveContainer>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* Existing Charts Row (Products) */}
-            <div style={styles.chartsRow}>
+            <motion.div variants={staggerContainer} style={styles.chartsRow}>
                 {/* Products by Category - Pie Chart */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <BarChart3 size={20} style={{ color: BRAND_COLORS.primary }} />
                         <h3 style={styles.chartTitle}>Produits par Catégorie</h3>
@@ -363,10 +372,10 @@ function AdminDashboard() {
                     ) : (
                         <div style={styles.noData}>Aucune catégorie trouvée</div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* Top Viewed - Bar Chart */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <Eye size={20} style={{ color: BRAND_COLORS.info }} />
                         <h3 style={styles.chartTitle}>Produits les Plus Vus</h3>
@@ -409,13 +418,13 @@ function AdminDashboard() {
                     ) : (
                         <div style={styles.noData}>Aucune donnée de vues</div>
                     )}
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* Bottom Row - Recent Products + Recent Users + Live Activity */}
-            <div style={styles.chartsRow}>
+            <motion.div variants={staggerContainer} style={styles.chartsRow}>
                 {/* Recent Products */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <Clock size={20} style={{ color: BRAND_COLORS.accent }} />
                         <h3 style={styles.chartTitle}>Derniers Produits Ajoutés</h3>
@@ -458,10 +467,10 @@ function AdminDashboard() {
                             <div style={styles.noData}>Aucun produit</div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Recent Users */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <Users size={20} style={{ color: BRAND_COLORS.success }} />
                         <h3 style={styles.chartTitle}>Derniers Inscrits</h3>
@@ -490,10 +499,10 @@ function AdminDashboard() {
                             <div style={styles.noData}>Aucun utilisateur</div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* NEW: Live Activity Feed */}
-                <div style={styles.chartCard}>
+                <motion.div variants={scaleIn} style={styles.chartCard}>
                     <div style={styles.chartHeader}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <span style={{ position: 'relative', display: 'flex', height: 8, width: 8 }}>
@@ -525,8 +534,8 @@ function AdminDashboard() {
                             <div style={styles.noData}>Aucune activité récente</div>
                         )}
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* CSS Animation */}
             <style>{`
@@ -547,7 +556,7 @@ function AdminDashboard() {
           100% { background-position: 200% 0; }
         }
       `}</style>
-        </div>
+        </motion.div>
     );
 }
 
@@ -555,11 +564,11 @@ function KPICard({ title, value, icon: Icon, color, gradient, subtitle, index })
     const [hovered, setHovered] = useState(false);
 
     return (
-        <div
+        <motion.div
+            variants={staggerItem}
+            whileHover={{ y: -4, scale: 1.02 }}
             style={{
                 ...kpiStyles.card,
-                animation: `fadeInUp 0.5s ease ${index * 0.1}s both`,
-                transform: hovered ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
                 boxShadow: hovered
                     ? `0 20px 60px ${color}30, 0 0 0 1px ${color}20`
                     : '0 4px 24px rgba(0,0,0,0.15)',
@@ -581,7 +590,7 @@ function KPICard({ title, value, icon: Icon, color, gradient, subtitle, index })
                 </div>
             </div>
             <p style={kpiStyles.subtitle}>{subtitle}</p>
-        </div>
+        </motion.div>
     );
 }
 
@@ -688,7 +697,6 @@ const styles = {
         borderRadius: '16px',
         padding: '24px',
         border: '1px solid rgba(255,255,255,0.05)',
-        animation: 'scaleIn 0.4s ease both',
     },
     chartHeader: {
         display: 'flex',
