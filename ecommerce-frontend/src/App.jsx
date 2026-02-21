@@ -21,6 +21,7 @@ import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
 import ClientOrders from './pages/ClientOrders';
+import ClientMessages from './pages/ClientMessages';
 import UserProfile from './pages/UserProfile';
 import Payment from './pages/Payment';
 import Contact from './pages/Contact';
@@ -58,7 +59,9 @@ function AppContent() {
                 <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/account/orders" element={<ClientOrders />} />
+                <Route path="/account/messages" element={<ClientMessages />} />
                 <Route path="/account/profile" element={<UserProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/mentions-legales" element={<MentionsLegales />} />
                 <Route path="/cgv" element={<CGV />} />

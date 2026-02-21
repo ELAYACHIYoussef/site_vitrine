@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, MapPin, Package, CreditCard, Shield, Edit2, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import InstagramSyncPanel from '../components/InstagramSyncPanel';
 
 const UserProfile = () => {
-    const { user, deleteAccount } = useAuth();
+    const { user, deleteAccount, token } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    // Mock data for display - in real app, fetch from API
+    // All useState calls must be before useEffect (Rules of Hooks)
     const [formData, setFormData] = useState({
         username: user?.username || '',
         email: user?.email || '',
@@ -18,6 +20,16 @@ const UserProfile = () => {
         zipCode: '75008',
         country: 'France'
     });
+
+    useEffect(() => {
+        if (searchParams.get('instagram_connected') === 'true') {
+            toast.success('Compte Instagram connecté avec succès !');
+            setSearchParams({});
+        } else if (searchParams.get('error')) {
+            toast.error('Erreur lors de la connexion Instagram : ' + searchParams.get('error'));
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -107,7 +119,7 @@ const UserProfile = () => {
                     </div>
 
                     {/* Main Form */}
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-2 space-y-8">
                         <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                                 <User className="w-5 h-5 text-indigo-600" />
@@ -196,7 +208,14 @@ const UserProfile = () => {
                                     </div>
                                 </div>
 
-                                )}
+                                {/* Linked Accounts - Instagram Sync */}
+                                <div className="border-t border-slate-100 pt-6">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                        <Camera className="w-5 h-5 text-indigo-600" />
+                                        Comptes liés
+                                    </h3>
+                                    <InstagramSyncPanel />
+                                </div>
                                 {/* Danger Zone */}
                                 <div className="border-t-2 border-red-100 mt-12 pt-8">
                                     <h3 className="text-lg font-bold text-red-600 mb-4 flex items-center gap-2">
@@ -230,7 +249,7 @@ const UserProfile = () => {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

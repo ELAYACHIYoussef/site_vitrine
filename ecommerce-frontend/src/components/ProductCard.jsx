@@ -2,11 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getImageUrl } from '../utils/imageUtils';
 
 const ProductCard = ({ product }) => {
+    const { user } = useAuth();
     const { addToCart } = useCart();
     const { toggleWishlist, isInWishlist } = useWishlist();
     const isLoved = isInWishlist(product.id);
@@ -34,7 +36,7 @@ const ProductCard = ({ product }) => {
                 {/* Overlay Buttons */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
                     <button
-                        onClick={() => toggleWishlist(product)}
+                        onClick={() => toggleWishlist(product, user?.id)}
                         className={`p-3 rounded-full shadow-lg transition-all transform hover:scale-110 hover:-translate-y-1 ${isLoved ? 'bg-rose-500 text-white' : 'bg-white text-slate-900 hover:bg-rose-500 hover:text-white'
                             }`}
                         title={isLoved ? "Retirer des favoris" : "Ajouter aux favoris"}

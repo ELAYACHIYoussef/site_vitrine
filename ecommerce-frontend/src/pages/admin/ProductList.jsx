@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, Package, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Search, Save, X, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import productService from '../../api/productService';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
@@ -13,6 +13,10 @@ const ProductList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, product: null });
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Quick Stock State
+    const [editingStock, setEditingStock] = useState(null); // { id: 1, value: 50 }
+    const [isUpdatingStock, setIsUpdatingStock] = useState(false);
 
     useEffect(() => {
         loadProducts();
@@ -48,6 +52,26 @@ const ProductList = () => {
             toast.error('Erreur lors de la suppression');
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    const handleStockUpdate = async (product, newStock) => {
+        if (newStock < 0) return;
+        setIsUpdatingStock(true);
+        try {
+            await productService.updateProduct(product.id, { stock: parseInt(newStock) }, null);
+            toast.success("Stock mis à jour");
+
+            // Optimistic update
+            setProducts(products.map(p =>
+                p.id === product.id ? { ...p, stock: parseInt(newStock) } : p
+            ));
+            setEditingStock(null);
+        } catch (error) {
+            console.error(error);
+            toast.error("Erreur mise à jour stock");
+        } finally {
+            setIsUpdatingStock(false);
         }
     };
 
@@ -117,7 +141,7 @@ const ProductList = () => {
                     {filteredProducts.map(product => (
                         <div key={product.id} className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden group hover:shadow-xl transition-all">
                             {/* Image */}
-                            <div className="aspect-square bg-slate-100 overflow-hidden">
+                            <div className="aspect-square bg-slate-100 overflow-hidden relative">
                                 {product.thumbnail || product.images?.[0] ? (
                                     <img
                                         src={getImageUrl(product.thumbnail || product.images[0])}
@@ -129,39 +153,90 @@ const ProductList = () => {
                                         <Package className="w-16 h-16 text-slate-300" />
                                     </div>
                                 )}
+                                <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold shadow-sm">
+                                    ID: {product.id}
+                                </div>
                             </div>
 
                             {/* Content */}
                             <div className="p-4">
                                 <div className="flex items-start justify-between mb-2">
-                                    <h3 className="font-bold text-slate-900 line-clamp-2 flex-1">
+                                    <h3 className="font-bold text-slate-900 line-clamp-2 flex-1 h-12">
                                         {product.name}
                                     </h3>
                                 </div>
 
                                 <p className="text-sm text-slate-600 mb-3">{product.categoryLabel || product.category}</p>
 
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-2xl font-bold text-[#FF6835]">
+                                <div className="flex items-center justify-between mb-4 bg-slate-50 p-2 rounded-lg">
+                                    <span className="text-xl font-bold text-[#FF6835]">
                                         {product.price?.toFixed(2)} €
                                     </span>
-                                    <span className="text-sm text-slate-600">
-                                        Stock: {product.stock || 0}
-                                    </span>
+
+                                    {/* Quick Stock Control */}
+                                    <div className="flex items-center gap-2">
+                                        {editingStock?.id === product.id ? (
+                                            <div className="flex items-center gap-1">
+                                                <input
+                                                    type="number"
+                                                    value={editingStock.value}
+                                                    onChange={(e) => setEditingStock({ ...editingStock, value: e.target.value })}
+                                                    className="w-16 px-2 py-1 text-sm border border-indigo-300 rounded focus:border-indigo-500 outline-none"
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => handleStockUpdate(product, editingStock.value)}
+                                                    className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200"
+                                                >
+                                                    <Save className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingStock(null)}
+                                                    className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 group/stock">
+                                                <button
+                                                    onClick={() => handleStockUpdate(product, Math.max(0, (product.stock || 0) - 1))}
+                                                    className="w-6 h-6 flex items-center justify-center rounded bg-slate-200 hover:bg-slate-300 text-slate-600 transition-colors"
+                                                    disabled={isUpdatingStock}
+                                                >
+                                                    -
+                                                </button>
+                                                <span
+                                                    className="text-sm font-medium text-slate-700 min-w-[3ch] text-center cursor-pointer hover:text-indigo-600 hover:underline decoration-dashed underline-offset-4"
+                                                    onClick={() => setEditingStock({ id: product.id, value: product.stock || 0 })}
+                                                    title="Cliquez pour éditer"
+                                                >
+                                                    {product.stock || 0}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleStockUpdate(product, (product.stock || 0) + 1)}
+                                                    className="w-6 h-6 flex items-center justify-center rounded bg-slate-200 hover:bg-slate-300 text-slate-600 transition-colors"
+                                                    disabled={isUpdatingStock}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => navigate(`/admin/products/edit/${product.id}`)}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#FF6835] hover:bg-orange-700 rounded-lg transition-colors text-white font-medium"
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#FF6835] hover:bg-orange-700 rounded-lg transition-colors text-white font-medium shadow-sm"
                                     >
                                         <Edit className="w-4 h-4" />
                                         Modifier
                                     </button>
                                     <button
                                         onClick={() => handleDeleteClick(product)}
-                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30"
+                                        className="px-4 py-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>

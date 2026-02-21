@@ -19,12 +19,28 @@ export const WishlistProvider = ({ children }) => {
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
     }, [wishlist]);
 
-    const addToWishlist = (product) => {
+    const addToWishlist = async (product, userId = null) => {
         setWishlist((prev) => {
             if (prev.find((item) => item.id === product.id)) {
                 toast.error("Ce produit est déjà dans vos favoris");
                 return prev;
             }
+
+            // Notify Backend (Fire and Forget)
+            try {
+                fetch('http://localhost:8080/api/catalog/interactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'LIKE',
+                        productId: product.id,
+                        userId: userId
+                    })
+                }).catch(err => console.error("Failed to log like", err));
+            } catch (e) {
+                // Ignore error
+            }
+
             toast.success("Ajouté aux favoris ❤️");
             return [...prev, product];
         });
@@ -39,11 +55,11 @@ export const WishlistProvider = ({ children }) => {
         return wishlist.some((item) => item.id === productId);
     };
 
-    const toggleWishlist = (product) => {
+    const toggleWishlist = (product, userId = null) => {
         if (isInWishlist(product.id)) {
             removeFromWishlist(product.id);
         } else {
-            addToWishlist(product);
+            addToWishlist(product, userId);
         }
     };
 

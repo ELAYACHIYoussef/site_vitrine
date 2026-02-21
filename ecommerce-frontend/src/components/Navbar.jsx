@@ -1,41 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getGlobalConfig } from '../api/configService';
 
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { ShoppingCart, Heart, User, LogOut, Menu, Package } from 'lucide-react';
+import { ShoppingCart, Heart, User, LogOut, Menu, Package, MessageCircle } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
     const { cartCount, setIsCartOpen } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
+    const [storeName, setStoreName] = useState('VITRINE.IO');
+
+    useEffect(() => {
+        getGlobalConfig().then(config => {
+            if (config?.STORE_NAME) setStoreName(config.STORE_NAME);
+        });
+    }, []);
 
     return (
         <nav className="glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300">
             <Link to="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-2 group">
-                <span className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg group-hover:rotate-12 transition-transform">V</span>
-                <span className="text-slate-900">VITRINE<span className="text-indigo-600">.IO</span></span>
+                <span className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg group-hover:rotate-12 transition-transform">{storeName.charAt(0)}</span>
+                <span className="text-slate-900">{storeName}</span>
             </Link>
 
             <div className="hidden md:flex space-x-10 items-center font-medium text-slate-600">
                 {user?.role === 'admin' ? (
-                    // Admin: Search bar instead of navigation
-                    <div className="flex items-center gap-4">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Rechercher..."
-                                className="pl-10 pr-4 py-2 rounded-full bg-slate-100 border border-transparent focus:border-indigo-600 focus:bg-white transition-all outline-none w-64"
-                            />
-                            <svg className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                    </div>
+                    // Admin: Link to Dashboard
+                    <Link to="/admin" className="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                        Tableau de Bord
+                    </Link>
                 ) : (
-                    // Client: Regular navigation
+                    // Client: Navigation
                     <>
                         <Link to="/" className="hover:text-indigo-600 transition-colors relative group">
                             Accueil
@@ -51,6 +50,25 @@ const Navbar = () => {
                         </Link>
                     </>
                 )}
+
+                {/* Global Search Bar */}
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const term = e.target.search.value;
+                    if (term.trim()) {
+                        navigate(`/products?search=${encodeURIComponent(term)}`);
+                    }
+                }} className="relative hidden lg:block">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Rechercher..."
+                        className="pl-10 pr-4 py-2 rounded-full bg-slate-100 border border-transparent focus:border-indigo-600 focus:bg-white transition-all outline-none w-64"
+                    />
+                    <svg className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </form>
             </div>
 
             <div className="flex items-center space-x-6">
@@ -109,6 +127,13 @@ const Navbar = () => {
                                 >
                                     <Package className="w-4 h-4" />
                                     <span>Mes Commandes</span>
+                                </Link>
+                                <Link
+                                    to="/account/messages"
+                                    className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    <span>Messages</span>
                                 </Link>
                                 <Link
                                     to="/account/profile"

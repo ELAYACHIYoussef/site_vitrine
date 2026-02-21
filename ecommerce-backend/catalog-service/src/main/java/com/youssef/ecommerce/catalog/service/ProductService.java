@@ -14,6 +14,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ImageService imageService;
+    private final InstagramService instagramService;
 
     public List<Product> getAllProducts() {
         return productRepository.findAllWithImages();
@@ -32,12 +33,22 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        productRepository.findById(id).ifPresent(p -> {
+            instagramService.deleteProductFromInstagram(p.getInstagramMediaId());
+            productRepository.deleteById(id);
+        });
     }
 
     public void incrementViews(Long id) {
         productRepository.findById(id).ifPresent(p -> {
             p.setViews(p.getViews() + 1);
+            productRepository.save(p);
+        });
+    }
+
+    public void incrementLikes(Long id) {
+        productRepository.findById(id).ifPresent(p -> {
+            p.setLikes(p.getLikes() + 1);
             productRepository.save(p);
         });
     }
@@ -76,7 +87,20 @@ public class ProductService {
                 .colors(colors)
                 .build();
 
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        
+        // Post to Instagram asynchronously (or synchronously for now)
+        try {
+            instagramService.postProductToInstagram(savedProduct);
+            // If we got an ID back, we would save it here:
+            // savedProduct.setInstagramMediaId(id);
+            // productRepository.save(savedProduct);
+        } catch (Exception e) {
+            // Don't fail product creation if Instagram fails
+            System.err.println("Failed to sync with Instagram: " + e.getMessage());
+        }
+        
+        return savedProduct;
     }
 
     /**
@@ -127,7 +151,13 @@ public class ProductService {
             }
         }
 
-        return productRepository.save(product);
+        Product savedAndUpdate = productRepository.save(product);
+        try {
+            instagramService.updateProductOnInstagram(savedAndUpdate);
+        } catch (Exception e) {
+             System.err.println("Failed to update Instagram: " + e.getMessage());
+        }
+        return savedAndUpdate;
     }
 
     // Stats methods

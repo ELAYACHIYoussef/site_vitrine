@@ -1,0 +1,25 @@
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+.env
+
+# Database
+*.db
+*.sqlite
+
+# Java / Maven
+target/
+*.jar
+*.war
+*.ear
+*.class
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.log
