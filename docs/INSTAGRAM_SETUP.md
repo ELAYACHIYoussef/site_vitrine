@@ -3,9 +3,9 @@
 Pour activer la publication réelle des produits sur Instagram, suivez ces étapes.
 
 ## 1. Prérequis sur Meta for Developers
-1. Allez sur [Meta for Developers](https://developers.facebook.com/ une **Page Facebook**.) et créez une nouvelle application de type **Business**.
+1. Allez sur [Meta for Developers](https://developers.facebook.com/) et créez une nouvelle application de type **Business**.
 2. Ajoutez le produit **Instagram Graph API** à votre application.
-3. Liez votre **Compte Instagram Professionnel** à
+3. Liez votre **Compte Instagram Professionnel** à une **Page Facebook**.
 4. Dans l'Explorateur Graph API, obtenez un **Access Token** avec les permissions :
    - `instagram_content_publish`
    - `instagram_basic`

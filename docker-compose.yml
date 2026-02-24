@@ -6,7 +6,7 @@ services:
   # ---------------------------------------------------------------------------
   discovery-service:
     build:
-      context: ./ecommerce-backend
+      context: ./backend
       dockerfile: discovery-service/Dockerfile
     container_name: azymarket-discovery
     ports:
@@ -25,7 +25,7 @@ services:
   # ---------------------------------------------------------------------------
   api-gateway:
     build:
-      context: ./ecommerce-backend
+      context: ./backend
       dockerfile: api-gateway/Dockerfile
     container_name: azymarket-gateway
     ports:
@@ -44,7 +44,7 @@ services:
   # ---------------------------------------------------------------------------
   auth-service:
     build:
-      context: ./ecommerce-backend
+      context: ./backend
       dockerfile: auth-service/Dockerfile
     container_name: azymarket-auth
     ports:
@@ -74,7 +74,7 @@ services:
 
   catalog-service:
     build:
-      context: ./ecommerce-backend
+      context: ./backend
       dockerfile: catalog-service/Dockerfile
     container_name: azymarket-catalog
     ports:
@@ -102,7 +102,7 @@ services:
 
   order-service:
     build:
-      context: ./ecommerce-backend
+      context: ./backend
       dockerfile: order-service/Dockerfile
     container_name: azymarket-order
     ports:
@@ -134,7 +134,7 @@ services:
   # FRONTEND
   # ---------------------------------------------------------------------------
   frontend:
-    build: ./ecommerce-frontend
+    build: ./frontend
     container_name: azymarket-frontend
     ports:
       - "5173:80"
