@@ -155,29 +155,30 @@ const ProductDetails = () => {
 
                     {/* CENTER COLUMN: Main Image */}
                     <div className="lg:col-span-5 relative">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            key={activeImage}
-                            className="aspect-[4/5] lg:aspect-square bg-white rounded-xl overflow-hidden sticky top-8 flex items-center justify-center p-4"
-                        >
-                            {activeImage === 'video' && product.videoUrl ? (
-                                <div className="w-full h-full flex items-center justify-center bg-black rounded-lg">
-                                    <video
-                                        src={product.videoUrl}
-                                        controls
-                                        autoPlay
-                                        className="max-w-full max-h-full"
-                                        poster={getImageUrl(product.thumbnail)}
-                                    ></video>
-                                </div>
-                            ) : (
-                                <img
-                                    src={getImageUrl(activeImage || product.thumbnail)}
-                                    alt={product.name}
-                                    className="max-h-full max-w-full object-contain mix-blend-multiply"
-                                />
-                            )}
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                key={activeImage}
+                                className="aspect-[4/5] lg:aspect-square bg-white rounded-xl overflow-hidden sticky top-8 flex items-center justify-center p-4"
+                            >
+                                {activeImage === 'video' && product.videoUrl ? (
+                                    <div className="w-full h-full flex items-center justify-center bg-black rounded-lg">
+                                        <video
+                                            src={product.videoUrl}
+                                            controls
+                                            autoPlay
+                                            className="max-w-full max-h-full"
+                                            poster={getImageUrl(product.thumbnail)}
+                                        ></video>
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={getImageUrl(activeImage || product.thumbnail)}
+                                        alt={product.name}
+                                        className="max-h-full max-w-full object-contain mix-blend-multiply"
+                                    />
+                                )}
 
                                 {/* Mobile Thumbnails Overlay */}
                                 <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 lg:hidden px-4 overflow-x-auto pb-2">

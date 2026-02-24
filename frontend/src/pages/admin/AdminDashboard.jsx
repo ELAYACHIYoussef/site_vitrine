@@ -319,7 +319,7 @@ function AdminDashboard() {
                         <div style={styles.noData}>Connectez Instagram pour voir les stats</div>
                     )}
                 </div>
-            </div>
+            </motion.div>
 
             {/* Existing Charts Row (Products) */}
             <motion.div variants={staggerContainer} style={styles.chartsRow}>

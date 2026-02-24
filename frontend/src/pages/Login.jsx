@@ -216,7 +216,7 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <a
+                        <motion.a
                             href="http://localhost:8080/api/auth/google/simulate"
                             className="w-full py-3.5 px-6 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-3"
                         >

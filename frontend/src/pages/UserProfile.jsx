@@ -118,7 +118,7 @@ const UserProfile = () => {
                 >
                     <div className="h-32 bg-gradient-to-r from-indigo-600 to-violet-600 relative">
                         <div className="absolute -bottom-16 left-8">
-                            <div className="relative group">
+                            <motion.div className="relative group">
                                 <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center overflow-hidden shadow-lg">
                                     {user?.avatarUrl ? (
                                         <img src={user.avatarUrl} alt="Profil" className="w-full h-full object-cover" />
@@ -126,7 +126,7 @@ const UserProfile = () => {
                                         <User className="w-16 h-16 text-slate-400" />
                                     )}
                                 </div>
-                                <button
+                                <motion.button
                                     onClick={() => setShowAvatarPicker(true)}
                                     className="absolute bottom-0 right-0 p-2 bg-indigo-600 rounded-full text-white shadow-lg hover:bg-indigo-700 transition-colors"
                                 >
@@ -348,7 +348,7 @@ const UserProfile = () => {
                         </div>
                     </motion.div>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };
