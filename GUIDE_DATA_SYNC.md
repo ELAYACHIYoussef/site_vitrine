@@ -2,7 +2,18 @@
 
 Ce guide explique **comment vos données sont sauvegardées** et **comment les partager** avec votre binôme (ton pote).
 
----
+1.  Assurez-vous que votre Docker tourne (`docker-compose up`).
+2.  Lancez le script de sauvegarde :
+    ```powershell
+    .\save-db.ps1
+    ```
+    Cela va créer ou mettre à jour le fichier `db-dump.sql`.
+3.  Envoyez le tout sur Git :
+    ```powershell
+    git add db-dump.sql
+    git commit -m "Mise à jour des produits dans la DB"
+    git push
+    ```
 
 ## 1. 🧠 Comment ça marche ? (La Technique)
 

@@ -28,6 +28,14 @@ const ProductCatalog = () => {
         setSelectedCategory(queryCategory);
     }, [searchParams]);
 
+    // Sync state with URL params
+    useEffect(() => {
+        const querySearch = searchParams.get('search') || '';
+        const queryCategory = searchParams.get('category') || 'All';
+        setSearchTerm(querySearch);
+        setSelectedCategory(queryCategory);
+    }, [searchParams]);
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
