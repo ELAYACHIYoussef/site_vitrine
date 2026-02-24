@@ -175,7 +175,7 @@ const Home = () => {
                                 </Link>
                             </motion.div>
                         ))}
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
@@ -222,7 +222,7 @@ const Home = () => {
                             </motion.div>
                         ))}
                     </div>
-                </motion.div>
+                </div>
             </section>
 
             {/* Luxury Newsletter */}

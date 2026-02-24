@@ -15,8 +15,10 @@ services:
       - azymarket-net
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health" ]
-      interval: 10s
-      retries: 5
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # ---------------------------------------------------------------------------
   # CORE SERVICES
