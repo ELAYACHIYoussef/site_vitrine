@@ -279,44 +279,36 @@ function AdminDashboard() {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Orders Status - Pie Chart */}
+                {/* Social Performance - Bar Chart */}
                 <div style={styles.chartCard}>
                     <div style={styles.chartHeader}>
-                        <ShoppingBag size={20} style={{ color: BRAND_COLORS.purple }} />
-                        <h3 style={styles.chartTitle}>État des Commandes</h3>
+                        <Instagram size={20} style={{ color: BRAND_COLORS.instagram }} />
+                        <h3 style={styles.chartTitle}>Performance Sociale (Instagram)</h3>
                     </div>
-                    <ResponsiveContainer width="100%" height={280}>
-                        <PieChart>
-                            <Pie
-                                data={[
-                                    { name: 'En attente', value: 12, color: '#f59e0b' },
-                                    { name: 'Validée', value: 19, color: '#3b82f6' },
-                                    { name: 'Expédiée', value: 8, color: '#8b5cf6' },
-                                    { name: 'Livrée', value: 45, color: '#10b981' },
-                                    { name: 'Annulée', value: 3, color: '#ef4444' },
-                                ]}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                paddingAngle={5}
-                                dataKey="value"
-                            >
-                                {PIE_COLORS.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{
-                                    background: '#1e293b',
-                                    border: 'none',
-                                    borderRadius: '12px',
-                                    color: '#fff',
-                                }}
-                            />
-                            <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
-                        </PieChart>
-                    </ResponsiveContainer>
+                    {instagram?.connected ? (
+                        <ResponsiveContainer width="100%" height={280}>
+                            <BarChart data={[
+                                { name: 'Likes', value: 1250, color: '#E1306C' },
+                                { name: 'Commentaires', value: 84, color: '#833AB4' },
+                                { name: 'Partages', value: 42, color: '#5851DB' },
+                                { name: 'Vues Vidéo', value: 3450, color: '#405DE6' }
+                            ]}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                                <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                                <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                                <Tooltip
+                                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '12px' }}
+                                />
+                                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                                    {[0, 1, 2, 3].map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={['#E1306C', '#833AB4', '#5851DB', '#405DE6'][index]} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div style={styles.noData}>Connectez Instagram pour voir les stats</div>
+                    )}
                 </div>
             </div>
 

@@ -46,17 +46,42 @@ public class AuthService {
     public Optional<Map<String, Object>> login(String email, String password) {
         return userRepository.findByEmail(email)
                 .filter(user -> passwordEncoder.matches(password, user.getPassword()))
-                .map(user -> {
-                    String token = jwtService.generateToken(user.getUsername(), user.getRole());
-                    Map<String, Object> userData = Map.of(
-                            "id", user.getId(),
-                            "username", user.getUsername(),
-                            "email", user.getEmail(),
-                            "role", user.getRole());
-                    return Map.of(
-                            "token", token,
-                            "user", userData);
+                .map(this::generateAuthResponse);
+    }
+
+    public Map<String, Object> simulateGoogleLogin(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setEmail(email);
+                    newUser.setUsername(email.split("@")[0]);
+                    newUser.setPassword(passwordEncoder.encode("mock_password"));
+
+                    if (ADMIN_EMAILS.contains(email.toLowerCase())) {
+                        newUser.setRole("admin");
+                    } else {
+                        newUser.setRole("client");
+                    }
+
+                    return userRepository.save(newUser);
                 });
+
+        return generateAuthResponse(user);
+    }
+
+    private Map<String, Object> generateAuthResponse(User user) {
+        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+        Map<String, Object> userData = new java.util.LinkedHashMap<>();
+        userData.put("id", user.getId());
+        userData.put("username", user.getUsername());
+        userData.put("email", user.getEmail());
+        userData.put("role", user.getRole());
+        userData.put("avatarUrl", user.getAvatarUrl());
+
+        Map<String, Object> response = new java.util.LinkedHashMap<>();
+        response.put("token", token);
+        response.put("user", userData);
+        return response;
     }
 
     public void deleteUser(String email) {

@@ -59,8 +59,9 @@ public class ProductService {
     public Product createProductWithImages(
             String name, String category, String categoryLabel,
             Double price, Integer stock, String description,
-            String descriptionCourte, List<org.springframework.web.multipart.MultipartFile> images,
-            List<String> sizes, List<String> colors)
+            String descriptionCourte, String videoUrl,
+            List<org.springframework.web.multipart.MultipartFile> images,
+            List<String> sizes, List<String> colors, Boolean publishToInstagram)
             throws java.io.IOException {
 
         // Save images and get URLs
@@ -82,24 +83,27 @@ public class ProductService {
                 .description(description)
                 .descriptionCourte(descriptionCourte)
                 .thumbnail(!imageUrls.isEmpty() ? imageUrls.get(0) : null)
+                .videoUrl(videoUrl)
                 .images(imageUrls)
                 .sizes(sizes)
                 .colors(colors)
                 .build();
 
         Product savedProduct = productRepository.save(product);
-        
+
         // Post to Instagram asynchronously (or synchronously for now)
-        try {
-            instagramService.postProductToInstagram(savedProduct);
-            // If we got an ID back, we would save it here:
-            // savedProduct.setInstagramMediaId(id);
-            // productRepository.save(savedProduct);
-        } catch (Exception e) {
-            // Don't fail product creation if Instagram fails
-            System.err.println("Failed to sync with Instagram: " + e.getMessage());
+        if (Boolean.TRUE.equals(publishToInstagram)) {
+            try {
+                instagramService.postProductToInstagram(savedProduct);
+                // If we got an ID back, we would save it here:
+                // savedProduct.setInstagramMediaId(id);
+                // productRepository.save(savedProduct);
+            } catch (Exception e) {
+                // Don't fail product creation if Instagram fails
+                System.err.println("Failed to sync with Instagram: " + e.getMessage());
+            }
         }
-        
+
         return savedProduct;
     }
 
@@ -109,7 +113,8 @@ public class ProductService {
     public Product updateProductWithImages(
             Long id, String name, String category, String categoryLabel,
             Double price, Integer stock, String description,
-            String descriptionCourte, List<org.springframework.web.multipart.MultipartFile> images,
+            String descriptionCourte, String videoUrl,
+            List<org.springframework.web.multipart.MultipartFile> images,
             List<String> sizes, List<String> colors)
             throws java.io.IOException {
 
@@ -135,6 +140,8 @@ public class ProductService {
             product.setDescription(description);
         if (descriptionCourte != null)
             product.setDescriptionCourte(descriptionCourte);
+        if (videoUrl != null)
+            product.setVideoUrl(videoUrl);
         if (sizes != null)
             product.setSizes(sizes);
         if (colors != null)
@@ -155,7 +162,7 @@ public class ProductService {
         try {
             instagramService.updateProductOnInstagram(savedAndUpdate);
         } catch (Exception e) {
-             System.err.println("Failed to update Instagram: " + e.getMessage());
+            System.err.println("Failed to update Instagram: " + e.getMessage());
         }
         return savedAndUpdate;
     }

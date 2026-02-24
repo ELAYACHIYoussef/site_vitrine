@@ -25,6 +25,9 @@ public class User {
     @Column(updatable = false)
     private java.time.LocalDateTime createdAt;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(name = "instagram_user_id")
     private String instagramUserId;
 
@@ -32,7 +35,8 @@ public class User {
     private String instagramAccessToken;
 
     // Manual constructor for builder
-    public User(Long id, String username, String email, String password, String role, java.time.LocalDateTime createdAt, String instagramUserId, String instagramAccessToken) {
+    public User(Long id, String username, String email, String password, String role, java.time.LocalDateTime createdAt,
+            String instagramUserId, String instagramAccessToken, String avatarUrl) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -41,22 +45,19 @@ public class User {
         this.createdAt = createdAt;
         this.instagramUserId = instagramUserId;
         this.instagramAccessToken = instagramAccessToken;
+        this.avatarUrl = avatarUrl;
     }
 
     // Manual no-args constructor
     public User() {
     }
 
-    public String getRole() {
-        return role;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public java.time.LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(java.time.LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getInstagramUserId() {
@@ -73,6 +74,18 @@ public class User {
 
     public void setInstagramAccessToken(String instagramAccessToken) {
         this.instagramAccessToken = instagramAccessToken;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -124,9 +137,15 @@ public class User {
         private java.time.LocalDateTime createdAt;
         private String instagramUserId;
         private String instagramAccessToken;
+        private String avatarUrl;
 
         public UserBuilder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public UserBuilder avatarUrl(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
             return this;
         }
 
@@ -166,7 +185,8 @@ public class User {
         }
 
         public User build() {
-            return new User(id, username, email, password, role, createdAt, instagramUserId, instagramAccessToken);
+            return new User(id, username, email, password, role, createdAt, instagramUserId, instagramAccessToken,
+                    avatarUrl);
         }
     }
 }

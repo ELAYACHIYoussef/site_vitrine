@@ -25,8 +25,8 @@ const OAuth2RedirectHandler = () => {
                     const user = response.data;
                     localStorage.setItem('user', JSON.stringify(user));
                     toast.success("Connexion Google réussie !");
-                    // Force reload to update AuthContext
-                    window.location.href = '/';
+                    // Redirect to profile to see the change
+                    window.location.href = '/profile';
                 } catch (err) {
                     console.error("Error fetching user profile:", err);
                     toast.error("Erreur lors de la récupération du profil");

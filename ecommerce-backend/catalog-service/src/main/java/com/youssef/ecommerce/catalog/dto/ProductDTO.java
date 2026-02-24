@@ -24,4 +24,5 @@ public class ProductDTO {
     private List<String> sizes;
     private List<String> colors;
     private String caracteristiques;
+    private Boolean publishToInstagram;
 }

@@ -41,13 +41,15 @@ public class ProductController {
             @RequestParam(value = "stock", defaultValue = "0") Integer stock,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "descriptionCourte", required = false) String descriptionCourte,
+            @RequestParam(value = "videoUrl", required = false) String videoUrl,
             @RequestParam(value = "images", required = false) List<org.springframework.web.multipart.MultipartFile> images,
             @RequestParam(value = "sizes", required = false) List<String> sizes,
-            @RequestParam(value = "colors", required = false) List<String> colors) {
+            @RequestParam(value = "colors", required = false) List<String> colors,
+            @RequestParam(value = "publishToInstagram", defaultValue = "false") Boolean publishToInstagram) {
         try {
             Product product = productService.createProductWithImages(
                     name, category, categoryLabel, price, stock,
-                    description, descriptionCourte, images, sizes, colors);
+                    description, descriptionCourte, videoUrl, images, sizes, colors, publishToInstagram);
             return ResponseEntity.ok(toMap(product));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -64,13 +66,14 @@ public class ProductController {
             @RequestParam(value = "stock", required = false) Integer stock,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "descriptionCourte", required = false) String descriptionCourte,
+            @RequestParam(value = "videoUrl", required = false) String videoUrl,
             @RequestParam(value = "images", required = false) List<org.springframework.web.multipart.MultipartFile> images,
             @RequestParam(value = "sizes", required = false) List<String> sizes,
             @RequestParam(value = "colors", required = false) List<String> colors) {
         try {
             Product product = productService.updateProductWithImages(
                     id, name, category, categoryLabel, price, stock,
-                    description, descriptionCourte, images, sizes, colors);
+                    description, descriptionCourte, videoUrl, images, sizes, colors);
             return ResponseEntity.ok(toMap(product));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -117,6 +120,14 @@ public class ProductController {
         return ResponseEntity.ok(instagramService.getInstagramStats());
     }
 
+    @PostMapping("/instagram/sync")
+    public ResponseEntity<?> syncInstagram() {
+        try {
+            return ResponseEntity.ok(instagramService.syncFromInstagram());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @PostMapping("/products/{id}/reduce-stock")
     public ResponseEntity<?> reduceStock(@PathVariable("id") Long id, @RequestParam("quantity") Integer quantity) {
@@ -144,6 +155,8 @@ public class ProductController {
         map.put("description", product.getDescription());
         map.put("descriptionCourte", product.getDescriptionCourte());
         map.put("thumbnail", product.getThumbnail());
+        map.put("videoUrl", product.getVideoUrl());
+        map.put("instagramMediaId", product.getInstagramMediaId());
         map.put("images", product.getImages() != null ? new ArrayList<>(product.getImages()) : new ArrayList<>());
         map.put("sizes", product.getSizes() != null ? new ArrayList<>(product.getSizes()) : new ArrayList<>());
         map.put("colors", product.getColors() != null ? new ArrayList<>(product.getColors()) : new ArrayList<>());

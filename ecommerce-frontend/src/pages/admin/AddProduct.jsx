@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Image as ImageIcon, Instagram } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import productService from '../../api/productService';
 import { getCategories } from '../../api/categoryService';
@@ -17,7 +18,8 @@ const AddProduct = () => {
         price: '',
         stock: '',
         description: '',
-        descriptionCourte: ''
+        descriptionCourte: '',
+        videoUrl: ''
     });
 
     useEffect(() => {
@@ -51,12 +53,12 @@ const AddProduct = () => {
 
         // Validation
         if (!formData.name || !formData.category || !formData.price) {
-            alert('Veuillez remplir tous les champs obligatoires');
+            toast.error('Veuillez remplir tous les champs obligatoires');
             return;
         }
 
         if (images.length === 0) {
-            alert('Veuillez ajouter au moins une image');
+            toast.error('Veuillez ajouter au moins une image');
             return;
         }
 
@@ -64,11 +66,11 @@ const AddProduct = () => {
 
         try {
             await productService.createProduct(formData, images);
-            alert('Produit créé avec succès !');
+            toast.success('Produit créé avec succès !');
             navigate('/admin/products');
         } catch (error) {
             console.error('Erreur:', error);
-            alert('Erreur lors de la création du produit: ' + (error.response?.data || error.message));
+            toast.error('Erreur lors de la création du produit: ' + (error.response?.data || error.message));
         } finally {
             setLoading(false);
         }
@@ -198,13 +200,54 @@ const AddProduct = () => {
                                     className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
                                 />
                             </div>
+
+                            {/* Video URL */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    URL de la Vidéo (MP4, YouTube, Instagram)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="videoUrl"
+                                    value={formData.videoUrl}
+                                    onChange={handleChange}
+                                    placeholder="Ex: https://example.com/video.mp4"
+                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                />
+                                <p className="text-xs text-slate-500 mt-1">Laissez vide si aucune vidéo</p>
+                            </div>
+
                         </div>
 
-                        {/* Right Column - Images */}
+                        {/* Right Column - Images & Export */}
                         <div className="space-y-6">
-                            <h2 className="text-lg font-bold text-slate-900 border-b pb-3">
-                                Images du Produit
-                            </h2>
+                            {/* Marketing & Export Section */}
+                            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-2xl shadow-lg text-white">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                    <ImageIcon className="w-5 h-5 text-indigo-200" />
+                                    Marketing & Export
+                                </h3>
+                                <div className="p-4 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
+                                    <label className="flex items-center gap-4 cursor-pointer group">
+                                        <div className="relative">
+                                            <input
+                                                type="checkbox"
+                                                name="publishToInstagram"
+                                                id="publishToInstagram"
+                                                checked={formData.publishToInstagram || false}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, publishToInstagram: e.target.checked }))}
+                                                className="sr-only"
+                                            />
+                                            <div className={`w-14 h-7 rounded-full transition-all duration-300 ${formData.publishToInstagram ? 'bg-green-400' : 'bg-white/20'}`}></div>
+                                            <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ${formData.publishToInstagram ? 'translate-x-7' : 'translate-x-0'}`}></div>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-sm">Publier sur Instagram</span>
+                                            <span className="text-[10px] text-indigo-100 opacity-80">Synchronisation automatique</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
 
                             <ImageUpload
                                 images={images}

@@ -6,9 +6,19 @@ import toast from 'react-hot-toast';
 import InstagramSyncPanel from '../components/InstagramSyncPanel';
 
 const UserProfile = () => {
-    const { user, deleteAccount, token } = useAuth();
+    const { user, deleteAccount, updateUser, token } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [showAvatarPicker, setShowAvatarPicker] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const avatars = [
+        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop",
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop"
+    ];
 
     // All useState calls must be before useEffect (Rules of Hooks)
     const [formData, setFormData] = useState({
@@ -31,6 +41,32 @@ const UserProfile = () => {
         }
     }, [searchParams, setSearchParams]);
 
+    const handleAvatarSelect = async (avatarUrl) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/users/avatar', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ avatarUrl })
+            });
+
+            if (response.ok) {
+                updateUser({ avatarUrl });
+                setShowAvatarPicker(false);
+                toast.success("Avatar mis à jour !");
+            } else if (response.status === 401) {
+                toast.error("Session expirée. Veuillez vous reconnecter.");
+                logout();
+            } else {
+                toast.error("Échec de la mise à jour");
+            }
+        } catch (e) {
+            toast.error("Erreur réseau");
+        }
+    };
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -46,6 +82,32 @@ const UserProfile = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            {/* Avatar Picker Modal */}
+            {showAvatarPicker && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Choisir un avatar</h2>
+                        <div className="grid grid-cols-3 gap-4 mb-8">
+                            {avatars.map((url, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handleAvatarSelect(url)}
+                                    className="w-full aspect-square rounded-2xl overflow-hidden hover:scale-105 hover:ring-4 ring-indigo-500 transition-all"
+                                >
+                                    <img src={url} alt="Avatar option" className="w-full h-full object-cover" />
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setShowAvatarPicker(false)}
+                            className="w-full py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                        >
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="max-w-4xl mx-auto">
                 {/* Header Profile Card */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
@@ -53,9 +115,16 @@ const UserProfile = () => {
                         <div className="absolute -bottom-16 left-8">
                             <div className="relative group">
                                 <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center overflow-hidden shadow-lg">
-                                    <User className="w-16 h-16 text-slate-400" />
+                                    {user?.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt="Profil" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="w-16 h-16 text-slate-400" />
+                                    )}
                                 </div>
-                                <button className="absolute bottom-0 right-0 p-2 bg-indigo-600 rounded-full text-white shadow-lg hover:bg-indigo-700 transition-colors">
+                                <button
+                                    onClick={() => setShowAvatarPicker(true)}
+                                    className="absolute bottom-0 right-0 p-2 bg-indigo-600 rounded-full text-white shadow-lg hover:bg-indigo-700 transition-colors"
+                                >
                                     <Camera className="w-4 h-4" />
                                 </button>
                             </div>

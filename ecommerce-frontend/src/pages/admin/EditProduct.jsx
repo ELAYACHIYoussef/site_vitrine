@@ -22,7 +22,8 @@ const EditProduct = () => {
         price: '',
         stock: '',
         description: '',
-        descriptionCourte: ''
+        descriptionCourte: '',
+        videoUrl: ''
     });
 
     useEffect(() => {
@@ -69,7 +70,8 @@ const EditProduct = () => {
                 price: product.price || '',
                 stock: product.stock || '',
                 description: product.description || '',
-                descriptionCourte: product.descriptionCourte || ''
+                descriptionCourte: product.descriptionCourte || '',
+                videoUrl: product.videoUrl || ''
             });
 
             // Store existing images
@@ -253,6 +255,22 @@ const EditProduct = () => {
                                     rows="3"
                                     className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#FF6835] focus:ring-2 focus:ring-orange-200 outline-none transition-all resize-none"
                                 />
+                            </div>
+
+                            {/* Video URL */}
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    URL de la Vidéo (MP4, YouTube, Instagram)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="videoUrl"
+                                    value={formData.videoUrl}
+                                    onChange={handleChange}
+                                    placeholder="Ex: https://example.com/video.mp4"
+                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#FF6835] focus:ring-2 focus:ring-orange-200 outline-none transition-all"
+                                />
+                                <p className="text-xs text-slate-500 mt-1">Laissez vide si aucune vidéo</p>
                             </div>
                         </div>
 

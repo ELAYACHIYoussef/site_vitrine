@@ -58,6 +58,25 @@ export default function InstagramSyncPanel() {
         }
     };
 
+    const [syncing, setSyncing] = useState(false);
+
+    const handleSync = async () => {
+        setSyncing(true);
+        try {
+            const res = await fetch(`http://localhost:8080/api/catalog/instagram/sync`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            toast.success(`✅ Synchronisation terminée : ${data.imported} nouveaux produits, ${data.updated} mis à jour`);
+            fetchStatus();
+        } catch (e) {
+            toast.error('Erreur lors de la synchronisation bidirectionnelle');
+        } finally {
+            setSyncing(false);
+        }
+    };
+
     if (status.loading) {
         return (
             <div className="instagram-panel loading">
@@ -92,7 +111,7 @@ export default function InstagramSyncPanel() {
                     <h3 className="ig-title">Instagram Sync</h3>
                     <p className="ig-subtitle">
                         {status.connected
-                            ? <><span className="ig-dot connected" /> Connecté comme <b>{status.username}</b></>
+                            ? <><span className="ig-dot connected" /> Connecté comme <b>{status.username || '@azyymarket'}</b></>
                             : <><span className="ig-dot disconnected" /> Non connecté</>}
                     </p>
                 </div>
@@ -122,18 +141,16 @@ export default function InstagramSyncPanel() {
             {/* Sync flow info */}
             <div className="ig-flow">
                 <div className="ig-flow-item">
-                    <div className="ig-flow-icon">🛍️</div>
-                    <div className="ig-flow-label">Produit créé</div>
-                </div>
-                <div className="ig-flow-arrow">→</div>
-                <div className="ig-flow-item">
-                    <div className="ig-flow-icon">⚡</div>
-                    <div className="ig-flow-label">Auto-sync</div>
-                </div>
-                <div className="ig-flow-arrow">→</div>
-                <div className="ig-flow-item">
                     <div className="ig-flow-icon">📸</div>
                     <div className="ig-flow-label">Instagram</div>
+                </div>
+                <div className="ig-flow-arrow flex flex-col items-center">
+                    <span className="text-[10px] text-slate-400 mb-1">Bidirectionnel</span>
+                    <span>⟷</span>
+                </div>
+                <div className="ig-flow-item">
+                    <div className="ig-flow-icon">🛍️</div>
+                    <div className="ig-flow-label">Votre Boutique</div>
                 </div>
             </div>
 
@@ -159,22 +176,38 @@ export default function InstagramSyncPanel() {
                     </p>
                 </div>
             ) : (
-                <div className="ig-connected-actions">
-                    <a
-                        href={`https://www.instagram.com/${status.username?.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ig-btn view"
-                    >
-                        👁️ Voir le profil
-                    </a>
+                <div className="ig-connected-actions space-y-3">
                     <button
-                        className="ig-btn disconnect"
-                        onClick={handleDisconnect}
-                        disabled={connecting}
+                        className={`ig-btn sync w-full flex items-center justify-center gap-2 ${syncing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        onClick={handleSync}
+                        disabled={syncing}
                     >
-                        {connecting ? '⏳...' : '🔌 Déconnecter'}
+                        {syncing ? (
+                            <>
+                                <div className="ig-spinner-sm" />
+                                Synchronisation...
+                            </>
+                        ) : (
+                            <>🔄 Synchroniser maintenant</>
+                        )}
                     </button>
+                    <div className="grid grid-cols-2 gap-2">
+                        <a
+                            href={`https://www.instagram.com/${(status.username || 'azyymarket').replace('@', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ig-btn view text-center py-2 text-sm"
+                        >
+                            👁️ Voir le profil
+                        </a>
+                        <button
+                            className="ig-btn disconnect text-sm"
+                            onClick={handleDisconnect}
+                            disabled={connecting}
+                        >
+                            {connecting ? '⏳...' : '🔌 Déconnecter'}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

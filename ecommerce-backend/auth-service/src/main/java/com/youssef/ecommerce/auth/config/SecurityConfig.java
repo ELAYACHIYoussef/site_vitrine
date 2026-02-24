@@ -26,7 +26,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/ping", "/error", "/oauth2/**", "/login/oauth2/**")
+                        .requestMatchers("/register", "/login", "/ping", "/error", "/oauth2/**", "/login/oauth2/**",
+                                "/google/simulate")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

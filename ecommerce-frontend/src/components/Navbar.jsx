@@ -12,152 +12,126 @@ const Navbar = () => {
     const { cartCount, setIsCartOpen } = useCart();
     const { wishlist } = useWishlist();
     const navigate = useNavigate();
-    const [storeName, setStoreName] = useState('VITRINE.IO');
+    const [storeName, setStoreName] = useState('AZYMARKET');
+    const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
         getGlobalConfig().then(config => {
-            if (config?.STORE_NAME) setStoreName(config.STORE_NAME);
+            if (config?.STORE_NAME) setStoreName(config.STORE_NAME.toUpperCase());
         });
+
+        const handleScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const isAdmin = user && (user.role === 'admin' || user.role === 'ROLE_ADMIN' || user.role === 'ADMIN');
+
     return (
-        <nav className="glass-nav px-6 py-4 flex justify-between items-center transition-all duration-300">
-            <Link to="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-2 group">
-                <span className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg group-hover:rotate-12 transition-transform">{storeName.charAt(0)}</span>
-                <span className="text-slate-900">{storeName}</span>
-            </Link>
+        <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled
+            ? 'py-4 bg-white/70 backdrop-blur-2xl border-b border-slate-200/50 shadow-xl shadow-slate-900/5'
+            : 'py-8 bg-transparent'
+            }`}>
+            <div className="container mx-auto px-6 flex items-center justify-between">
+                {/* Logo Section */}
+                <Link to="/" className="flex items-center gap-4 group">
+                    <motion.div
+                        whileHover={{ rotate: 12, scale: 1.1 }}
+                        className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-slate-900/20"
+                    >
+                        <ShoppingBag size={24} />
+                    </motion.div>
+                    <span className="text-2xl font-[1000] tracking-tighter text-slate-900">
+                        {storeName}
+                    </span>
+                </Link>
 
-            <div className="hidden md:flex space-x-10 items-center font-medium text-slate-600">
-                {user?.role === 'admin' ? (
-                    // Admin: Link to Dashboard
-                    <Link to="/admin" className="font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-                        Tableau de Bord
-                    </Link>
-                ) : (
-                    // Client: Navigation
-                    <>
-                        <Link to="/" className="hover:text-indigo-600 transition-colors relative group">
-                            Accueil
-                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
-                        </Link>
-                        <Link to="/products" className="hover:text-indigo-600 transition-colors relative group">
-                            Produits
-                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
-                        </Link>
-                        <Link to="/contact" className="hover:text-indigo-600 transition-colors relative group">
-                            Contact
-                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
-                        </Link>
-                    </>
-                )}
-
-                {/* Global Search Bar */}
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const term = e.target.search.value;
-                    if (term.trim()) {
-                        navigate(`/products?search=${encodeURIComponent(term)}`);
-                    }
-                }} className="relative hidden lg:block">
-                    <input
-                        type="text"
-                        name="search"
-                        placeholder="Rechercher..."
-                        className="pl-10 pr-4 py-2 rounded-full bg-slate-100 border border-transparent focus:border-indigo-600 focus:bg-white transition-all outline-none w-64"
-                    />
-                    <svg className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </form>
-            </div>
-
-            <div className="flex items-center space-x-6">
-                {user?.role === 'admin' ? (
-                    // Admin: Notifications + Profile
-                    <div className="flex items-center space-x-4">
-                        <div className="relative cursor-pointer group">
-                            <svg className="w-6 h-6 text-slate-600 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-md font-bold">3</span>
-                        </div>
+                {/* Main Navigation */}
+                <div className="hidden lg:flex items-center gap-12">
+                    {[
+                        { name: 'Collections', path: '/products' },
+                        { name: 'Nouveautés', path: '/products?sort=newest' },
+                        { name: 'Contact', path: '/contact' },
+                    ].map((link, i) => (
                         <Link
-                            to="/admin"
-                            className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
+                            key={i}
+                            to={link.path}
+                            className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-600 transition-colors relative group"
                         >
-                            <User className="w-4 h-4" />
-                            <span>{user?.username}</span>
+                            {link.name}
+                            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-indigo-600 rounded-full opacity-0 group-hover:opacity-100 transition-all"></span>
                         </Link>
-                        <button onClick={logout} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all">
-                            <LogOut className="w-5 h-5" />
-                        </button>
+                    ))}
+                </div>
+
+                {/* Action Icons */}
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                        <motion.button
+                            whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.05)' }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => navigate('/wishlist')}
+                            className="p-3 text-slate-600 rounded-2xl relative"
+                        >
+                            <Heart size={20} className={wishlist.length > 0 ? 'fill-rose-500 text-rose-500' : ''} />
+                            {wishlist.length > 0 && (
+                                <span className="absolute top-2 right-2 w-4 h-4 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                                    {wishlist.length}
+                                </span>
+                            )}
+                        </motion.button>
+
+                        <motion.button
+                            whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.05)' }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => setIsCartOpen(true)}
+                            className="p-3 text-slate-600 rounded-2xl relative"
+                        >
+                            <ShoppingCart size={20} />
+                            {cartCount > 0 && (
+                                <span className="absolute top-2 right-2 w-4 h-4 bg-indigo-600 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </motion.button>
                     </div>
-                ) : (
-                    // Client: Cart, Wishlist, Profile
-                    <>
-                        {isAuthenticated() && (
-                            <div className="flex space-x-4 items-center border-r border-slate-200 pr-6 mr-2">
-                                <Link to="/wishlist" className="relative group">
-                                    <Heart className="w-5 h-5 cursor-pointer text-slate-400 hover:text-rose-500 hover:scale-110 transition-all" />
-                                    {wishlist.length > 0 && (
-                                        <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                                            {wishlist.length}
-                                        </span>
-                                    )}
-                                </Link>
-                                <button
-                                    onClick={() => setIsCartOpen(true)}
-                                    className="relative group bg-transparent border-none p-0 cursor-pointer"
-                                >
-                                    <ShoppingCart className="w-5 h-5 text-slate-600 hover:text-indigo-600 transition-colors" />
-                                    {cartCount > 0 && (
-                                        <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                                            {cartCount}
-                                        </span>
-                                    )}
-                                </button>
-                            </div>
-                        )}
 
-                        {isAuthenticated() ? (
-                            <div className="flex items-center space-x-4">
-                                <Link
-                                    to="/account/orders"
-                                    className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
-                                >
-                                    <Package className="w-4 h-4" />
-                                    <span>Mes Commandes</span>
-                                </Link>
-                                <Link
-                                    to="/account/messages"
-                                    className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
-                                >
-                                    <MessageCircle className="w-4 h-4" />
-                                    <span>Messages</span>
-                                </Link>
-                                <Link
-                                    to="/account/profile"
-                                    className="flex items-center space-x-2 text-sm font-semibold text-slate-700 bg-slate-100 px-4 py-2 rounded-full hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-slate-200"
-                                >
-                                    <User className="w-4 h-4" />
-                                    <span>{user?.username}</span>
-                                </Link>
-                                <button onClick={() => { logout(); navigate('/'); }} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all">
-                                    <LogOut className="w-5 h-5" />
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="flex items-center space-x-4">
-                                <Link to="/login" className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">Connexion</Link>
-                                <Link to="/register" className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg hover:bg-slate-800 hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                                    S'inscrire
-                                </Link>
-                            </div>
-                        )}
-                    </>
-                )}
+                    <div className="h-8 w-[1px] bg-slate-200 mx-2 hidden md:block"></div>
 
-                <Menu className="w-6 h-6 md:hidden cursor-pointer text-slate-900" />
+                    {isAuthenticated() ? (
+                        <div className="flex items-center gap-4">
+                            {isAdmin && (
+                                <Link to="/admin" className="hidden xl:block px-6 py-2.5 bg-indigo-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 transition-all hover:-translate-y-0.5">
+                                    Admin
+                                </Link>
+                            )}
+                            <Link to="/profile" className="flex items-center gap-3 group">
+                                <div className="w-10 h-10 rounded-full border-2 border-white shadow-xl overflow-hidden ring-4 ring-slate-50 group-hover:ring-indigo-50 transition-all">
+                                    <img
+                                        src={user?.avatarUrl || `https://i.pravatar.cc/100?u=${user?.id}`}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            </Link>
+                            <motion.button
+                                whileHover={{ scale: 1.1, color: '#e11d48' }}
+                                onClick={() => { logout(); navigate('/'); }}
+                                className="p-2 text-slate-400"
+                            >
+                                <LogOut size={20} />
+                            </motion.button>
+                        </div>
+                    ) : (
+                        <Link to="/login" className="px-8 py-3 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-widest shadow-2xl shadow-slate-900/10 hover:bg-indigo-600 transition-all hover:-translate-y-0.5 active:scale-95">
+                            Connexion
+                        </Link>
+                    )}
+
+                    <button className="lg:hidden p-3 text-slate-900">
+                        <Menu size={24} />
+                    </button>
+                </div>
             </div>
         </nav>
     );

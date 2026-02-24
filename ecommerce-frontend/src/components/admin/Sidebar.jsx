@@ -15,7 +15,8 @@ import {
     X,
     Layers,
     Plus,
-    List
+    List,
+    User
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -80,6 +81,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             label: 'Settings',
             icon: Settings,
             path: '/admin/settings'
+        },
+        {
+            id: 'profile',
+            label: 'Mon Profil',
+            icon: User,
+            path: '/profile'
         }
     ];
 

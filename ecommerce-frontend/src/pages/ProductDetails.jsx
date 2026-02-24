@@ -119,17 +119,33 @@ const ProductDetails = () => {
                             >
                                 <img src={getImageUrl(product.thumbnail)} alt="Thumbnail" className="w-full h-full object-cover" />
                             </button>
-                            {images.map((img, idx) => (
+                            {/* Filter out duplicates (especially the main thumbnail) and uniquely key them */}
+                            {Array.from(new Set(images))
+                                .filter(img => img !== product.thumbnail)
+                                .map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveImage(img)}
+                                        className={`w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${activeImage === img
+                                            ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500'
+                                            : 'border-slate-200 hover:border-indigo-300'}`}
+                                    >
+                                        <img src={getImageUrl(img)} alt={`View ${idx + 2}`} className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            {product.videoUrl && (
                                 <button
-                                    key={idx}
-                                    onClick={() => setActiveImage(img)}
-                                    className={`w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${activeImage === img
-                                        ? 'border-amber-500 shadow-md'
-                                        : 'border-slate-200 hover:border-amber-300'}`}
+                                    onClick={() => setActiveImage('video')}
+                                    className={`w-16 h-16 rounded-md overflow-hidden border-2 transition-all flex flex-col items-center justify-center bg-slate-100 ${activeImage === 'video'
+                                        ? 'border-indigo-600 shadow-md ring-1 ring-indigo-600'
+                                        : 'border-slate-200 hover:border-indigo-400'}`}
                                 >
-                                    <img src={getImageUrl(img)} alt={`View ${idx}`} className="w-full h-full object-cover" />
+                                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white mb-1">
+                                        <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-white border-b-[5px] border-b-transparent ml-1"></div>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-indigo-600 uppercase">Vidéo</span>
                                 </button>
-                            ))}
+                            )}
                         </div>
                     </div>
 
@@ -141,11 +157,23 @@ const ProductDetails = () => {
                             key={activeImage}
                             className="aspect-[4/5] lg:aspect-square bg-white rounded-xl overflow-hidden sticky top-8 flex items-center justify-center p-4"
                         >
-                            <img
-                                src={getImageUrl(activeImage || product.thumbnail)}
-                                alt={product.name}
-                                className="max-h-full max-w-full object-contain mix-blend-multiply"
-                            />
+                            {activeImage === 'video' && product.videoUrl ? (
+                                <div className="w-full h-full flex items-center justify-center bg-black rounded-lg">
+                                    <video
+                                        src={product.videoUrl}
+                                        controls
+                                        autoPlay
+                                        className="max-w-full max-h-full"
+                                        poster={getImageUrl(product.thumbnail)}
+                                    ></video>
+                                </div>
+                            ) : (
+                                <img
+                                    src={getImageUrl(activeImage || product.thumbnail)}
+                                    alt={product.name}
+                                    className="max-h-full max-w-full object-contain mix-blend-multiply"
+                                />
+                            )}
 
                             {/* Mobile Thumbnails Overlay */}
                             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 lg:hidden px-4 overflow-x-auto">

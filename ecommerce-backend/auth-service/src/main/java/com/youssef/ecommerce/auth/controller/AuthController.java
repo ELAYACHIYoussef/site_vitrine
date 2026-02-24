@@ -57,6 +57,7 @@ public class AuthController {
                     m.put("username", u.getUsername());
                     m.put("email", u.getEmail());
                     m.put("role", u.getRole());
+                    m.put("avatarUrl", u.getAvatarUrl());
                     return ResponseEntity.ok(m);
                 })
                 .orElse(ResponseEntity.status(404).build());
@@ -123,8 +124,40 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Compte supprimé avec succès"));
     }
 
+    @GetMapping("/google/simulate")
+    public org.springframework.http.ResponseEntity<Void> simulateGoogle(
+            @RequestParam(defaultValue = "selmanim113@gmail.com") String email) {
+        Map<String, Object> authResponse = authService.simulateGoogleLogin(email);
+        String token = (String) authResponse.get("token");
+
+        // Redirect to frontend with token
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.FOUND)
+                .location(java.net.URI.create("http://localhost:5173/oauth2/redirect?token=" + token))
+                .build();
+    }
+
     @GetMapping("/ping")
     public ResponseEntity<?> ping() {
         return ResponseEntity.ok(Map.of("message", "pong"));
+    }
+
+    @PutMapping("/users/avatar")
+    public ResponseEntity<?> updateAvatar(@RequestBody Map<String, String> request,
+            org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        String username = authentication.getName();
+        String avatarUrl = request.get("avatarUrl");
+
+        return userRepository.findByUsername(username)
+                .or(() -> userRepository.findByEmail(username)) // Try email if username not found (identity mismatch
+                                                                // fix)
+                .map(u -> {
+                    u.setAvatarUrl(avatarUrl);
+                    userRepository.save(u);
+                    return ResponseEntity.ok(Map.of("message", "Avatar mis à jour", "avatarUrl", avatarUrl));
+                })
+                .orElse(ResponseEntity.status(404).build());
     }
 }

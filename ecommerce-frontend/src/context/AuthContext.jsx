@@ -39,7 +39,23 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    const isAuthenticated = () => !!token;
+    const isTokenExpired = (token) => {
+        if (!token) return true;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 < Date.now();
+        } catch (e) {
+            return true;
+        }
+    };
+
+    useEffect(() => {
+        if (token && isTokenExpired(token)) {
+            logout();
+        }
+    }, [token]);
+
+    const isAuthenticated = () => !!token && !isTokenExpired(token);
     const isAdmin = () => user?.role === 'admin';
 
     const deleteAccount = async () => {
@@ -52,8 +68,14 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateUser = (updatedUser) => {
+        const newUser = { ...user, ...updatedUser };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout, deleteAccount, isAuthenticated, isAdmin }}>
+        <AuthContext.Provider value={{ user, token, loading, login, logout, deleteAccount, updateUser, isAuthenticated, isAdmin }}>
             {children}
         </AuthContext.Provider>
     );

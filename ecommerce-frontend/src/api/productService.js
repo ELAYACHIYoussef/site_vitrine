@@ -33,6 +33,8 @@ const productService = {
         formData.append('stock', productData.stock || 0);
         if (productData.description) formData.append('description', productData.description);
         if (productData.descriptionCourte) formData.append('descriptionCourte', productData.descriptionCourte);
+        if (productData.videoUrl) formData.append('videoUrl', productData.videoUrl);
+        if (productData.publishToInstagram !== undefined) formData.append('publishToInstagram', productData.publishToInstagram);
 
         // Add images
         if (images && images.length > 0) {
@@ -67,6 +69,7 @@ const productService = {
         if (productData.stock !== undefined) formData.append('stock', productData.stock);
         if (productData.description) formData.append('description', productData.description);
         if (productData.descriptionCourte) formData.append('descriptionCourte', productData.descriptionCourte);
+        if (productData.videoUrl) formData.append('videoUrl', productData.videoUrl);
 
         // Add images
         if (images && images.length > 0) {
