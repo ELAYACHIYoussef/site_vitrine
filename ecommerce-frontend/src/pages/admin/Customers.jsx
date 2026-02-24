@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Users, Mail, Phone, Calendar } from 'lucide-react';
 import { customerService } from '../../api/customerService';
 import { toast } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '../../hooks/animations';
 
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
@@ -45,18 +47,27 @@ const Customers = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-center items-center h-64"
+            >
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-            </div>
+            </motion.div>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Clients</h1>
-            <p className="text-slate-500 mb-8">Liste des clients enregistrés</p>
+        <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="container mx-auto px-4 py-8"
+        >
+            <motion.h1 variants={fadeInUp} className="text-3xl font-bold text-slate-900 mb-2">Clients</motion.h1>
+            <motion.p variants={fadeInUp} className="text-slate-500 mb-8">Liste des clients enregistrés</motion.p>
 
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <motion.div variants={scaleIn} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-200">
@@ -69,46 +80,58 @@ const Customers = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {customers.length === 0 ? (
-                                <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
-                                        Aucun client trouvé.
-                                    </td>
-                                </tr>
-                            ) : (
-                                customers.map((customer) => (
-                                    <tr key={customer.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold uppercase">
-                                                    {customer.username ? customer.username.charAt(0) : '?'}
+                            <AnimatePresence>
+                                {customers.length === 0 ? (
+                                    <motion.tr
+                                        key="empty"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                    >
+                                        <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                                            Aucun client trouvé.
+                                        </td>
+                                    </motion.tr>
+                                ) : (
+                                    customers.map((customer) => (
+                                        <motion.tr
+                                            variants={staggerItem}
+                                            layout
+                                            key={customer.id}
+                                            className="hover:bg-slate-50 transition-colors"
+                                        >
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold uppercase">
+                                                        {customer.username ? customer.username.charAt(0) : '?'}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium text-slate-900 block">{customer.username}</span>
+                                                        <span className="text-xs text-slate-500 capitalize">{customer.role}</span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <span className="font-medium text-slate-900 block">{customer.username}</span>
-                                                    <span className="text-xs text-slate-500 capitalize">{customer.role}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-slate-600">{customer.email}</td>
-                                        <td className="px-6 py-4 text-slate-600">
-                                            {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}
-                                        </td>
-                                        <td className="px-6 py-4 text-slate-600">
-                                            <span className="inline-block px-2 py-1 bg-slate-100 rounded text-xs font-semibold">
-                                                {customer.ordersCount}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 font-bold text-green-600">
-                                            {customer.totalSpent} €
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600">{customer.email}</td>
+                                            <td className="px-6 py-4 text-slate-600">
+                                                {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600">
+                                                <span className="inline-block px-2 py-1 bg-slate-100 rounded text-xs font-semibold">
+                                                    {customer.ordersCount}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 font-bold text-green-600">
+                                                {customer.totalSpent} €
+                                            </td>
+                                        </motion.tr>
+                                    ))
+                                )}
+                            </AnimatePresence>
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
 

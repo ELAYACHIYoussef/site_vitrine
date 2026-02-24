@@ -77,16 +77,53 @@ const Login = () => {
             >
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] px-8 py-10 text-center border-b border-white/5">
-                        <div className="w-16 h-16 bg-gradient-to-br from-[#e85d04] to-[#f48c06] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#e85d04]/30">
+                    <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] px-8 py-10 text-center border-b border-white/5 relative overflow-hidden">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                            className="w-16 h-16 bg-gradient-to-br from-[#e85d04] to-[#f48c06] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#e85d04]/30 relative z-10"
+                        >
                             <span className="text-white font-bold text-3xl">A</span>
-                        </div>
-                        <h2 className="text-3xl font-extrabold text-white mb-2">Connexion</h2>
-                        <p className="text-slate-400">Bienvenue sur AzyMarket</p>
+                        </motion.div>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-3xl font-extrabold text-white mb-2 relative z-10"
+                        >
+                            Connexion
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-slate-400 relative z-10"
+                        >
+                            Bienvenue sur AzyMarket
+                        </motion.p>
+
+                        {/* Header micro-decoration */}
+                        <motion.div
+                            animate={{
+                                scale: [1, 1.2, 1],
+                                opacity: [0.1, 0.2, 0.1]
+                            }}
+                            transition={{ duration: 4, repeat: Infinity }}
+                            className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16 blur-2xl"
+                        />
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="px-8 py-10 space-y-6">
+                    <motion.form
+                        variants={{
+                            animate: { transition: { staggerChildren: 0.1 } }
+                        }}
+                        initial="initial"
+                        animate="animate"
+                        onSubmit={handleSubmit}
+                        className="px-8 py-10 space-y-6"
+                    >
                         {error && (
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
@@ -98,48 +135,64 @@ const Login = () => {
                             </motion.div>
                         )}
 
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-bold text-slate-300 mb-2">
+                        <motion.div
+                            variants={{
+                                initial: { opacity: 0, x: -20 },
+                                animate: { opacity: 1, x: 0 }
+                            }}
+                        >
+                            <label htmlFor="email" className="block text-sm font-bold text-slate-300 mb-2 ml-1">
                                 Email
                             </label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                            <div className="relative group">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-[#e85d04] transition-colors" />
                                 <input
                                     type="email"
                                     id="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600 hover:bg-slate-900/80"
                                     placeholder="votre@email.com"
                                     required
                                 />
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-bold text-slate-300 mb-2">
+                        <motion.div
+                            variants={{
+                                initial: { opacity: 0, x: -20 },
+                                animate: { opacity: 1, x: 0 }
+                            }}
+                        >
+                            <label htmlFor="password" className="block text-sm font-bold text-slate-300 mb-2 ml-1">
                                 Mot de passe
                             </label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                            <div className="relative group">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-[#e85d04] transition-colors" />
                                 <input
                                     type="password"
                                     id="password"
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#e85d04] focus:border-transparent transition-all outline-none text-white placeholder-slate-600 hover:bg-slate-900/80"
                                     placeholder="••••••••"
                                     required
                                 />
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <button
+                        <motion.button
+                            variants={{
+                                initial: { opacity: 0, y: 10 },
+                                animate: { opacity: 1, y: 0 }
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             type="submit"
                             disabled={loading}
-                            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#e85d04] to-[#f48c06] hover:from-[#dc2f02] hover:to-[#e85d04] text-white font-bold shadow-lg shadow-orange-500/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#e85d04] to-[#f48c06] hover:from-[#dc2f02] hover:to-[#e85d04] text-white font-black shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm"
                         >
                             {loading ? (
                                 <>
@@ -152,7 +205,7 @@ const Login = () => {
                                     Se connecter
                                 </>
                             )}
-                        </button>
+                        </motion.button>
 
                         <div className="relative my-6">
                             <div className="absolute inset-0 flex items-center">
@@ -186,7 +239,7 @@ const Login = () => {
                                 />
                             </svg>
                             Google
-                        </a>
+                        </motion.a>
 
                         <div className="text-center pt-4 border-t border-white/5">
                             <p className="text-slate-400 text-sm">
@@ -196,7 +249,7 @@ const Login = () => {
                                 </Link>
                             </p>
                         </div>
-                    </form>
+                    </motion.form>
                 </div>
             </motion.div>
         </div>

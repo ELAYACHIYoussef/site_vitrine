@@ -4,6 +4,8 @@ import { Navigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, MapPin, Package, CreditCard, Shield, Edit2, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import InstagramSyncPanel from '../components/InstagramSyncPanel';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '../hooks/animations';
 
 const UserProfile = () => {
     const { user, deleteAccount, updateUser, token } = useAuth();
@@ -110,7 +112,10 @@ const UserProfile = () => {
 
             <div className="max-w-4xl mx-auto">
                 {/* Header Profile Card */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+                <motion.div
+                    variants={fadeInUp}
+                    className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8 group"
+                >
                     <div className="h-32 bg-gradient-to-r from-indigo-600 to-violet-600 relative">
                         <div className="absolute -bottom-16 left-8">
                             <div className="relative group">
@@ -126,76 +131,100 @@ const UserProfile = () => {
                                     className="absolute bottom-0 right-0 p-2 bg-indigo-600 rounded-full text-white shadow-lg hover:bg-indigo-700 transition-colors"
                                 >
                                     <Camera className="w-4 h-4" />
-                                </button>
-                            </div>
+                                </motion.button>
+                            </motion.div>
                         </div>
                     </div>
                     <div className="pt-20 pb-8 px-8">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className="text-3xl font-bold text-slate-900">{user?.username}</h1>
-                                <p className="text-slate-500 flex items-center gap-2 mt-1">
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                            <motion.div variants={staggerItem}>
+                                <h1 className="text-3xl font-black text-slate-900">{user?.username}</h1>
+                                <p className="text-slate-500 flex items-center gap-2 mt-1 font-medium">
                                     <Shield className="w-4 h-4 text-indigo-500" />
                                     Membre depuis 2024 • Client AzyMarket
                                 </p>
-                            </div>
-                            <button
+                            </motion.div>
+                            <motion.button
+                                variants={staggerItem}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsEditing(!isEditing)}
-                                className={`px-4 py-2 rounded-xl font-medium transition-all flex items-center gap-2 ${isEditing
+                                className={`px-5 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${isEditing
                                     ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg'
+                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100'
                                     }`}
                             >
                                 <Edit2 className="w-4 h-4" />
                                 {isEditing ? 'Annuler' : 'Modifier le profil'}
-                            </button>
+                            </motion.button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 <div className="grid md:grid-cols-3 gap-8">
                     {/* Sidebar Stats */}
-                    <div className="space-y-6">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <h3 className="font-bold text-slate-800 mb-4">Statistiques</h3>
+                    <motion.div variants={fadeInUp} className="space-y-6">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                            <h3 className="font-black text-slate-900 mb-4 uppercase text-xs tracking-widest opacity-50">Statistiques</h3>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-xl text-indigo-900">
+                                <motion.div
+                                    whileHover={{ x: 5 }}
+                                    className="flex items-center justify-between p-4 bg-indigo-50/50 rounded-2xl text-indigo-900 border border-indigo-100/50"
+                                >
                                     <div className="flex items-center gap-3">
-                                        <Package className="w-5 h-5" />
-                                        <span className="font-medium">Commandes</span>
+                                        <Package className="w-5 h-5 opacity-70" />
+                                        <span className="font-bold">Commandes</span>
                                     </div>
-                                    <span className="font-bold text-lg">5</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl text-green-900">
+                                    <span className="font-black text-xl">5</span>
+                                </motion.div>
+                                <motion.div
+                                    whileHover={{ x: 5 }}
+                                    className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-2xl text-emerald-900 border border-emerald-100/50"
+                                >
                                     <div className="flex items-center gap-3">
-                                        <CreditCard className="w-5 h-5" />
-                                        <span className="font-medium">Dépensé</span>
+                                        <CreditCard className="w-5 h-5 opacity-70" />
+                                        <span className="font-bold">Dépensé</span>
                                     </div>
-                                    <span className="font-bold text-lg">342 €</span>
-                                </div>
+                                    <span className="font-black text-xl">342 €</span>
+                                </motion.div>
                             </div>
                         </div>
 
-                        {/* Quick Menu (visual only for now) */}
+                        {/* Quick Menu */}
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <h3 className="font-bold text-slate-800 mb-4">Compte</h3>
-                            <ul className="space-y-2 text-slate-600">
-                                <li className="hover:text-indigo-600 cursor-pointer transition-colors p-2 hover:bg-slate-50 rounded-lg">Notifications</li>
-                                <li className="hover:text-indigo-600 cursor-pointer transition-colors p-2 hover:bg-slate-50 rounded-lg">Sécurité</li>
-                                <li className="hover:text-indigo-600 cursor-pointer transition-colors p-2 hover:bg-slate-50 rounded-lg">Moyens de paiement</li>
+                            <h3 className="font-black text-slate-900 mb-4 uppercase text-xs tracking-widest opacity-50">Compte</h3>
+                            <ul className="space-y-1">
+                                {['Notifications', 'Sécurité', 'Moyens de paiement'].map((item, idx) => (
+                                    <motion.li
+                                        key={item}
+                                        whileHover={{ x: 4, backgroundColor: '#f8fafc' }}
+                                        className="text-slate-600 font-bold cursor-pointer transition-all p-3 rounded-xl flex items-center justify-between group"
+                                    >
+                                        {item}
+                                        <Edit2 className="w-3 h-3 opacity-0 group-hover:opacity-30 transition-opacity" />
+                                    </motion.li>
+                                ))}
                             </ul>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Main Form */}
-                    <div className="md:col-span-2 space-y-8">
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <User className="w-5 h-5 text-indigo-600" />
+                    <motion.div variants={fadeInUp} className="md:col-span-2 space-y-8">
+                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                            <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                                <div className="p-2 bg-indigo-50 rounded-xl">
+                                    <User className="w-5 h-5 text-indigo-600" />
+                                </div>
                                 Informations Personnelles
                             </h2>
 
-                            <form onSubmit={handleSave} className="space-y-6">
+                            <motion.form
+                                initial="initial"
+                                animate="animate"
+                                variants={staggerContainer}
+                                onSubmit={handleSave}
+                                className="space-y-6"
+                            >
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700">Nom d'utilisateur</label>
@@ -295,7 +324,9 @@ const UserProfile = () => {
                                         La suppression de votre compte est irréversible. Toutes vos données personnelles seront effacées conformément au RGPD.
                                         Vos commandes passées seront conservées à des fins comptables uniquement.
                                     </p>
-                                    <button
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
                                         type="button"
                                         onClick={async () => {
                                             if (window.confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
@@ -311,13 +342,13 @@ const UserProfile = () => {
                                         className="px-6 py-3 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 font-medium transition-colors"
                                     >
                                         Supprimer mon compte
-                                    </button>
+                                    </motion.button>
                                 </div>
-                            </form>
+                            </motion.form>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

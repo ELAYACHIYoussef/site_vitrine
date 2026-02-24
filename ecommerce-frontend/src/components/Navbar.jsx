@@ -6,6 +6,8 @@ import { getGlobalConfig } from '../api/configService';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ShoppingCart, Heart, User, LogOut, Menu, Package, MessageCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fadeInLeft, fadeInRight } from '../hooks/animations';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();

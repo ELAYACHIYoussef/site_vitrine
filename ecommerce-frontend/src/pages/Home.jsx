@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Truck, HeadphonesIcon, ArrowRight, Star, Smartphone, Laptop, Watch, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '../utils/imageUtils';
+import { fadeInUp, fadeInLeft, fadeInRight, scaleIn, staggerContainer, staggerItem } from '../hooks/animations';
 
 const Home = () => {
     return (
@@ -174,7 +175,7 @@ const Home = () => {
                                 </Link>
                             </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -221,7 +222,7 @@ const Home = () => {
                             </motion.div>
                         ))}
                     </div>
-                </div>
+                </motion.div>
             </section>
 
             {/* Luxury Newsletter */}

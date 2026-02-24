@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Save, Lock, Bell, Store, Globe, Loader } from 'lucide-react';
 import { getGlobalConfig, updateGlobalConfig } from '../../api/configService';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '../../hooks/animations';
 
 const Settings = () => {
     const [config, setConfig] = useState({
@@ -44,43 +46,69 @@ const Settings = () => {
         }
     };
 
-    if (loading) return <div className="p-20 text-center"><Loader className="animate-spin mx-auto text-indigo-600" /></div>;
+    if (loading) {
+        return (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-20 text-center"
+            >
+                <Loader className="animate-spin mx-auto text-indigo-600" />
+            </motion.div>
+        );
+    }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-8">
+        <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="container mx-auto px-4 py-8"
+        >
+            <motion.div variants={fadeInUp} className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-slate-900">Paramètres</h1>
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50"
+                    className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 shadow-lg shadow-indigo-100"
                 >
                     {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     {saving ? 'Enregistrement...' : 'Enregistrer'}
-                </button>
-            </div>
+                </motion.button>
+            </motion.div>
 
             <div className="grid lg:grid-cols-4 gap-8">
                 {/* Settings Sidebar */}
-                <div className="lg:col-span-1 space-y-2">
-                    <button className="w-full text-left px-4 py-3 rounded-xl bg-orange-50 text-orange-600 font-semibold flex items-center gap-3">
+                <motion.div variants={fadeInUp} className="lg:col-span-1 space-y-2">
+                    <motion.button
+                        whileHover={{ x: 4 }}
+                        className="w-full text-left px-4 py-3 rounded-xl bg-orange-50 text-orange-600 font-semibold flex items-center gap-3"
+                    >
                         <Store className="w-5 h-5" />
                         Général
-                    </button>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 font-medium flex items-center gap-3 transition-colors">
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ x: 4 }}
+                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 font-medium flex items-center gap-3 transition-colors"
+                    >
                         <Lock className="w-5 h-5" />
                         Sécurité
-                    </button>
-                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 font-medium flex items-center gap-3 transition-colors">
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ x: 4 }}
+                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 font-medium flex items-center gap-3 transition-colors"
+                    >
                         <Bell className="w-5 h-5" />
                         Notifications
-                    </button>
-                </div>
+                    </motion.button>
+                </motion.div>
 
                 {/* Main Content */}
-                <div className="lg:col-span-3 space-y-6">
+                <motion.div variants={staggerContainer} className="lg:col-span-3 space-y-6">
                     {/* Store Info */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <motion.div variants={scaleIn} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Informations de la Boutique</h2>
                         <div className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
@@ -116,10 +144,10 @@ const Settings = () => {
                                 ></textarea>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* SEO/Links */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <motion.div variants={scaleIn} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-2">
                             <Globe className="w-5 h-5 text-slate-500" />
                             Réseaux Sociaux
@@ -148,10 +176,10 @@ const Settings = () => {
                                 />
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

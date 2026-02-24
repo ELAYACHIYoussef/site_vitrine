@@ -68,4 +68,11 @@ public class OrderController {
     public ResponseEntity<List<Order>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable UUID id,
+            @RequestBody java.util.Map<String, String> payload) {
+        String status = payload.get("status");
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
+    }
 }
