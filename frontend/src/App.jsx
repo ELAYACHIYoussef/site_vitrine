@@ -40,7 +40,6 @@ function AppContent() {
               }}
             />
             <CookieConsent />
-            <CartDrawer />
             <AntigravityCursor />
           </WishlistProvider>
         </CartProvider>

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { ShoppingBag, X, Trash2, Minus, Plus, ArrowRight } from 'lucide-react';
 import { staggerContainer, staggerItem, slideInRight } from '../hooks/animations';
 
 const CartDrawer = () => {
