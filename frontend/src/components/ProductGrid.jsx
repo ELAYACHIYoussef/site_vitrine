@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { catalogService } from '../api';
 import ProductCard from './ProductCard';
 import { Loader2 } from 'lucide-react';

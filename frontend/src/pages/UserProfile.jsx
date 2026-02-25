@@ -55,7 +55,7 @@ const UserProfile = () => {
             });
 
             if (response.ok) {
-                updateUser({ avatarUrl });
+                updateUser({ ...user, avatarUrl });
                 setShowAvatarPicker(false);
                 toast.success("Avatar mis à jour !");
             } else if (response.status === 401) {

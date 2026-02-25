@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Heart, ShoppingBag, Eye, Video } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Video, Star, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getImageUrl } from '../utils/imageUtils';
 import { fadeInUp, staggerItem } from '../hooks/animations';

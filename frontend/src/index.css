@@ -20,6 +20,10 @@
   --color-text-muted: #64748b;
   /* Slate 500 - Subtle Text */
 
+  /* Antigravity Custom */
+  --color-accent-glow: rgba(99, 102, 241, 0.15);
+  --font-display: 'Outfit', sans-serif;
+
   font-family: var(--font-primary);
   line-height: 1.6;
   font-weight: 400;
@@ -83,21 +87,39 @@ body {
 }
 
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-20px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
+  0%, 100% { transform: translateY(0) rotate(0); }
+  33% { transform: translateY(-15px) rotate(2deg); }
+  66% { transform: translateY(-5px) rotate(-1deg); }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+.animate-antigravity {
+  animation: float 8s ease-in-out infinite;
+}
+
+.text-gradient-antigravity {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-rose-400;
+}
+
+.spotlight-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 9999;
+  filter: blur(60px);
+  mix-blend-mode: plus-lighter;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, opacity 0.3s;
+}
+
+.spotlight-glow.active {
+  width: 600px;
+  height: 600px;
+  opacity: 0.25;
 }
 
 /* ---- Instagram Sync Panel ---- */

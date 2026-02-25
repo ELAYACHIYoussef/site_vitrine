@@ -1,15 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import AdminLayout from './components/AdminLayout';
 import CookieConsent from './components/CookieConsent';
 import CartDrawer from './components/CartDrawer';
 import AnimatedRoutes from './components/AnimatedRoutes';
+import AntigravityCursor from './components/AntigravityCursor';
 
 function AppContent() {
   const location = useLocation();
@@ -21,13 +21,13 @@ function AppContent() {
         <CartProvider>
           <WishlistProvider>
             {!isAdminRoute && <Navbar />}
-            <main className={isAdminRoute ? '' : 'pb-20'}>
+            {!isAdminRoute && <CartDrawer />}
+            <main className={`${isAdminRoute ? '' : 'pb-20'} ${location.pathname !== '/' && !isAdminRoute ? 'pt-28' : ''}`}>
               <AnimatedRoutes />
             </main>
 
             {!isAdminRoute && <Footer />}
 
-            {/* Toast Notifications */}
             <Toaster
               position="top-right"
               toastOptions={{
@@ -37,30 +37,15 @@ function AppContent() {
                   color: '#0f172a',
                   fontWeight: '500',
                 },
-                success: {
-                  iconTheme: {
-                    primary: '#10b981',
-                    secondary: '#fff',
-                  },
-                },
-                error: {
-                  iconTheme: {
-                    primary: '#ef4444',
-                    secondary: '#fff',
-                  },
-                },
               }}
             />
-            import CartDrawer from './components/CartDrawer';
-
-            // ... (in AppContent)
-
             <CookieConsent />
             <CartDrawer />
+            <AntigravityCursor />
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>
-    </div >
+    </div>
   );
 }
 

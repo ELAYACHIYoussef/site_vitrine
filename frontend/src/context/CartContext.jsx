@@ -23,26 +23,32 @@ export const CartProvider = ({ children }) => {
     }, [cart]);
 
     const addToCart = (product, quantity = 1) => {
+        const itemToAdd = {
+            ...product,
+            selectedSize: product.selectedSize || 'M',
+            selectedColor: product.selectedColor || 'Bleu'
+        };
+
         const existingItem = cart.find(item =>
-            item.id === product.id &&
-            item.selectedSize === product.selectedSize &&
-            item.selectedColor === product.selectedColor
+            item.id === itemToAdd.id &&
+            item.selectedSize === itemToAdd.selectedSize &&
+            item.selectedColor === itemToAdd.selectedColor
         );
 
         if (existingItem) {
-            toast.success(`Quantité mise à jour : ${product.name}`);
+            toast.success(`Quantité mise à jour : ${itemToAdd.name}`);
             setCart(prevCart =>
                 prevCart.map(item =>
-                    (item.id === product.id &&
-                        item.selectedSize === product.selectedSize &&
-                        item.selectedColor === product.selectedColor)
+                    (item.id === itemToAdd.id &&
+                        item.selectedSize === itemToAdd.selectedSize &&
+                        item.selectedColor === itemToAdd.selectedColor)
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 )
             );
         } else {
-            toast.success(`Ajouté au panier : ${product.name}`);
-            setCart(prevCart => [...prevCart, { ...product, quantity }]);
+            toast.success(`Ajouté au panier : ${itemToAdd.name}`);
+            setCart(prevCart => [...prevCart, { ...itemToAdd, quantity }]);
         }
     };
 

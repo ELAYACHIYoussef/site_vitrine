@@ -5,7 +5,7 @@ import { getGlobalConfig } from '../api/configService';
 
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { ShoppingCart, Heart, User, LogOut, Menu, Package, MessageCircle } from 'lucide-react';
+import { ShoppingCart, Heart, User, LogOut, Menu, Package, MessageCircle, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeInLeft, fadeInRight } from '../hooks/animations';
 
@@ -29,9 +29,11 @@ const Navbar = () => {
 
     const isAdmin = user && (user.role === 'admin' || user.role === 'ROLE_ADMIN' || user.role === 'ADMIN');
 
+    const isHomePage = location.pathname === '/';
+
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled
-            ? 'py-4 bg-white/70 backdrop-blur-2xl border-b border-slate-200/50 shadow-xl shadow-slate-900/5'
+        <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled || !isHomePage
+            ? 'py-4 bg-white/90 backdrop-blur-2xl border-b border-slate-200/50 shadow-xl shadow-slate-900/5'
             : 'py-8 bg-transparent'
             }`}>
             <div className="container mx-auto px-6 flex items-center justify-between">
